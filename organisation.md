@@ -38,21 +38,21 @@ Automatische Diagnose – a) Identifikation von Mustern, b) automatische Anerken
 
 ## Module
 
-0. **Architektur** (2 Personen)
-0.1. Struktur und Organisation
-0.2. Schnittstellen (definieren und sicherstellen)
+0. **Architektur** (2 Personen)  
+0.1. Struktur und Organisation  
+0.2. Schnittstellen (definieren und sicherstellen)  
 
-1. **Daten** (3 Personen)
-1.1. Aufbereitung
-1.2. Datenbank
+1. **Daten** (3 Personen)  
+1.1. Aufbereitung  
+1.2. Datenbank  
 
-2. **Machine Learning** (8 Personen)
-2.1. Muster / Krankheiten erkennen 
-2.2. passende Behandlung suchen 
+2. **Machine Learning** (8 Personen)  
+2.1. Muster / Krankheiten erkennen   
+2.2. passende Behandlung suchen  
 
-3. **Applikation** (4 Personen)
-3.1. Integration
-3.2. Darstellung
+3. **Applikation** (4 Personen)  
+3.1. Integration  
+3.2. Darstellung  
 
 ## Tool Stack
 
