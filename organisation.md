@@ -1,5 +1,7 @@
 # RobotDoc
 
+[![hackmd-github-sync-badge](https://hackmd.io/N9pS5F-vR9ercxHQCnbP7Q/badge)](https://hackmd.io/N9pS5F-vR9ercxHQCnbP7Q)
+
 :::info
 Automatische Diagnose – a) Identifikation von Mustern, b) automatische Anerkennung von Krankheiten und c) Vorschlag von Behandlung. [^1]
 :::
