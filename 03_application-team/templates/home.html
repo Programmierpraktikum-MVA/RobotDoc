@@ -35,25 +35,35 @@
                         RobotDoc
                     </h1>
                     <h2 class="subtitle">
-                        Coming Soon
+                        Coming Soon!
                     </h2>
                     <div class="box">
-                        <div class="field is-grouped">
-                            <p class="control is-expanded">
-                                <input class="input" type="text" placeholder="Enter your email">
-                            </p>
-                            <p class="control">
-                                <a class="button is-info">
-                                    Notify Me
-                                </a>
-                            </p>
-                        </div>
+                        <form action="/sendInput" method="post" accept-charset="UTF-8">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded">
+                                    <input class="input" type="text" name="textToConvert" placeholder="Enter text">
+                                </p>
+                                <button type="submit" class="button is-info">
+                                    Convert
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="box" id="output">
+                        {{initialText}}
+                        <br>
+                        <br>
+                        {% for item in output %}
+                        <p>{{ item }}</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
 
     </section>
+
+    <script src="static/js/scripts.js"></script>
 
 </body>
 
