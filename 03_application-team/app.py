@@ -1,8 +1,9 @@
-from flask import Flask, Response, url_for, request, session, abort, render_template, redirect
+from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 import psycopg2
 from flask_sqlalchemy import SQLAlchemy
-
+import requests
+import json
 
 # default config
 app = Flask(__name__)
@@ -24,6 +25,26 @@ class User (UserMixin):
     pass
 
 
+API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all"
+headers = {"Authorization": "Bearer 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"}
+
+
+def query(payload):
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.json()
+
+
+def convertString(data):
+    output = []
+    for d in data:
+        score_pct = round(d['score'] * 100, 2)
+        line = f"{d['entity_group']}: {d['word']} (score: {score_pct}%, start: {d['start']}, end: {d['end']})"
+        output.append(line)
+
+    output.append("")
+    return output
+
+
 @ app.route("/")
 @login_required
 def start():
@@ -35,6 +56,19 @@ def start():
 @login_required
 def home():
     return render_template("home.html", user=str(current_user.id))
+
+# TODO use fetch instead
+
+
+@app.route("/sendInput", methods=["POST"])
+@login_required
+def convertText():
+    textToconvert = request.form.get("textToConvert")
+    output = query({
+        "inputs": textToconvert,
+    })
+    cleanOutput = convertString(output)
+    return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
 
 
 @ app.route("/login", methods=["GET", "POST"])
