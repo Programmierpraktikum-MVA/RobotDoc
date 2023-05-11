@@ -3,13 +3,12 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 import psycopg2
 from flask_sqlalchemy import SQLAlchemy
 import requests
-import json
 
 # default config
 app = Flask(__name__)
 app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
-# postgreSQL DB config
+# postgreSQL DB config coming soon
 
 users = {"Doc1": {"password": "mva2023"}}
 
@@ -18,6 +17,7 @@ users = {"Doc1": {"password": "mva2023"}}
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
+
 # user config
 
 
@@ -25,6 +25,7 @@ class User (UserMixin):
     pass
 
 
+# huggingface api
 API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all"
 headers = {"Authorization": "Bearer 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"}
 
@@ -45,19 +46,17 @@ def convertString(data):
     return output
 
 
-@ app.route("/")
+@app.route("/")
 @login_required
 def start():
     if current_user.is_authenticated:
         return redirect("/home")
 
 
-@ app.route("/home")
+@app.route("/home")
 @login_required
 def home():
     return render_template("home.html", user=str(current_user.id))
-
-# TODO use fetch instead
 
 
 @app.route("/sendInput", methods=["POST"])
@@ -71,7 +70,7 @@ def convertText():
     return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
 
 
-@ app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
         return redirect("/home")
@@ -103,7 +102,7 @@ def unauthorized_handler():
     return redirect("/login")
 
 
-@ login_manager.user_loader
+@login_manager.user_loader
 def load_user(username):
     if username not in users:
         return
