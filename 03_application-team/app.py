@@ -1,73 +1,111 @@
-from flask import Flask, render_template, redirect, request
-import flask_login
+from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+import psycopg2
+from flask_sqlalchemy import SQLAlchemy
+import requests
 
+# default config
 app = Flask(__name__)
-app.secret_key = b'_6#y2L"F4Q8z\n\xec]/'
+app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
-# PAGE: welcome
-@app.route('/')
-def index():
-    return render_template('index.html')
+# postgreSQL DB config coming soon
 
-# PAGE: start
-@app.route('/start/')
-@flask_login.login_required # requires login
-def start():
-    return render_template('start.html', user=str(flask_login.current_user.id))
+users = {"Doc1": {"password": "mva2023"}}
 
-# START: login (reference: https://pypi.org/project/Flask-Login/)
 
-# login manager
-login_manager = flask_login.LoginManager() # instantiation
-login_manager.init_app(app) # add app
+# flask-login config
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
-users = {'beta@robotdoc.de': {'password': 'mva'}} # user (mock) database
+# user config
 
-class User(flask_login.UserMixin): # user object
+
+class User (UserMixin):
     pass
-@login_manager.user_loader # callback
-def user_loader(email):
-    if email not in users:
-        return
-    user = User()
-    user.id = email
-    return user
-@login_manager.request_loader # callback
-def request_loader(request):
-    email = request.form.get('email')
-    if email not in users:
-        return
-    user = User()
-    user.id = email
-    return user
 
-# PAGE: login
-@app.route('/login/', methods=['GET', 'POST'])
+
+# huggingface api
+API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all"
+headers = {"Authorization": "Bearer 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"}
+
+
+def query(payload):
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.json()
+
+
+def convertString(data):
+    output = []
+    for d in data:
+        score_pct = round(d['score'] * 100, 2)
+        line = f"{d['entity_group']}: {d['word']} (score: {score_pct}%, start: {d['start']}, end: {d['end']})"
+        output.append(line)
+
+    output.append("")
+    return output
+
+
+@app.route("/")
+@login_required
+def start():
+    if current_user.is_authenticated:
+        return redirect("/home")
+
+
+@app.route("/home")
+@login_required
+def home():
+    return render_template("home.html", user=str(current_user.id))
+
+
+@app.route("/sendInput", methods=["POST"])
+@login_required
+def convertText():
+    textToconvert = request.form.get("textToConvert")
+    output = query({
+        "inputs": textToconvert,
+    })
+    cleanOutput = convertString(output)
+    return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
+
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'GET':
-        return render_template("login.html")
+    if current_user.is_authenticated:
+        return redirect("/home")
+    if request.method == "POST":
+        username = request.form["username"]
+        remember_me = request.form.get("remember_me")
+        if username in users and request.form["password"] == users[username]["password"]:
+            user = User()
+            user.id = username
+            if (remember_me):
+                login_user(user, remember=True)
+            else:
+                login_user(user)
+            return redirect("/home")
+        return render_template("index.html", loginFailed=True)
+    else:
+        return render_template("index.html")
 
-    email = request.form['email']
-    if email in users and request.form['password'] == users[email]['password']:
-        user = User()
-        user.id = email
-        flask_login.login_user(user)
-        return redirect('/start/')
 
-    return render_template("login.html", error='Error logging in!')
-
-# logout
-@app.route('/logout/')
+@app.route("/logout")
+@login_required
 def logout():
-    flask_login.logout_user()
-    return redirect('/login/')
+    logout_user()
+    return redirect("/")
 
-# failure
+
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return redirect('/login/')
+    return redirect("/login")
 
-# END: login
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@login_manager.user_loader
+def load_user(username):
+    if username not in users:
+        return
+    user = User()
+    user.id = username
+    return user
