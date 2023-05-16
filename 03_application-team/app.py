@@ -10,7 +10,13 @@ app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
 # postgreSQL DB config coming soon
 users = {"Doc1": {"password": "mva2023"}}
-
+patientData = [
+    {"name": "John", "age": 35, "weight": 75.5},
+    {"name": "Sarah", "age": 42, "weight": 68.2},
+    {"name": "Tamer", "age": 22, "weight": 150.2},
+    {"name": "Noah", "age": 23, "weight": 70.2},
+    {"name": "Michael", "age": 54, "weight": 80.1}
+]
 
 # flask-login config
 login_manager = LoginManager()
@@ -55,6 +61,12 @@ def start():
 @login_required
 def home():
     return render_template("home.html", user=str(current_user.id))
+
+
+@app.route("/patients")
+@login_required
+def patients():
+    return render_template("patients.html", patients=patientData)
 
 
 @app.route("/sendInput", methods=["POST"])
