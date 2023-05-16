@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | RobotDoc</title>
     <link rel="stylesheet" href="static/css/bulma.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.jpg') }}">
 </head>
 
 <body>
@@ -35,7 +36,7 @@
                         RobotDoc
                     </h1>
                     <h2 class="subtitle">
-                        Coming Soon!
+                        Explain who you are and how you are feeling below.
                     </h2>
                     <div class="box">
                         <form action="/sendInput" method="post" accept-charset="UTF-8">
@@ -44,7 +45,7 @@
                                     <input class="input" type="text" name="textToConvert" placeholder="Enter text">
                                 </p>
                                 <button type="submit" class="button is-info">
-                                    Convert
+                                    Process
                                 </button>
                             </div>
                         </form>

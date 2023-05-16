@@ -1,15 +1,14 @@
 from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-import psycopg2
-from flask_sqlalchemy import SQLAlchemy
 import requests
+
 
 # default config
 app = Flask(__name__)
 app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
-# postgreSQL DB config coming soon
 
+# postgreSQL DB config coming soon
 users = {"Doc1": {"password": "mva2023"}}
 
 
@@ -18,14 +17,13 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+
 # user config
-
-
 class User (UserMixin):
     pass
 
 
-# huggingface api
+# huggingface api (reference: https://huggingface.co/d4data/biomedical-ner-all)
 API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all"
 headers = {"Authorization": "Bearer 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"}
 
