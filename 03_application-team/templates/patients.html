@@ -55,11 +55,13 @@
                 <div class="columns is-multiline">
                     {% for patient in patients %}
                     <div class="column is-one-third">
-                        <div class="box">
-                            <strong>Name:</strong> {{ patient.name }}<br>
-                            <strong>Age:</strong> {{ patient.age }}<br>
-                            <strong>Weight:</strong> {{ patient.weight }}
-                        </div>
+                        <a href="/patients/{{patient.id}}">
+                            <div class="box">
+                                <strong>Name:</strong> {{ patient.name }}<br>
+                                <strong>Age:</strong> {{ patient.age }}<br>
+                                <strong>Weight:</strong> {{ patient.weight }}
+                            </div>
+                        </a>
                     </div>
                     {% endfor %}
                 </div>
