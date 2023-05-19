@@ -13,6 +13,10 @@ db = SQLAlchemy(app)
 #db.init_app(app)
 
 class Users(db.Model):
+    """
+    represents the table structure of the PostgreSQL server
+    *DOES NOT create a new if table, if non-existent*
+    """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String)
     name = db.Column(db.String)
