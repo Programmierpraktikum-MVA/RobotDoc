@@ -1,5 +1,6 @@
 from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
 import requests
 
 
@@ -7,6 +8,16 @@ import requests
 app = Flask(__name__)
 app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sebas@localhost:5432/robotdoc_test'
+db = SQLAlchemy(app)
+#db.init_app(app)
+
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String)
+    name = db.Column(db.String)
+    surname = db.Column(db.String)
+    password = db.Column(db.String)
 
 # postgreSQL DB config coming soon
 users = {"Doc1": {"password": "mva2023"}}
@@ -75,7 +86,15 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         remember_me = request.form.get("remember_me")
-        if username in users and request.form["password"] == users[username]["password"]:
+
+        username_data = db.session.execute(db.select(Users.username).filter_by(username=username))
+        password_data = db.session.execute(db.select(Users.password).filter_by(username=username))
+        for row in username_data:
+            username_cand = row.username
+        for row in password_data:
+            password_cand = row.password
+
+        if username == username_cand and request.form["password"] == password_cand:
             user = User()
             user.id = username
             if (remember_me):
