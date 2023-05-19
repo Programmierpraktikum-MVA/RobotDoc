@@ -87,11 +87,9 @@ def login():
         username = request.form["username"]
         remember_me = request.form.get("remember_me")
 
-        username_data = db.session.execute(db.select(Users.username).filter_by(username=username))
-        password_data = db.session.execute(db.select(Users.password).filter_by(username=username))
+        username_data = db.session.scalars(db.select(Users).filter_by(username=username))
         for row in username_data:
             username_cand = row.username
-        for row in password_data:
             password_cand = row.password
 
         if username == username_cand and request.form["password"] == password_cand:
