@@ -91,15 +91,16 @@ def login():
         username = request.form["username"]
         remember_me = request.form.get("remember_me")
 
-        username_cand = None
-        username_data = db.session.scalars(db.select(Users).filter_by(username=username))
-        for row in username_data:
-            username_cand = row.username
-            password_cand = row.password
-        if username_cand == None:
+        username_db = None
+        user_data = db.session.scalars(db.select(Users).filter_by(username=username))
+        for row in user_data:
+            username_db = row.username
+            password_db = row.password
+        if username_db == None:
             return render_template("index.html", loginFailed=True)
+        password_cand = request.form["password"]
 
-        if username == username_cand and request.form["password"] == password_cand:
+        if username == username_db and password_cand == password_db:
             user = User()
             user.id = username
             if (remember_me):
