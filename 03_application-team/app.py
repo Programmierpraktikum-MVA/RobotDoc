@@ -72,7 +72,7 @@ def patients():
 @login_required
 def patients_route(id):
     print("You pressed on: " + str(id))
-    return redirect("/patients")
+    return render_template("patientSpec.html", patientData=patientData[id-1])
 
 
 @app.route("/sendInput", methods=["POST"])
