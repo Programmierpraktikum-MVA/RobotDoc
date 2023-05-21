@@ -127,8 +127,13 @@ def unauthorized_handler():
 
 @login_manager.user_loader
 def load_user(username):
-    if username not in users:
+    username_db = None
+    user_data = db.session.scalars(db.select(Users).filter_by(username=username))
+    for row in user_data:
+        username_db = row.username
+    if username_db == None:
         return
+
     user = User()
     user.id = username
     return user
