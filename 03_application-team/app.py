@@ -2,6 +2,7 @@ from flask import Flask, Response, url_for, request, session, abort, render_temp
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 import requests
+import json
 
 
 # default config
@@ -25,11 +26,11 @@ class Accounts(db.Model):
 
 # postgreSQL DB config coming soon
 patientData = [
-    {"id": 1, "name": "John", "age": 35, "weight": 75.5},
-    {"id": 2, "name": "Sarah", "age": 42, "weight": 68.2},
-    {"id": 3, "name": "Tamer", "age": 22, "weight": 150.2},
-    {"id": 4, "name": "Noah", "age": 23, "weight": 70.2},
-    {"id": 5, "name": "Michael", "age": 54, "weight": 80.1}
+    {"id": 1, "name": "John", "age": 35, "weight": 75.5, "sex": "", "symptoms": []},
+    {"id": 2, "name": "Sarah", "age": 42, "weight": 68.2, "sex": "", "symptoms": []},
+    {"id": 3, "name": "Tamer", "age": 22, "weight": 85.2, "sex": "", "symptoms": []},
+    {"id": 4, "name": "Noah", "age": 23, "weight": 70.2, "sex": "", "symptoms": []},
+    {"id": 5, "name": "Mike", "age": 54, "weight": 80.1, "sex": "", "symptoms": []}
 ]
 
 # flask-login config
@@ -63,6 +64,22 @@ def convertString(data):
     return output
 
 
+def parseString(data):
+    # Create a dictionary to hold the arrays
+    entity_groups = {}
+    # Iterate over each item in the list
+    for item in data:
+        entity_group = item['entity_group']
+        word = item['word']
+    # If the entity group already exists, append the word to the existing array
+        if entity_group in entity_groups:
+            entity_groups[entity_group].append(word)
+    # Otherwise, create a new array for the entity group
+        else:
+            entity_groups[entity_group] = [word]
+    return entity_groups
+
+
 @app.route("/")
 @login_required
 def start():
@@ -82,6 +99,20 @@ def patients():
     return render_template("patients.html", patients=patientData)
 
 
+@app.route("/assignTokens/<int:id>", methods=["POST"])
+@login_required
+def assignTokens(id):
+    textToconvert = request.form.get("textToConvert")
+    output = query({
+        "inputs": textToconvert
+    })
+    parsedOutput = parseString(output)
+    if "Sign_symptom" in parsedOutput:
+        print(parsedOutput["Sign_symptom"])
+        patientData[id-1]["symptoms"].append(parsedOutput["Sign_symptom"])
+    return render_template("patientSpec.html", patientData=patientData[id-1])
+
+
 @app.route("/patients/<int:id>")
 @login_required
 def patients_route(id):
@@ -93,10 +124,14 @@ def patients_route(id):
 @login_required
 def convertText():
     textToconvert = request.form.get("textToConvert")
-    output = query({
-        "inputs": textToconvert,
-    })
-    cleanOutput = convertString(output)
+    try:
+        output = query({
+            "inputs": textToconvert
+        })
+        cleanOutput = convertString(output)
+    except:
+        cleanOutput = "Error"
+    print(cleanOutput)
     return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
 
 
