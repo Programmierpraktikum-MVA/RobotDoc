@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | RobotDoc</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.jpg') }}">
+</head>
+
+<body>
+    <section class="hero is-info is-fullheight">
+        <div class="hero-head">
+            <nav class="navbar">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <a class="navbar-item" href="../">
+                            <img src="{{ url_for('static', filename='img/RobotDoc-logo_V1.png') }}" alt="Logo">
+                        </a>
+                        <span class="navbar-burger burger" data-target="navbarMenu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </div>
+                    <div id="navbarMenu" class="navbar-menu">
+                        <div class="navbar-start">
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/home">
+                                    <span>Home</span>
+                                </a>
+                            </span>
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/patients">
+                                    <span>Patienten</span>
+                                </a>
+                            </span>
+                        </div>
+                        <div class="navbar-end">
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/logout">
+                                    <span>Logout</span>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <div class="column is-6 is-offset-3">
+                    <p>Logged in as Patient: <span>{{patientData["id"]}}</span></p>
+                    <h1 class="title">
+                        Hello {{patientData["name"]}}
+                    </h1>
+                    <h2 class="subtitle">
+                        Explain who you are and how you are feeling below.
+                    </h2>
+                    <div class="box">
+                        <form action="/sendInput" method="post" accept-charset="UTF-8">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded">
+                                    <input class="input" type="text" name="textToConvert" placeholder="Enter text">
+                                </p>
+                                <button type="submit" class="button is-info">
+                                    Process
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/scripts.js')}}"></script>
+
+</body>
+
+</html>
