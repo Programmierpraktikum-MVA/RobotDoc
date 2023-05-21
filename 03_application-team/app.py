@@ -127,10 +127,7 @@ def unauthorized_handler():
 
 @login_manager.user_loader
 def load_user(username):
-    username_db = None
-    user_data = db.session.scalars(db.select(Users).filter_by(username=username))
-    for row in user_data:
-        username_db = row.username
+    username_db = db.session.scalars(db.select(Users.username).filter_by(username=username))
     if username_db == None:
         return
 
