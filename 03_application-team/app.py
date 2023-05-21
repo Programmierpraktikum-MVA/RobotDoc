@@ -8,19 +8,17 @@ import requests
 app = Flask(__name__)
 app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sebas@localhost:5432/robotdoc_test'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://xqrornwg:QjZBbShdIqvLjHohXXMfvIXoSuc3lnZr@horton.db.elephantsql.com/xqrornwg'
 db = SQLAlchemy(app)
 #db.init_app(app)
 
-class Users(db.Model):
+class Accounts(db.Model):
     """
     represents the table structure of the PostgreSQL server
     *DOES NOT create a new if table, if non-existent*
     """
-    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String)
-    name = db.Column(db.String)
-    surname = db.Column(db.String)
     password = db.Column(db.String)
 
 # postgreSQL DB config coming soon
@@ -92,7 +90,7 @@ def login():
         remember_me = request.form.get("remember_me")
 
         username_db = None
-        user_data = db.session.scalars(db.select(Users).filter_by(username=username))
+        user_data = db.session.scalars(db.select(Accounts).filter_by(username=username))
         for row in user_data:
             username_db = row.username
             password_db = row.password
@@ -127,7 +125,7 @@ def unauthorized_handler():
 
 @login_manager.user_loader
 def load_user(username):
-    username_db = db.session.scalars(db.select(Users.username).filter_by(username=username))
+    username_db = db.session.scalars(db.select(Accounts.username).filter_by(username=username))
     if username_db == None:
         return
 
