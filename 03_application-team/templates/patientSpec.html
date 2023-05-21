@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | RobotDoc</title>
-    <link rel="stylesheet" href="static/css/bulma.css">
-    <link rel="shortcut icon" href="static/img/favicon.jpg">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.jpg') }}">
 </head>
 
 <body>
@@ -17,7 +17,7 @@
                 <div class="container">
                     <div class="navbar-brand">
                         <a class="navbar-item" href="../">
-                            <img src="static/img/RobotDoc-logo_V1.png" alt="Logo">
+                            <img src="{{ url_for('static', filename='img/RobotDoc-logo_V1.png') }}" alt="Logo">
                         </a>
                         <span class="navbar-burger burger" data-target="navbarMenu">
                             <span></span>
@@ -53,9 +53,9 @@
         <div class="hero-body">
             <div class="container has-text-centered">
                 <div class="column is-6 is-offset-3">
-                    <p>Logged in as <span>{{user}}</span></p>
+                    <p>Logged in as Patient: <span>{{patientData["id"]}}</span></p>
                     <h1 class="title">
-                        RobotDoc
+                        Hello {{patientData["name"]}}
                     </h1>
                     <h2 class="subtitle">
                         Explain who you are and how you are feeling below.
@@ -72,21 +72,12 @@
                             </div>
                         </form>
                     </div>
-                    <div class="box" id="output">
-                        {{initialText}}
-                        <br>
-                        <br>
-                        {% for item in output %}
-                        <p>{{ item }}</p>
-                        {% endfor %}
-                    </div>
                 </div>
             </div>
         </div>
-
     </section>
 
-    <script src="static/js/scripts.js"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js')}}"></script>
 
 </body>
 

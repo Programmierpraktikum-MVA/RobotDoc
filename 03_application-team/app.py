@@ -10,7 +10,13 @@ app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
 # postgreSQL DB config coming soon
 users = {"Doc1": {"password": "mva2023"}}
-
+patientData = [
+    {"id": 1, "name": "John", "age": 35, "weight": 75.5},
+    {"id": 2, "name": "Sarah", "age": 42, "weight": 68.2},
+    {"id": 3, "name": "Tamer", "age": 22, "weight": 150.2},
+    {"id": 4, "name": "Noah", "age": 23, "weight": 70.2},
+    {"id": 5, "name": "Michael", "age": 54, "weight": 80.1}
+]
 
 # flask-login config
 login_manager = LoginManager()
@@ -39,7 +45,6 @@ def convertString(data):
         score_pct = round(d['score'] * 100, 2)
         line = f"{d['entity_group']}: {d['word']} (score: {score_pct}%, start: {d['start']}, end: {d['end']})"
         output.append(line)
-
     output.append("")
     return output
 
@@ -55,6 +60,19 @@ def start():
 @login_required
 def home():
     return render_template("home.html", user=str(current_user.id))
+
+
+@app.route("/patients")
+@login_required
+def patients():
+    return render_template("patients.html", patients=patientData)
+
+
+@app.route("/patients/<int:id>")
+@login_required
+def patients_route(id):
+    print("You pressed on: " + str(id))
+    return render_template("patientSpec.html", patientData=patientData[id-1])
 
 
 @app.route("/sendInput", methods=["POST"])
