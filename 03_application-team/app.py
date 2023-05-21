@@ -10,7 +10,8 @@ app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://xqrornwg:QjZBbShdIqvLjHohXXMfvIXoSuc3lnZr@horton.db.elephantsql.com/xqrornwg'
 db = SQLAlchemy(app)
-#db.init_app(app)
+# db.init_app(app)
+
 
 class Accounts(db.Model):
     """
@@ -21,8 +22,8 @@ class Accounts(db.Model):
     username = db.Column(db.String)
     password = db.Column(db.String)
 
+
 # postgreSQL DB config coming soon
-users = {"Doc1": {"password": "mva2023"}}
 patientData = [
     {"id": 1, "name": "John", "age": 35, "weight": 75.5},
     {"id": 2, "name": "Sarah", "age": 42, "weight": 68.2},
@@ -106,16 +107,15 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         remember_me = request.form.get("remember_me")
-
         username_db = None
-        user_data = db.session.scalars(db.select(Accounts).filter_by(username=username))
+        user_data = db.session.scalars(
+            db.select(Accounts).filter_by(username=username))
         for row in user_data:
             username_db = row.username
             password_db = row.password
         if username_db == None:
             return render_template("index.html", loginFailed=True)
         password_cand = request.form["password"]
-
         if username == username_db and password_cand == password_db:
             user = User()
             user.id = username
@@ -143,10 +143,10 @@ def unauthorized_handler():
 
 @login_manager.user_loader
 def load_user(username):
-    username_db = db.session.scalars(db.select(Accounts.username).filter_by(username=username))
+    username_db = db.session.scalars(
+        db.select(Accounts.username).filter_by(username=username))
     if username_db == None:
         return
-
     user = User()
     user.id = username
     return user
