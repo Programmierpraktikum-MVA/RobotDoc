@@ -4,6 +4,7 @@ Automatische Diagnose – a) Identifikation von Mustern, b) automatische Anerken
 
 ## Set-up
 
+- choose application: ```cd 03_application-team```
 - install requirements: ```pip install -r requirements.txt```
 - start application: ```flask --app app.py --debug run```
 - open application: http://127.0.0.1:5000
