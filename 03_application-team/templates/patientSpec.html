@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | RobotDoc</title>
+    <title>Patient {{patientData["id"]}} | RobotDoc</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.jpg') }}">
 </head>
@@ -61,7 +61,7 @@
                         Explain who you are and how you are feeling below.
                     </h2>
                     <div class="box">
-                        <form action="/sendInput" method="post" accept-charset="UTF-8">
+                        <form action="/assignTokens/{{patientData['id']}}" method="post" accept-charset="UTF-8">
                             <div class="field is-grouped">
                                 <p class="control is-expanded">
                                     <input class="input" type="text" name="textToConvert" placeholder="Enter text">
@@ -71,6 +71,11 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                    <div class="box">
+                        <p>Age: </p>
+                        <p>Sex: </p>
+                        <p>Symptoms: {{patientData["symptoms"]}} </p>
                     </div>
                 </div>
             </div>
