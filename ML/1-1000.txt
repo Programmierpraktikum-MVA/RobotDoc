@@ -2,7 +2,7 @@ the
 of
 to
 and
-Hello
+hello
 a
 in
 is
@@ -16,7 +16,6 @@ on
 are
 with
 as
-I
 his
 they
 be
@@ -178,7 +177,6 @@ follow
 act
 why
 ask
-men
 change
 went
 light
@@ -355,7 +353,6 @@ better
 true
 during
 hundred
-five
 remember
 step
 early
@@ -368,12 +365,10 @@ fast
 verb
 sing
 listen
-six
 table
 travel
 less
 morning
-ten
 simple
 several
 vowel
@@ -428,7 +423,6 @@ stood
 contain
 front
 teach
-week
 final
 gave
 green
@@ -484,11 +478,8 @@ check
 game
 shape
 equate
-hot
 miss
 brought
-heat
-
 snow
 tire
 bring
@@ -504,8 +495,6 @@ ball
 yet
 wave
 drop
-heart
-am
 present
 heavy
 dance
@@ -518,7 +507,6 @@ size
 vary
 settle
 speak
-weight
 general
 ice
 matter
@@ -527,7 +515,6 @@ pair
 include
 divide
 syllable
-felt
 perhaps
 pick
 sudden
@@ -699,7 +686,6 @@ trip
 office
 receive
 row
-mouth
 exact
 symbol
 die
@@ -855,7 +841,6 @@ deal
 swim
 term
 opposite
-wife
 shoe
 spread
 arrange
@@ -865,7 +850,6 @@ cotton
 born
 determine
 quart
-nine
 truck
 noise
 level
