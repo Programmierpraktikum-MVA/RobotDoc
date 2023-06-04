@@ -109,6 +109,11 @@ def login():
         return render_template("index.html")
 
 
+@app.route("/signup")
+def signup():
+    return render_template("index.html", signUp=True)
+
+
 @app.route("/logout")
 @login_required
 def logout():
