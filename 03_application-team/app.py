@@ -65,11 +65,14 @@ def patients():
 @app.route("/assignTokens/<int:id>", methods=["POST"])
 @login_required
 def assignTokens(id):
-    textToconvert = request.form.get("textToConvert")
-    output = query({
-        "inputs": textToconvert
-    })
-    parsedOutput = parseString(output)
+    try:
+        textToconvert = request.form.get("textToConvert")
+        output = query({
+            "inputs": textToconvert
+        })
+        parsedOutput = parseString(output)
+    except:
+        parsedOutput = "Error"
     if "Sign_symptom" in parsedOutput:
         print(parsedOutput["Sign_symptom"])
         patientData[id-1]["symptoms"].append(parsedOutput["Sign_symptom"])

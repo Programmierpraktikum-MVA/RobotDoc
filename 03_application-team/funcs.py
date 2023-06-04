@@ -1,4 +1,3 @@
-from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify
 import requests
 
 # huggingface api (reference: https://huggingface.co/d4data/biomedical-ner-all)
