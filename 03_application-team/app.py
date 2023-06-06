@@ -29,18 +29,3 @@ def start():
 @login_required
 def home():
     return render_template("home.html", user=str(current_user.id))
-
-
-@app.route("/sendInput", methods=["POST"])
-@login_required
-def convertText():
-    textToconvert = request.form.get("textToConvert")
-    try:
-        output = query({
-            "inputs": textToconvert
-        })
-        cleanOutput = convertString(output)
-    except:
-        cleanOutput = "Error"
-    print(cleanOutput)
-    return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
