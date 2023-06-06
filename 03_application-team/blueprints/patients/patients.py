@@ -12,6 +12,21 @@ def patientsView():
     return render_template("patients.html", patients=patientData)
 
 
+@patients.route("/sendInput", methods=["POST"])
+@login_required
+def convertText():
+    textToconvert = request.form.get("textToConvert")
+    try:
+        output = query({
+            "inputs": textToconvert
+        })
+        cleanOutput = convertString(output)
+    except:
+        cleanOutput = "Error"
+    print(cleanOutput)
+    return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
+
+
 @patients.route("/assignTokens/<int:id>", methods=["POST"])
 @login_required
 def assignTokens(id):
