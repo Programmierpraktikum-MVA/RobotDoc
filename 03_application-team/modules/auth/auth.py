@@ -25,13 +25,13 @@ def login():
         for row in user_data:
             username_db = row.username
             password_db = row.password
-        if username_db == None:
+        if username_db is None:
             return render_template("index.html", loginFailed=True)
         password_cand = request.form["password"]
         if username == username_db and password_cand == password_db:
             user = User()
             user.id = username
-            if (remember_me):
+            if remember_me:
                 login_user(user, remember=True)
             else:
                 login_user(user)
@@ -57,7 +57,7 @@ def unauthorized_handler():
 def load_user(username):
     username_db = db.session.scalars(
         db.select(Accounts.username).filter_by(username=username))
-    if username_db == None:
+    if username_db is None:
         return
     user = User()
     user.id = username
