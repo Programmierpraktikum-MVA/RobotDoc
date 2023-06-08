@@ -2,8 +2,8 @@ from flask import Flask, Response, url_for, request, session, abort, render_temp
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from util.funcs import *
 from util.db_model import *
-from blueprints.auth.auth import *
-from blueprints.patients.patients import *
+from modules.auth.auth import *
+from modules.patients.patients import *
 
 # default config
 app = Flask(__name__)
