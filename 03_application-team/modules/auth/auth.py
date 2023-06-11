@@ -1,6 +1,7 @@
 from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify, Blueprint
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from util.db_model import *
+from util.db_access import *
 import bcrypt as bcr
 
 auth = Blueprint('auth', __name__)
@@ -50,9 +51,18 @@ def logout():
     return redirect("/")
 
 
-@auth.route("/signup")
+@auth.route("/signup", methods=["GET", "POST"])
 def signup():
-    return render_template("signup.html")
+    if request.method == "POST":
+        username = request.form["username"]
+        pw = request.form["password"]
+        try:
+            register_user(username, pw)
+        except:
+            print("Didnt work")
+        return render_template("signup.html")
+    else:
+        return render_template("signup.html")
 
 
 @login_manager.unauthorized_handler
