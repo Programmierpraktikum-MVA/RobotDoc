@@ -10,7 +10,7 @@ def register_user(username_cand, password):
     Returns 0 on success.
     """
     username_db = db.session.scalars(
-        db.select(Accounts.username).filter_by(username=username))
+        db.select(Accounts.username).filter_by(username=username_cand))
     if username_db is not None:
         raise Exception
 
