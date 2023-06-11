@@ -58,9 +58,10 @@ def signup():
         pw = request.form["password"]
         try:
             register_user(username, pw)
+            return render_template("index.html", signupSuccess=True)
         except:
             print("Didnt work")
-        return render_template("signup.html")
+            return render_template("signup.html", signupFail=True)
     else:
         return render_template("signup.html")
 
