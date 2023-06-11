@@ -11,7 +11,7 @@ def register_user(username_cand, password):
     """
     username_db = db.session.scalars(
         db.select(Accounts.username).filter_by(username=username_cand))
-    if username_db is not None:
+    if username_db == "":
         raise Exception
 
     pw = password.encode('UTF-8')
