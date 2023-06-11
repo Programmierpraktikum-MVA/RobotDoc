@@ -1,4 +1,4 @@
-# RobotDoc
+# RobotDoc 
 
 Automatische Diagnose – a) Identifikation von Mustern, b) automatische Anerkennung von Krankheiten und c) Vorschlag von Behandlung. [^1]
 
