@@ -50,6 +50,11 @@ def logout():
     return redirect("/")
 
 
+@auth.route("/signup")
+def signup():
+    return render_template("signup.html")
+
+
 @login_manager.unauthorized_handler
 def unauthorized_handler():
     return redirect("/login")
