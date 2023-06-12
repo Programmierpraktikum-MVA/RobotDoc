@@ -1,4 +1,5 @@
 import requests
+from util.exceptions import *
 
 # huggingface api (reference: https://huggingface.co/d4data/biomedical-ner-all)
 API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all"
@@ -27,10 +28,34 @@ def parseString(data):
     for item in data:
         entity_group = item['entity_group']
         word = item['word']
-    # If the entity group already exists, append the word to the existing array
+        # If the entity group already exists, append the word to the existing array
         if entity_group in entity_groups:
             entity_groups[entity_group].append(word)
-    # Otherwise, create a new array for the entity group
+        # Otherwise, create a new array for the entity group
         else:
             entity_groups[entity_group] = [word]
     return entity_groups
+
+
+def validate_username(username):
+    """
+    Username has to be alphanumeric and at least on character long.
+    Raises InvalidUsername Exception.
+    :param username: to validate
+    :return: None if valid
+    """
+    if not str(username).isalnum():
+        raise InvalidUsernameError
+    return
+
+
+def validate_password(password):
+    """
+    Password has to be at least 8 characters long.
+    Raises InvalidPassword Exception
+    :param password: to validate
+    :return: None if valid
+    """
+    if len(password) < 8:
+        raise InvalidPasswordError
+    return
