@@ -38,12 +38,24 @@ def parseString(data):
 
 
 def validate_username(username):
+    """
+    Username has to be alphanumeric and at least on character long.
+    Raises InvalidUsername Exception.
+    :param username: to validate
+    :return: None if valid
+    """
     if not str(username).isalnum():
         raise InvalidUsername
     return
 
 
 def validate_password(password):
+    """
+    Password has to be at least 8 characters long.
+    Raises InvalidPassword Exception
+    :param password: to validate
+    :return: None if valid
+    """
     if len(password) < 8:
         raise InvalidPassword
     return
