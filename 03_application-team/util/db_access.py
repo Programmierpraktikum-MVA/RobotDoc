@@ -15,13 +15,13 @@ def register_user(username_cand, password):
     :exception InvalidUsername: if username is invalid (from validate_username())
     :exception InvalidPassword: if password is invalid (from validate_password())
     """
-    validate_username(username_cand)
-    validate_password(password)
-
     username_db = db.session.scalars(
         db.select(Accounts.username).filter_by(username=username_cand))
     if username_db == "":
         raise OccupiedUsernameError
+
+    validate_username(username_cand)
+    validate_password(password)
 
     pw = password.encode('UTF-8')
     salt = bcr.gensalt()
