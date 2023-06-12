@@ -28,7 +28,7 @@ def register_user(username_cand, password):
     pw = bcr.hashpw(pw, salt)
 
     new_user = Accounts()
-    new_user.username = username_cand
+    new_user.username = str(username_cand).strip()
     new_user.hash = pw
 
     db.session.add(new_user)
