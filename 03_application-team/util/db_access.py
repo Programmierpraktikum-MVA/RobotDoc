@@ -15,8 +15,11 @@ def register_user(username_cand, password):
     :exception InvalidUsername: if username is invalid (from validate_username())
     :exception InvalidPassword: if password is invalid (from validate_password())
     """
-    username_db = db.session.scalars(
+    username_db = None
+    rows = db.session.scalars(
         db.select(Accounts.username).filter_by(username=username_cand))
+    for row in rows:
+        username_db = row
     if username_db == username_cand:
         raise OccupiedUsernameError
 
