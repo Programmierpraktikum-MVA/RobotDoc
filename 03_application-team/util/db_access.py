@@ -17,7 +17,7 @@ def register_user(username_cand, password):
     """
     username_db = db.session.scalars(
         db.select(Accounts.username).filter_by(username=username_cand))
-    if not username_db == "":
+    if username_db == username_cand:
         raise OccupiedUsernameError
 
     validate_username(username_cand)
