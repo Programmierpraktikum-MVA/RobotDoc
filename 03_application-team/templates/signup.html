@@ -19,27 +19,32 @@
                         <figure class="avatar">
                             <img src="static/img/RobotDoc-logo_V1.png">
                         </figure>
-                        <form action="/login" method="post" accept-charset="UTF-8">
+                        <form action="/signup" method="post" accept-charset="UTF-8">
                             <div class="field">
                                 <div class="control">
-                                    <input class="input is-large" type="username" placeholder="Your Email" autofocus=""
+                                    <input class="input is-large" type="username" placeholder="Username" autofocus=""
                                         name="username">
                                 </div>
                             </div>
 
                             <div class="field">
                                 <div class="control">
-                                    <input class="input is-large" type="password" placeholder="Your Password"
-                                        name="password">
+                                    <input class="input is-large" type="password"
+                                        placeholder="Password (min. 8 characters)" name="password">
                                 </div>
                             </div>
                             <div>
-                                {% if loginFailed %}
-                                <p> Login failed </p>
+                                {% if signupFail %}
+                                <p> Sign up failed! </p>
+                                {% elif invalidUsername %}
+                                <p> Username field is empty! </p>
+                                {% elif takenUsername %}
+                                <p> Username is already taken! </p>
+                                {% elif invalidPassword %}
+                                <p> Password doesn't match requirements! </p>
                                 {% endif %}
                             </div>
-                            <button class="button is-block is-info is-large is-fullwidth">Sign up <i
-                                    class="fa fa-sign-in" aria-hidden="true"></i></button>
+                            <button class="button is-block is-info is-large is-fullwidth">Sign up</button>
                         </form>
                     </div>
                     <p class="has-text-grey">
