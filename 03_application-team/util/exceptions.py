@@ -4,3 +4,7 @@ class InvalidUsername(Exception):
 
 class InvalidPassword(Exception):
     pass
+
+
+class OccupiedUsername(Exception):
+    pass
