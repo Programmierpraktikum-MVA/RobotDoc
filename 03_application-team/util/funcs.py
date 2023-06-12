@@ -45,7 +45,7 @@ def validate_username(username):
     :return: None if valid
     """
     if not str(username).isalnum():
-        raise InvalidUsername
+        raise InvalidUsernameError
     return
 
 
@@ -57,5 +57,5 @@ def validate_password(password):
     :return: None if valid
     """
     if len(password) < 8:
-        raise InvalidPassword
+        raise InvalidPasswordError
     return

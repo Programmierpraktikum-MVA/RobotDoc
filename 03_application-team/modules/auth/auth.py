@@ -2,6 +2,7 @@ from flask import Flask, Response, url_for, request, session, abort, render_temp
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from util.db_model import *
 from util.db_access import *
+from util.db_access import *
 import bcrypt as bcr
 
 auth = Blueprint('auth', __name__)
@@ -44,26 +45,34 @@ def login():
         return render_template("index.html")
 
 
-@auth.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect("/")
-
-
 @auth.route("/signup", methods=["GET", "POST"])
 def signup():
+    if current_user.is_authenticated:
+        return redirect("/home")
     if request.method == "POST":
         username = request.form["username"]
         pw = request.form["password"]
         try:
             register_user(username, pw)
             return render_template("index.html", signupSuccess=True)
-        except:
-            print("Didnt work")
-            return render_template("signup.html", signupFail=True)
+        except InvalidUsernameError:
+            print("Invalid username")
+            return render_template("signup.html", invalidUsername=True)
+        except OccupiedUsernameError:
+            print("Username already taken")
+            return render_template("signup.html", takenUsername=True)
+        except InvalidPasswordError:
+            print("Password doesnt match requirements")
+            return render_template("signup.html", invalidPassword=True)
     else:
         return render_template("signup.html")
+
+
+@auth.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
 
 
 @login_manager.unauthorized_handler

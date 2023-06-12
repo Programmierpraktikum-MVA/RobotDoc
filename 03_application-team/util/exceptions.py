@@ -1,10 +1,10 @@
-class InvalidUsername(Exception):
+class InvalidUsernameError(Exception):
     pass
 
 
-class InvalidPassword(Exception):
+class InvalidPasswordError(Exception):
     pass
 
 
-class OccupiedUsername(Exception):
+class OccupiedUsernameError(Exception):
     pass

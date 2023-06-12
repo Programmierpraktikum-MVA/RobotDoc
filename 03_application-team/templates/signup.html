@@ -36,10 +36,15 @@
                             <div>
                                 {% if signupFail %}
                                 <p> Sign up failed! </p>
+                                {% elif invalidUsername %}
+                                <p> Username field is empty! </p>
+                                {% elif takenUsername %}
+                                <p> Username is already taken! </p>
+                                {% elif invalidPassword %}
+                                <p> Password doesn't match requirements! </p>
                                 {% endif %}
                             </div>
-                            <button class="button is-block is-info is-large is-fullwidth">Sign up <i
-                                    class="fa fa-sign-in" aria-hidden="true"></i></button>
+                            <button class="button is-block is-info is-large is-fullwidth">Sign up</button>
                         </form>
                     </div>
                     <p class="has-text-grey">

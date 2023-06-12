@@ -21,7 +21,7 @@ def register_user(username_cand, password):
     username_db = db.session.scalars(
         db.select(Accounts.username).filter_by(username=username_cand))
     if username_db == "":
-        raise OccupiedUsername
+        raise OccupiedUsernameError
 
     pw = password.encode('UTF-8')
     salt = bcr.gensalt()
