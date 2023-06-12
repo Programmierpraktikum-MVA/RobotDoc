@@ -7,7 +7,9 @@ def register_user(username_cand, password):
     """
     Registers a new user with given username and password.
     Raises exception if username is already in use.
-    Returns 0 on success.
+    :param username_cand: chosen username
+    :param password: chosen password
+    :return: 0 on success
     """
     username_db = db.session.scalars(
         db.select(Accounts.username).filter_by(username=username_cand))
