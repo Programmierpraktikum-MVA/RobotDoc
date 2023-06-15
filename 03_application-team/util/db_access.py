@@ -72,7 +72,7 @@ def get_patient_data(pat_id):
     )
     output = {}
     for row in result:
-        output.update({"name": row.name, "surname": row.surname, "age": row.age, "sex": row.sex, "height": row.height, "symptoms": row.symptoms})
+        output.update({"name": row.name, "surname": row.surname, "age": row.age, "sex": row.sex, "weight": row.weight, "symptoms": row.symptoms})
 
     return json.dumps(output)
 
