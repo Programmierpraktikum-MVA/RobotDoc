@@ -12,6 +12,20 @@ class Accounts(db.Model):
     hash = db.Column(db.LargeBinary)
 
 
+class Patients(db.Model):
+    """
+    represents the table structure of "patients" at database
+    """
+    pat_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, foreign_key=True)
+    name = db.Column(db.String)
+    surname = db.Column(db.String)
+    age = db.Column(db.Integer)
+    sex = db.Column(db.String)
+    height = db.Column(db.Integer)
+    symptoms = db.Coumn(db.ARRAY(db.String))
+
+
 # postgreSQL DB config coming soon
 patientData = [
     {"id": 1, "name": "John", "age": 35, "weight": 75.5, "sex": "", "symptoms": []},
