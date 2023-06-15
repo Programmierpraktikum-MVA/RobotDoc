@@ -5,8 +5,7 @@ db = SQLAlchemy()
 
 class Accounts(db.Model):
     """
-    represents the table structure of the PostgreSQL server
-    *DOES NOT create a new if table, if non-existent*
+    represents the table structure of "accounts" at Database
     """
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String)
