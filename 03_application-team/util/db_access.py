@@ -3,6 +3,7 @@ from util.db_model import *
 from util.exceptions import *
 from util.funcs import validate_username, validate_password
 import bcrypt as bcr
+import json
 
 
 def register_user(username_cand, password):
@@ -59,3 +60,18 @@ def get_patient_ids(username):
         raise NoPatientAssociatedError
 
     return pat_ids
+
+
+def get_patient_data(pat_id):
+    """
+    :param pat_id:
+    :return: Patient data in JSON format
+    """
+    result = db.session.execute(
+        db.select(Patients).filter_by(pat_id=pat_id)
+    )
+    output = {}
+    for row in result:
+        output.update({"name": row.name, "surname": row.surname, "age": row.age, "sex": row.sex, "height": row.height, "symptoms": row.symptoms})
+
+    return json.dumps(output)
