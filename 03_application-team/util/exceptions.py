@@ -8,3 +8,7 @@ class InvalidPasswordError(Exception):
 
 class OccupiedUsernameError(Exception):
     pass
+
+
+class NoPatientAssociated(Exception):
+    pass

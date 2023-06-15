@@ -37,3 +37,25 @@ def register_user(username_cand, password):
     db.session.add(new_user)
     db.session.commit()
     return 0
+
+
+def get_patient_ids(username):
+    """
+    :param username:
+    :return: Patient IDs associated with given user as integer array.
+    :exception NoPatientAssociated: if no patients are associated with given user
+    """
+    uid = db.session.scalars(
+        db.select(Accounts.user_id).filter_by(username=username)
+    )
+    pat_ids = []
+    result = db.session.execute(
+        db.select(Patients.pat_id).filter_by(user_id=uid)
+    )
+    for x in result:
+        pat_ids.append(x)
+
+    if len(pat_ids) == 0:
+        raise NoPatientAssociated
+
+    return pat_ids
