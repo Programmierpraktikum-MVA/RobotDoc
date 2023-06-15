@@ -75,3 +75,18 @@ def get_patient_data(pat_id):
         output.update({"name": row.name, "surname": row.surname, "age": row.age, "sex": row.sex, "height": row.height, "symptoms": row.symptoms})
 
     return json.dumps(output)
+
+
+def accumulate_patient_data(pat_ids):
+    """
+    :param pat_ids: Array of patient ids
+    :return: Data for all given patients in JSON as: {"patients": [PATIENT DATA]}
+    """
+    output = {}
+    data = []
+
+    for pid in pat_ids:
+        data.append(get_patient_data(pid))
+
+    output.update({"patients": data})
+    return json.dumps(output)
