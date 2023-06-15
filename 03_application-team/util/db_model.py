@@ -22,7 +22,7 @@ class Patients(db.Model):
     surname = db.Column(db.String)
     age = db.Column(db.Integer)
     sex = db.Column(db.String)
-    height = db.Column(db.Integer)
+    weight = db.Column(db.Float)
     symptoms = db.Coumn(db.ARRAY(db.String))
 
 
