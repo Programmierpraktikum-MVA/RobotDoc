@@ -10,5 +10,5 @@ class OccupiedUsernameError(Exception):
     pass
 
 
-class NoPatientAssociated(Exception):
+class NoPatientAssociatedError(Exception):
     pass
