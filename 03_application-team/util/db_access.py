@@ -56,6 +56,6 @@ def get_patient_ids(username):
         pat_ids.append(x)
 
     if len(pat_ids) == 0:
-        raise NoPatientAssociated
+        raise NoPatientAssociatedError
 
     return pat_ids
