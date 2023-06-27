@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | RobotDoc</title>
+    <title>Patients | RobotDoc</title>
     <link rel="stylesheet" href="static/css/bulma.css">
     <link rel="shortcut icon" href="static/img/favicon.jpg">
 </head>
@@ -50,39 +50,24 @@
             </nav>
         </div>
 
-        <div class="hero-body">
-            <div class="container has-text-centered">
-                <div class="column is-6 is-offset-3">
-                    <p>Logged in as <span>{{user}}</span></p>
-                    <h1 class="title">
-                        RobotDoc
-                    </h1>
-                    <h2 class="subtitle">
-                        Explain who you are and how you are feeling below.
-                    </h2>
-                    <div class="box">
-                        <form action="/sendInput" method="post" accept-charset="UTF-8">
-                            <div class="field is-grouped">
-                                <p class="control is-expanded">
-                                    <input class="input" type="text" name="textToConvert" placeholder="Enter text">
-                                </p>
-                                <button type="submit" class="button is-info">
-                                    Process
-                                </button>
+        <div class="hero-body has-text-centered">
+            <div class="container">
+                <div class="columns is-multiline">
+                    {% for patient in patients %}
+                    <div class="column is-one-third">
+                        <a href="/patients/{{patient.id}}">
+                            <div class="box">
+                                <strong>Name:</strong> {{ patient.name }}<br>
+                                <strong>Age:</strong> {{ patient.age }}<br>
+                                <strong>Weight:</strong> {{ patient.weight }}
                             </div>
-                        </form>
+                        </a>
                     </div>
-                    <div class="box" id="output">
-                        {{initialText}}
-                        <br>
-                        <br>
-                        {% for item in output %}
-                        <p>{{ item }}</p>
-                        {% endfor %}
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
+
 
     </section>
 
