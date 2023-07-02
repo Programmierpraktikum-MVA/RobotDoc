@@ -57,4 +57,5 @@ def assignTokens(id):
 @login_required
 def patients_route(id):
     print("You pressed on: " + str(id))
-    return render_template("patientSpec.html", patientData=patientData[id - 1])
+    data = get_patient_data(id)
+    return render_template("patientSpec.html", patientData=data)
