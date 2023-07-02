@@ -2,6 +2,7 @@ from flask import Flask, Response, url_for, request, session, abort, render_temp
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from util.db_model import *
 from util.funcs import *
+import modules.model.model as ml
 
 patients = Blueprint("patients", __name__)
 
@@ -17,10 +18,14 @@ def patientsView():
 def convertText():
     textToconvert = request.form.get("textToConvert")
     try:
+        symptoms = ml.process_input() # get symptoms (NLP)
+        cleanOutput = ml.predict(symptoms) # get diagnosis (prediction)
+        """ old api 
         output = query({
             "inputs": textToconvert
         })
         cleanOutput = convertString(output)
+         """
     except:
         cleanOutput = "Error"
     print(cleanOutput)
