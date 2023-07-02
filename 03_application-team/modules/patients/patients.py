@@ -17,7 +17,7 @@ def patientsView():
     except:
         patient_data = {patients: []}
         return render_template("patients.html", patients=patient_data)
-    patient_data = json.load(accumulate_patient_data(pat_ids))
+    patient_data = accumulate_patient_data(pat_ids)
     return render_template("patients.html", patients=patient_data)
 
 
