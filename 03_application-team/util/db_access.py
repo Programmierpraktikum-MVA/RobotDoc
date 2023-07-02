@@ -67,7 +67,7 @@ def get_patient_ids(username):
 def get_patient_data(pat_id):
     """
     :param pat_id:
-    :return: Patient data in JSON format
+    :return: Patient data as dictionary
     """
     result = db.session.scalars(
         db.select(Patients).filter_by(pat_id=pat_id)
