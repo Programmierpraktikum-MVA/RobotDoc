@@ -46,15 +46,17 @@ def get_patient_ids(username):
     :return: Patient IDs associated with given user as integer array.
     :exception NoPatientAssociated: if no patients are associated with given user
     """
-    uid = db.session.scalars(
+    result = db.session.execute(
         db.select(Accounts.user_id).filter_by(username=username)
     )
+    for row in result:
+        uid = row.user_id
     pat_ids = []
     result = db.session.execute(
         db.select(Patients.pat_id).filter_by(user_id=uid)
     )
     for x in result:
-        pat_ids.append(x)
+        pat_ids.append(x.pat_id)
 
     if len(pat_ids) == 0:
         raise NoPatientAssociatedError
@@ -72,6 +74,7 @@ def get_patient_data(pat_id):
     )
     output = {}
     for row in result:
+        #print(pat_id)
         output.update({"name": row.name, "surname": row.surname, "age": row.age, "sex": row.sex, "weight": row.weight, "symptoms": row.symptoms})
 
     return json.dumps(output)

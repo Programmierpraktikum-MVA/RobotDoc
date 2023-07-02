@@ -2,6 +2,8 @@ from flask import Flask, Response, url_for, request, session, abort, render_temp
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from util.db_model import *
 from util.funcs import *
+from util.db_access import *
+import json
 
 patients = Blueprint("patients", __name__)
 
@@ -9,7 +11,14 @@ patients = Blueprint("patients", __name__)
 @patients.route("/patients")
 @login_required
 def patientsView():
-    return render_template("patients.html", patients=patientData)
+    username = current_user.id
+    try:
+        pat_ids = get_patient_ids(username)
+    except:
+        patient_data = {patients: []}
+        return render_template("patients.html", patients=patient_data)
+    patient_data = json.load(accumulate_patient_data(pat_ids))
+    return render_template("patients.html", patients=patient_data)
 
 
 @patients.route("/sendInput", methods=["POST"])
@@ -40,12 +49,12 @@ def assignTokens(id):
         parsedOutput = "Error"
     if "Sign_symptom" in parsedOutput:
         print(parsedOutput["Sign_symptom"])
-        patientData[id-1]["symptoms"].append(parsedOutput["Sign_symptom"])
-    return render_template("patientSpec.html", patientData=patientData[id-1])
+        patientData[id - 1]["symptoms"].append(parsedOutput["Sign_symptom"])
+    return render_template("patientSpec.html", patientData=patientData[id - 1])
 
 
 @patients.route("/patients/<int:id>")
 @login_required
 def patients_route(id):
     print("You pressed on: " + str(id))
-    return render_template("patientSpec.html", patientData=patientData[id-1])
+    return render_template("patientSpec.html", patientData=patientData[id - 1])
