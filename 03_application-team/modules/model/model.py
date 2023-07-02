@@ -60,7 +60,7 @@ nlp.add_pipe("scispacy_linker", config={"resolve_abbreviations": True, "linker_n
 linker = nlp.get_pipe("scispacy_linker")
 
 #loads rasan first predicting model
-new_model = tf.keras.models.load_model(os.curdir+'/model_config')
+new_model = tf.keras.models.load_model('modules/model/model_config')
 
 #diseases dict
 diseases=['(vertigo) Paroymsal  Positional Vertigo', 'AIDS', 'Acne', 'Alcoholic hepatitis', 'Allergy', 'Arthritis', 'Bronchial Asthma', 'Cervical spondylosis', 'Chicken pox', 'Chronic cholestasis', 'Common Cold', 'Dengue', 'Diabetes ', 'Dimorphic hemmorhoids(piles)', 'Drug Reaction', 'Fungal infection', 'GERD', 'Gastroenteritis', 'Heart attack', 'Hepatitis B', 'Hepatitis C', 'Hepatitis D', 'Hepatitis E', 'Hypertension ', 'Hyperthyroidism', 'Hypoglycemia', 'Hypothyroidism', 'Impetigo', 'Jaundice', 'Malaria', 'Migraine', 'Osteoarthristis', 'Paralysis (brain hemorrhage)', 'Peptic ulcer diseae', 'Pneumonia', 'Psoriasis', 'Tuberculosis', 'Typhoid', 'Urinary tract infection', 'Varicose veins', 'hepatitis A']
@@ -166,9 +166,9 @@ def predict(nlp_output):
 #----------------------------#
 def main():
     reset_patient()
-    symptoms = process_input('I am 30 and a male, I have a headache, fever. I am also very tired.')
+    """symptoms = process_input('I am 30 and a male, I have a headache, fever. I am also very tired.')
     print(symptoms)
-    output=predict(symptoms)
+    output=predict(symptoms)"""
 
 if __name__ == '__main__':
     main()
