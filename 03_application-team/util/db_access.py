@@ -69,27 +69,24 @@ def get_patient_data(pat_id):
     :param pat_id:
     :return: Patient data in JSON format
     """
-    result = db.session.execute(
+    result = db.session.scalars(
         db.select(Patients).filter_by(pat_id=pat_id)
     )
     output = {}
     for row in result:
-        #print(pat_id)
-        output.update({"name": row.name, "surname": row.surname, "age": row.age, "sex": row.sex, "weight": row.weight, "symptoms": row.symptoms})
+        output.update({"id": row.pat_id, "name": row.name, "surname": row.surname, "age": row.age, "sex": row.sex, "weight": row.weight, "symptoms": row.symptoms})
 
-    return json.dumps(output)
+    return output
 
 
 def accumulate_patient_data(pat_ids):
     """
     :param pat_ids: Array of patient ids
-    :return: Data for all given patients in JSON as: {"patients": [PATIENT DATA]}
+    :return: Data for all given patients as array
     """
-    output = {}
     data = []
 
     for pid in pat_ids:
         data.append(get_patient_data(pid))
 
-    output.update({"patients": data})
-    return json.dumps(output)
+    return data
