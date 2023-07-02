@@ -23,7 +23,7 @@ class Patients(db.Model):
     age = db.Column(db.Integer)
     sex = db.Column(db.String)
     weight = db.Column(db.Float)
-    symptoms = db.Coumn(db.ARRAY(db.String))
+    symptoms = db.Column(db.ARRAY(db.String))
 
 
 # postgreSQL DB config coming soon
