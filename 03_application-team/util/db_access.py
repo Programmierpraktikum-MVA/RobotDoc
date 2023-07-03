@@ -90,3 +90,12 @@ def accumulate_patient_data(pat_ids):
         data.append(get_patient_data(pid))
 
     return data
+
+
+def update_patient_symptoms(pat_id, symptoms):
+    db.session.execute(
+        db.update(Patients),
+        [
+            {"pat_id": pat_id, "symptoms": symptoms}
+        ]
+    )
