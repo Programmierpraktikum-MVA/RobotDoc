@@ -93,6 +93,11 @@ def accumulate_patient_data(pat_ids):
 
 
 def update_patient_symptoms(pat_id, symptoms):
+    """
+    :param pat_id: id of patient whose symptoms should be updated
+    :param symptoms: updated symptoms as array
+    :return: nothing
+    """
     db.session.execute(
         db.update(Patients),
         [
