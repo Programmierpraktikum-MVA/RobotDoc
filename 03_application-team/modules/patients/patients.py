@@ -39,6 +39,7 @@ def convertText():
 @patients.route("/assignTokens/<int:id>", methods=["POST"])
 @login_required
 def assignTokens(id):
+    data = get_patient_data(id)
     textToconvert = request.form.get("textToConvert")
     try:
         output = query({
@@ -48,9 +49,13 @@ def assignTokens(id):
     except:
         parsedOutput = "Error"
     if "Sign_symptom" in parsedOutput:
-        print(parsedOutput["Sign_symptom"])
-        patientData[id - 1]["symptoms"].append(parsedOutput["Sign_symptom"])
-    return render_template("patientSpec.html", patientData=patientData[id - 1])
+        new_symptom = parsedOutput["Sign_symptom"]
+        if data["symptoms"] is None:
+            data.update({"symptoms": new_symptom})
+        else:
+            data["symptoms"].append(new_symptom)
+        update_patient_symptoms(id, data["symptoms"])
+    return render_template("patientSpec.html", patientData=data)
 
 
 @patients.route("/patients/<int:id>")
