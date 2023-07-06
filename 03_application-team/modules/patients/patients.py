@@ -12,14 +12,13 @@ patients = Blueprint("patients", __name__)
 def patientsView():
     return render_template("patients.html", patients=patientData)
 
-
 # general prediction without user ("Home")
 @patients.route("/sendInput", methods=["POST"])
 @login_required
 def convertText():
     textToconvert = request.form.get("textToConvert")
     try:
-        cleanOutput = getSymptoms(textToconvert, 'mlteam')
+        cleanOutput = getSymptoms(textToconvert, PM.MLTEAM)
     except:
         cleanOutput = "Error"
     print(cleanOutput)
@@ -32,9 +31,9 @@ def convertText():
 def assignTokens(id):
     textToconvert = request.form.get("textToConvert")
     try:
-        symptoms = getSymptoms(textToconvert, 'mlteam')
+        symptoms = getSymptoms(textToconvert, PM.MLTEAM)
         patientData[id-1]["symptoms"].append(symptoms['symptoms']) # assign symptoms to patient
-        cleanOutput = getDiagnosis(symptoms, 'mlteam') 
+        cleanOutput = getDiagnosis(symptoms, PM.MLTEAM) 
     except:
         cleanOutput = "Error"
     """ old api 
