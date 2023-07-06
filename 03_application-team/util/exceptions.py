@@ -11,3 +11,6 @@ class OccupiedUsernameError(Exception):
 
 class InvalidModelError(Exception):
     pass
+
+class InvalidSymptomError(Exception):
+    pass
