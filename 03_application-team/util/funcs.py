@@ -18,13 +18,15 @@ class PM(Enum):
 
 def getSymptoms(input, model):
     if model == NLP.HF:   
-        payload = {"inputs": input} # get correct format
-        response = requests.post(API_URL, headers=headers, json=payload) # api call
-        return convertString(response.json)
+        payload = {
+            "inputs": input
+            } # get correct format
+        response = convertString(requests.post(API_URL, headers=headers, json=payload).json) # api call
+        if "Sign_symptom" in response: return response["Sign_symptom"]
+        else: raise InvalidSymptomError
     if model == NLP.MLTEAM:
         return ml.process_input(input) # get symptoms (NLP)
     else: raise InvalidModelError
-
 
 def getDiagnosis(symptoms, model):
     if model == PM.MLTEAM:
