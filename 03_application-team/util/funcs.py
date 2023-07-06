@@ -7,14 +7,20 @@ API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all
 headers = {"Authorization": "Bearer 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"}
 
 
-def query(input, model):
+def getSymptoms(input, model):
     if model == 'hfapi':   
         payload = {"inputs": input} # get correct format
         response = requests.post(API_URL, headers=headers, json=payload) # api call
         return convertString(response.json)
     if model == 'mlteam':
-        symptoms = ml.process_input(input) # get symptoms (NLP)
+        return ml.process_input(input) # get symptoms (NLP)
+    else: raise InvalidModelError
+
+
+def getDiagnosis(symptoms, model):
+    if model == 'mlteam':
         return ml.predict(symptoms) # get diagnosis (prediction)
+    else: raise InvalidModelError
 
 
 def convertString(data):
