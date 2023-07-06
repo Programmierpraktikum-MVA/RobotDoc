@@ -19,14 +19,7 @@ def patientsView():
 def convertText():
     textToconvert = request.form.get("textToConvert")
     try:
-        symptoms = ml.process_input(textToconvert) # get symptoms (NLP)
-        cleanOutput = ml.predict(symptoms) # get diagnosis (prediction)
-        """ old api 
-        output = query({
-            "inputs": textToconvert
-        })
-        cleanOutput = convertString(output)
-         """
+        cleanOutput = query(textToconvert, 'mlteam')
     except:
         cleanOutput = "Error"
     print(cleanOutput)
