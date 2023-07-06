@@ -4,6 +4,10 @@ Automatische Diagnose – a) Identifikation von Mustern, b) automatische Anerken
 
 ## Set-up
 
+> It is best practise to create a virtual environment first  
+> create: ```python3 -m venv .venv```  
+> activate: ```source .venv/bin/activate```
+
 1. choose application: ```cd 03_application-team```
 2. install requirements: ```pip install -r requirements.txt```
 3. start application: ```flask --app app.py --debug run```
@@ -15,8 +19,9 @@ Automatische Diagnose – a) Identifikation von Mustern, b) automatische Anerken
     - create a new ```venv```, install all dependencies, and start / select it
     - restart ```venv```, terminal, and IDE
 - specific
+    - error: ```Could not build wheels for nmslib, which is required to install pyproject.toml-based projects``` => use older version of Python (tested up to ```3.9.6```)
     - error: ```Getting requirements to build wheel did not run successfully.``` (e.g. ```psycopg2```) => ```pip install psycopg2-binary``` 
-        - ```pip install``` all other dependencies
+        - ```pip install``` all other dependencies manually
         - for ```en-core-sci-sm```: ```pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_core_sci_sm-0.5.1.tar.gz```
     - error: ```AutoModeLForTokenClassification requires the PyTorch library but it was not found in your environment.``` => restart (```venv```, terminal) and select correct ```venv```
     - run ```model.py``` once to download and cache datasets (will take a long time) - or get dataset from a peer (```Useers/[username]/.scispacy/datasets```)
