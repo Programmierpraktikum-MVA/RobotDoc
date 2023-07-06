@@ -27,14 +27,19 @@ def convertText():
 
 
 # prediction for user
-@patients.route("/assignTokens/<int:id>", methods=["POST"])
+@patients.route("/assignTokens/<int:id>/<int:nlp>", methods=["POST"])
 @login_required
-def assignTokens(id):
+def assignTokens(id,nlp):
     textToconvert = request.form.get("textToConvert")
     try:
-        symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
-        patientData[id-1]["symptoms"].append(symptoms['symptoms']) # assign symptoms to patient
-        cleanOutput = getDiagnosis(symptoms, PM.MLTEAM) 
+        if nlp == 1:
+            symptoms = getSymptoms(textToconvert, NLP.HF)
+            patientData[id-1]["symptoms"].append(symptoms)
+            cleanOutput = 'This model does not support prediction!'
+        if nlp == 2:
+            symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
+            patientData[id-1]["symptoms"].append(symptoms['symptoms']) # assign symptoms to patient
+            cleanOutput = getDiagnosis(symptoms, PM.MLTEAM) 
     except:
         cleanOutput = "Error"
     """ old api 
