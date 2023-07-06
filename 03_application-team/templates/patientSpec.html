@@ -72,10 +72,12 @@
                             </div>
                         </form>
                     </div>
-                    <div class="box">
-                        <p>Age: </p>
-                        <p>Sex: </p>
-                        <p>Symptoms: {{patientData["symptoms"]}} </p>
+                    <div class="box" id="output">
+                        <p>Input: <b>{{initialText}}</b></p>
+                        <br>
+                        <p>Symptoms: {{patientData["symptoms"]}}</p>
+                        <br>
+                        <p>Prediction: <b>{{prediction}}</b></p>
                     </div>
                 </div>
             </div>
