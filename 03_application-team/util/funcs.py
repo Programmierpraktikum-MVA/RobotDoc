@@ -19,6 +19,7 @@ def getSymptoms(input, model):
 
 def getDiagnosis(symptoms, model):
     if model == 'mlteam':
+        # NOTE: symptoms need to be in the format: {"symptoms":[]}
         return ml.predict(symptoms) # get diagnosis (prediction)
     else: raise InvalidModelError
 
