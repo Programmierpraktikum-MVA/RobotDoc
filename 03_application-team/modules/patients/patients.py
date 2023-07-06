@@ -13,6 +13,7 @@ def patientsView():
     return render_template("patients.html", patients=patientData)
 
 
+# general prediction without user ("Home")
 @patients.route("/sendInput", methods=["POST"])
 @login_required
 def convertText():
@@ -32,10 +33,18 @@ def convertText():
     return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
 
 
+# prediction for user
 @patients.route("/assignTokens/<int:id>", methods=["POST"])
 @login_required
 def assignTokens(id):
     textToconvert = request.form.get("textToConvert")
+    try:
+        symptoms = ml.process_input(textToconvert) # get symptoms (NLP)
+        patientData[id-1]["symptoms"].append(symptoms['symptoms']) # assign symptoms to patient
+        cleanOutput = ml.predict(symptoms) # get diagnosis (prediction)
+    except:
+        cleanOutput = "Error"
+    """ old api 
     try:
         output = query({
             "inputs": textToconvert
@@ -46,7 +55,8 @@ def assignTokens(id):
     if "Sign_symptom" in parsedOutput:
         print(parsedOutput["Sign_symptom"])
         patientData[id-1]["symptoms"].append(parsedOutput["Sign_symptom"])
-    return render_template("patientSpec.html", patientData=patientData[id-1])
+    """
+    return render_template("patientSpec.html", patientData=patientData[id-1], prediction=cleanOutput, initialText=textToconvert)
 
 
 @patients.route("/patients/<int:id>")
