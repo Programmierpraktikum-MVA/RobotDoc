@@ -1,14 +1,20 @@
 import requests
 from util.exceptions import *
+import modules.model.model as ml
 
 # huggingface api (reference: https://huggingface.co/d4data/biomedical-ner-all)
 API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all"
 headers = {"Authorization": "Bearer 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"}
 
 
-def query(payload):
-    response = requests.post(API_URL, headers=headers, json=payload)
-    return response.json()
+def query(input, model):
+    if model == 'hfapi':   
+        payload = {"inputs": input} # get correct format
+        response = requests.post(API_URL, headers=headers, json=payload) # api call
+        return convertString(response.json)
+    if model == 'mlteam':
+        symptoms = ml.process_input(input) # get symptoms (NLP)
+        return ml.predict(symptoms) # get diagnosis (prediction)
 
 
 def convertString(data):
