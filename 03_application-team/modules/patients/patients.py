@@ -18,7 +18,7 @@ def patientsView():
 def convertText():
     textToconvert = request.form.get("textToConvert")
     try:
-        cleanOutput = getSymptoms(textToconvert, PM.MLTEAM)
+        cleanOutput = getDiagnosis(textToconvert, PM.MLTEAM)
     except:
         cleanOutput = "Error"
     print(cleanOutput)
@@ -31,7 +31,7 @@ def convertText():
 def assignTokens(id):
     textToconvert = request.form.get("textToConvert")
     try:
-        symptoms = getSymptoms(textToconvert, PM.MLTEAM)
+        symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
         patientData[id-1]["symptoms"].append(symptoms['symptoms']) # assign symptoms to patient
         cleanOutput = getDiagnosis(symptoms, PM.MLTEAM) 
     except:
