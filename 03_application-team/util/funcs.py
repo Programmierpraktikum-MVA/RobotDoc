@@ -1,28 +1,36 @@
 import requests
 from util.exceptions import *
 import modules.model.model as ml
+from enum import Enum
 
 # huggingface api (reference: https://huggingface.co/d4data/biomedical-ner-all)
 API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all"
 headers = {"Authorization": "Bearer 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"}
 
+# available natural language models
+class NLP(Enum):
+    HF = 1
+    MLTEAM = 2
+
+# available prediction models
+class PM(Enum):
+    MLTEAM = 1
 
 def getSymptoms(input, model):
-    if model == 'hfapi':   
+    if model == NLP.HF:   
         payload = {"inputs": input} # get correct format
         response = requests.post(API_URL, headers=headers, json=payload) # api call
         return convertString(response.json)
-    if model == 'mlteam':
+    if model == NLP.MLTEAM:
         return ml.process_input(input) # get symptoms (NLP)
     else: raise InvalidModelError
 
 
 def getDiagnosis(symptoms, model):
-    if model == 'mlteam':
+    if model == PM.MLTEAM:
         # NOTE: symptoms need to be in the format: {"symptoms":[]}
         return ml.predict(symptoms) # get diagnosis (prediction)
     else: raise InvalidModelError
-
 
 def convertString(data):
     output = []
