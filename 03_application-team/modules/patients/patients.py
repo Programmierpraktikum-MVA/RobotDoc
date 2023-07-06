@@ -18,7 +18,8 @@ def patientsView():
 def convertText():
     textToconvert = request.form.get("textToConvert")
     try:
-        cleanOutput = getDiagnosis(textToconvert, PM.MLTEAM)
+        symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
+        cleanOutput = getDiagnosis(symptoms, PM.MLTEAM)
     except:
         cleanOutput = "Error"
     print(cleanOutput)
