@@ -1,0 +1,18 @@
+FROM ubuntu
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get -y install libpq-dev
+RUN apt-get install python3.11 -y
+RUN apt-get install pip -y
+RUN python3 -m pip install --upgrade pip
+COPY ./requirements.txt ../requirements.txt
+COPY ./app.py ../robotdoc/app.py
+COPY ./modules ../robotdoc/modules
+COPY ./static ../robotdoc/static
+COPY ./templates ../robotdoc/templates
+COPY ./util ../robotdoc/util
+
+RUN pip install -r ../requirements.txt
+CMD flask --app ./robotdoc/app.py --debug run
+EXPOSE 5000
+
