@@ -163,8 +163,7 @@ def pipeline(patient):
 
 def decode_one_hot(pred):
   index = np.argmax(np.array(pred), axis=-1)
-  print(pred)
-  return diseases[index]
+  return (diseases[index],pred[index])
   
 
 def predict(nlp_output):
@@ -178,6 +177,13 @@ def main():
     sentence="I have a headache and some chills."
     print(predict(process_input(sentence)))
     print(tracemalloc.get_traced_memory())
+
+    snapshot = tracemalloc.take_snapshot()
+    top_stats = snapshot.statistics('lineno')
+
+    print("[ Top 10 ]")
+    for stat in top_stats[:10]:
+        print(stat)
     tracemalloc.stop()
 
 if __name__ == '__main__':
