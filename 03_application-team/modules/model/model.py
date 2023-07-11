@@ -162,7 +162,7 @@ def pipeline(patient):
 
 def decode_one_hot(pred):
   index = np.argmax(np.array(pred), axis=-1)
-  return (diseases[index],pred(index))
+  return (diseases[index],pred[index])
   
 
 def predict(nlp_output):
