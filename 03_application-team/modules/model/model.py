@@ -171,7 +171,7 @@ def predict(nlp_output):
 
 #----------------------------#
 def main():
-
+    reset_patient()
 
 if __name__ == '__main__':
     main()
