@@ -172,9 +172,12 @@ def predict(nlp_output):
 
 #----------------------------#
 def main():
-    tracemalloc.start()
+    #tracemalloc.start()
     reset_patient()
-    sentence="I have a headache and some chills."
+   """ sentence="I have a headache and some chills."
+    print(process_input(sentence))
+    print(tracemalloc.get_traced_memory())
+    tracemalloc.stop()
     print(predict(process_input(sentence)))
     print(tracemalloc.get_traced_memory())
 
@@ -184,7 +187,7 @@ def main():
     print("[ Top 10 ]")
     for stat in top_stats[:10]:
         print(stat)
-    tracemalloc.stop()
+    tracemalloc.stop()"""
 
 if __name__ == '__main__':
     main()
