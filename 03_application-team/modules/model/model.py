@@ -1,3 +1,4 @@
+import tracemalloc
 import spacy
 import tensorflow as tf
 import itertools
@@ -44,9 +45,11 @@ def update_patient(model_output):
 
 
 def reset_patient():
-    patient = {"symptoms":[]}
+    global patient 
+    patient= {"symptoms":[]}
 
 def process_input(sentence):
+    reset_patient()
     update_patient(fine_tuned_ner(sentence))
     return patient
 
@@ -64,13 +67,13 @@ nlp,linker = loadSciSpacy()
 
 
 #loads rasan first predicting model
-new_model = tf.keras.models.load_model('modules/model/model_config')
-
+model1 = tf.keras.models.load_model('modules/model/model_config')
+model2 = tf.keras.models.load_model('modules/model/model_config2')
 
 #diseases dict
 diseases=['(vertigo) Paroymsal  Positional Vertigo', 'AIDS', 'Acne', 'Alcoholic hepatitis', 'Allergy', 'Arthritis', 'Bronchial Asthma', 'Cervical spondylosis', 'Chicken pox', 'Chronic cholestasis', 'Common Cold', 'Dengue', 'Diabetes ', 'Dimorphic hemmorhoids(piles)', 'Drug Reaction', 'Fungal infection', 'GERD', 'Gastroenteritis', 'Heart attack', 'Hepatitis B', 'Hepatitis C', 'Hepatitis D', 'Hepatitis E', 'Hypertension ', 'Hyperthyroidism', 'Hypoglycemia', 'Hypothyroidism', 'Impetigo', 'Jaundice', 'Malaria', 'Migraine', 'Osteoarthristis', 'Paralysis (brain hemorrhage)', 'Peptic ulcer diseae', 'Pneumonia', 'Psoriasis', 'Tuberculosis', 'Typhoid', 'Urinary tract infection', 'Varicose veins', 'hepatitis A']
 possible_symp = ['itching', 'skin rash', 'nodal skin eruptions', 'dischromic  patches', 'continuous sneezing', 'shivering', 'chills', 'watering from eyes', 'stomach pain', 'acidity', 'ulcers on tongue', 'vomiting', 'cough', 'chest pain', 'yellowish skin', 'nausea', 'loss of appetite', 'abdominal pain', 'yellowing of eyes', 'burning micturition', 'spotting  urination', 'passage of gases', 'internal itching', 'indigestion', 'muscle wasting', 'patches in throat', 'high fever', 'extra marital contacts', 'fatigue', 'weight loss', 'restlessness', 'lethargy', 'irregular sugar level', 'blurred and distorted vision', 'obesity', 'excessive hunger', 'increased appetite', 'polyuria', 'sunken eyes', 'dehydration', 'diarrhoea', 'breathlessness', 'family history', 'mucoid sputum', 'headache', 'dizziness', 'loss of balance', 'lack of concentration', 'stiff neck', 'depression', 'irritability', 'visual disturbances', 'back pain', 'weakness in limbs', 'neck pain', 'weakness of one body side', 'altered sensorium', 'dark urine', 'sweating', 'muscle pain', 'mild fever', 'swelled lymph nodes', 'malaise', 'red spots over body', 'joint pain', 'pain behind the eyes', 'constipation', 'toxic look (typhos)', 'belly pain', 'yellow urine', 'receiving blood transfusion', 'receiving unsterile injections', 'coma', 'stomach bleeding', 'acute liver failure', 'swelling of stomach', 'distention of abdomen', 'history of alcohol consumption', 'fluid overload', 'phlegm', 'blood in sputum', 'throat irritation', 'redness of eyes', 'sinus pressure', 'runny nose', 'congestion', 'loss of smell', 'fast heart rate', 'rusty sputum', 'pain during bowel movements', 'pain in anal region', 'bloody stool', 'irritation in anus', 'cramps', 'bruising', 'swollen legs', 'swollen blood vessels', 'prominent veins on calf', 'weight gain', 'cold hands and feets', 'mood swings', 'puffy face and eyes', 'enlarged thyroid', 'brittle nails', 'swollen extremeties', 'abnormal menstruation', 'muscle weakness', 'anxiety', 'slurred speech', 'palpitations', 'drying and tingling lips', 'knee pain', 'hip joint pain', 'swelling joints', 'painful walking', 'movement stiffness', 'spinning movements', 'unsteadiness', 'pus filled pimples', 'blackheads', 'scurring', 'bladder discomfort', 'foul smell of urine', 'continuous feel of urine', 'skin peeling', 'silver like dusting', 'small dents in nails', 'inflammatory nails', 'blister', 'red sore around nose', 'yellow crust ooze']
-
+possible_sympv2=[' abdominal_pain', ' abnormal_menstruation', ' acidity', ' acute_liver_failure', ' altered_sensorium', ' anxiety', ' back_pain', ' belly_pain', ' blackheads', ' bladder_discomfort', ' blister', ' blood_in_sputum', ' bloody_stool', ' blurred_and_distorted_vision', ' breathlessness', ' brittle_nails', ' bruising', ' burning_micturition', ' chest_pain', ' chills', ' cold_hands_and_feets', ' coma', ' congestion', ' constipation', ' continuous_feel_of_urine', ' continuous_sneezing', ' cough', ' cramps', ' dark_urine', ' dehydration', ' depression', ' diarrhoea', ' dischromic _patches', ' distention_of_abdomen', ' dizziness', ' drying_and_tingling_lips', ' enlarged_thyroid', ' excessive_hunger', ' extra_marital_contacts', ' family_history', ' fast_heart_rate', ' fatigue', ' fluid_overload', ' foul_smell_of urine', ' headache', ' high_fever', ' hip_joint_pain', ' history_of_alcohol_consumption', ' increased_appetite', ' indigestion', ' inflammatory_nails', ' internal_itching', ' irregular_sugar_level', ' irritability', ' irritation_in_anus', ' joint_pain', ' knee_pain', ' lack_of_concentration', ' lethargy', ' loss_of_appetite', ' loss_of_balance', ' loss_of_smell', ' malaise', ' mild_fever', ' mood_swings', ' movement_stiffness', ' mucoid_sputum', ' muscle_pain', ' muscle_wasting', ' muscle_weakness', ' nausea', ' neck_pain', ' nodal_skin_eruptions', ' obesity', ' pain_behind_the_eyes', ' pain_during_bowel_movements', ' pain_in_anal_region', ' painful_walking', ' palpitations', ' passage_of_gases', ' patches_in_throat', ' phlegm', ' polyuria', ' prominent_veins_on_calf', ' puffy_face_and_eyes', ' pus_filled_pimples', ' receiving_blood_transfusion', ' receiving_unsterile_injections', ' red_sore_around_nose', ' red_spots_over_body', ' redness_of_eyes', ' restlessness', ' runny_nose', ' rusty_sputum', ' scurring', ' shivering', ' silver_like_dusting', ' sinus_pressure', ' skin_peeling', ' skin_rash', ' slurred_speech', ' small_dents_in_nails', ' spinning_movements', ' spotting_ urination', ' stiff_neck', ' stomach_bleeding', ' stomach_pain', ' sunken_eyes', ' sweating', ' swelled_lymph_nodes', ' swelling_joints', ' swelling_of_stomach', ' swollen_blood_vessels', ' swollen_extremeties', ' swollen_legs', ' throat_irritation', ' toxic_look_(typhos)', ' ulcers_on_tongue', ' unsteadiness', ' visual_disturbances', ' vomiting', ' watering_from_eyes', ' weakness_in_limbs', ' weakness_of_one_body_side', ' weight_gain', ' weight_loss', ' yellow_crust_ooze', ' yellow_urine', ' yellowing_of_eyes', ' yellowish_skin', 'itching']
 
 
 # Return a list of triplet tuples (UMLS concept ID, UMLS Canonical Name, Match score) for each entity that is in the given list of UMLS types
@@ -145,30 +148,59 @@ def symp_to_umls(symp_arr: list)-> list:
     umls.append(tuple[0])
   return umls
 
+def symp_to_umlsV2(symp_arr: list)-> list:
+    cleanSymp = [sub.strip().replace('_', ' ') for sub in symp_arr]
+
+    umls=[]
+    for s in cleanSymp:
+        subumls=[]
+        tuples=find_similarity('/ '+s+' /')
+        for tuple in tuples:
+            subumls.append(tuple[0])
+        umls.append(subumls)
+    return umls
+
 possible_symp_umls = sorted(symp_to_umls(possible_symp))
+possible_symp_umlsV2 = symp_to_umlsV2(possible_sympv2)
 
-
-def pipeline(patient):
-    symp = patient['symptoms']
-    output_vector = [0] * len(possible_symp_umls)
-    for i in range(len(symp)+2):
-      random.shuffle(symp)
-      umls_vector = symp_to_umls(symp)
-      for word in umls_vector:
-          if word in possible_symp_umls:
-              index = possible_symp_umls.index(word)
-              output_vector[index] = 1
-    return output_vector
+def pipeline(patient,case):
+    if(case==1):
+        symp = patient['symptoms']
+        output_vector = [0] * len(possible_symp_umls)
+        for i in range(len(symp)+2):
+            random.shuffle(symp)
+            umls_vector = symp_to_umls(symp)
+        for word in umls_vector:
+            if word in possible_symp_umls:
+                index = possible_symp_umls.index(word)
+                output_vector[index] = 1
+        return output_vector
+    elif(case==2):
+        symp = patient['symptoms']
+        output_vector = [0] * len(possible_sympv2)
+        for i in range(len(symp)+2):
+            random.shuffle(symp)
+            umls_vector = symp_to_umls(symp)
+        for word in umls_vector:
+            for id,u in enumerate(possible_symp_umlsV2):
+                if word in u:
+                     output_vector[id]=1 
+        return output_vector          
 
 def decode_one_hot(pred):
   index = np.argmax(np.array(pred), axis=-1)
   return (diseases[index],pred[index])
   
 
-def predict(nlp_output):
-  predict = new_model.predict([pipeline(nlp_output)])
-  return decode_one_hot(predict[0])
+def predict(nlp_output,case):
+    if(case==1):
+        predict = model1.predict([pipeline(nlp_output,case)])
+        
+    elif(case==2):
+        print(pipeline(nlp_output,2))
+        predict = model2.predict([pipeline(nlp_output,case)])
 
+    return decode_one_hot(predict[0])
 #----------------------------#
 def main():
     reset_patient()
