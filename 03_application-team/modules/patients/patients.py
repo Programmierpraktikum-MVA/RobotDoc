@@ -2,6 +2,7 @@ from flask import Flask, Response, url_for, request, session, abort, render_temp
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from util.db_model import *
 from util.funcs import *
+import modules.model.model as ml
 
 patients = Blueprint("patients", __name__)
 
@@ -11,26 +12,37 @@ patients = Blueprint("patients", __name__)
 def patientsView():
     return render_template("patients.html", patients=patientData)
 
-
+# general prediction without user ("Home")
 @patients.route("/sendInput", methods=["POST"])
 @login_required
 def convertText():
     textToconvert = request.form.get("textToConvert")
     try:
-        output = query({
-            "inputs": textToconvert
-        })
-        cleanOutput = convertString(output)
+        symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
+        cleanOutput = getDiagnosis(symptoms, PM.MLTEAM)
     except:
         cleanOutput = "Error"
     print(cleanOutput)
     return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
 
 
-@patients.route("/assignTokens/<int:id>", methods=["POST"])
+# prediction for user
+@patients.route("/assignTokens/<int:id>/<int:nlp>", methods=["POST"])
 @login_required
-def assignTokens(id):
+def assignTokens(id,nlp):
     textToconvert = request.form.get("textToConvert")
+    try:
+        if nlp == 1:
+            symptoms = getSymptoms(textToconvert, NLP.HF)
+            patientData[id-1]["symptoms"].append(symptoms)
+            cleanOutput = 'This model does not support prediction!'
+        if nlp == 2:
+            symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
+            patientData[id-1]["symptoms"].append(symptoms['symptoms']) # assign symptoms to patient
+            cleanOutput = getDiagnosis(symptoms, PM.MLTEAM) 
+    except:
+        cleanOutput = "Error"
+    """ old api 
     try:
         output = query({
             "inputs": textToconvert
@@ -41,7 +53,8 @@ def assignTokens(id):
     if "Sign_symptom" in parsedOutput:
         print(parsedOutput["Sign_symptom"])
         patientData[id-1]["symptoms"].append(parsedOutput["Sign_symptom"])
-    return render_template("patientSpec.html", patientData=patientData[id-1])
+    """
+    return render_template("patientSpec.html", patientData=patientData[id-1], prediction=cleanOutput, initialText=textToconvert)
 
 
 @patients.route("/patients/<int:id>")

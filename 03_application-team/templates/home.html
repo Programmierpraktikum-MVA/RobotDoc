@@ -73,12 +73,9 @@
                         </form>
                     </div>
                     <div class="box" id="output">
-                        {{initialText}}
+                        <p>Input: <b>{{initialText}}</b></p>
                         <br>
-                        <br>
-                        {% for item in output %}
-                        <p>{{ item }}</p>
-                        {% endfor %}
+                        <p>Prediction: <b>{{ output }}</b></p>
                     </div>
                 </div>
             </div>
