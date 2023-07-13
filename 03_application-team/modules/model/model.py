@@ -1,14 +1,12 @@
 import spacy
-import scispacy
 import tensorflow as tf
 import itertools
 import random
-import os
 import numpy as np 
 from scispacy.linking import EntityLinker
 from transformers import AutoModelForTokenClassification,pipeline, AutoModelForSequenceClassification,AutoTokenizer
-
 #-------------------------------- NLP ----------------------------#
+
 
 access_token='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'
 
@@ -55,16 +53,24 @@ def process_input(sentence):
 
 #------------------------- PIPELINE_AND_PREDICTION ------------------#
 
-nlp = spacy.load("en_core_sci_sm")
-nlp.add_pipe("scispacy_linker", config={"resolve_abbreviations": True, "linker_name": "umls"})
-linker = nlp.get_pipe("scispacy_linker")
+
+def loadSciSpacy():
+    nlp = spacy.load("en_core_sci_sm")
+    nlp.add_pipe("scispacy_linker", config={"resolve_abbreviations": True, "linker_name": "umls"})
+    linker = nlp.get_pipe("scispacy_linker")
+    return nlp, linker
+
+nlp,linker = loadSciSpacy()
+
 
 #loads rasan first predicting model
-new_model = tf.keras.models.load_model(os.curdir+'/model_config')
+new_model = tf.keras.models.load_model('modules/model/model_config')
+
 
 #diseases dict
 diseases=['(vertigo) Paroymsal  Positional Vertigo', 'AIDS', 'Acne', 'Alcoholic hepatitis', 'Allergy', 'Arthritis', 'Bronchial Asthma', 'Cervical spondylosis', 'Chicken pox', 'Chronic cholestasis', 'Common Cold', 'Dengue', 'Diabetes ', 'Dimorphic hemmorhoids(piles)', 'Drug Reaction', 'Fungal infection', 'GERD', 'Gastroenteritis', 'Heart attack', 'Hepatitis B', 'Hepatitis C', 'Hepatitis D', 'Hepatitis E', 'Hypertension ', 'Hyperthyroidism', 'Hypoglycemia', 'Hypothyroidism', 'Impetigo', 'Jaundice', 'Malaria', 'Migraine', 'Osteoarthristis', 'Paralysis (brain hemorrhage)', 'Peptic ulcer diseae', 'Pneumonia', 'Psoriasis', 'Tuberculosis', 'Typhoid', 'Urinary tract infection', 'Varicose veins', 'hepatitis A']
 possible_symp = ['itching', 'skin rash', 'nodal skin eruptions', 'dischromic  patches', 'continuous sneezing', 'shivering', 'chills', 'watering from eyes', 'stomach pain', 'acidity', 'ulcers on tongue', 'vomiting', 'cough', 'chest pain', 'yellowish skin', 'nausea', 'loss of appetite', 'abdominal pain', 'yellowing of eyes', 'burning micturition', 'spotting  urination', 'passage of gases', 'internal itching', 'indigestion', 'muscle wasting', 'patches in throat', 'high fever', 'extra marital contacts', 'fatigue', 'weight loss', 'restlessness', 'lethargy', 'irregular sugar level', 'blurred and distorted vision', 'obesity', 'excessive hunger', 'increased appetite', 'polyuria', 'sunken eyes', 'dehydration', 'diarrhoea', 'breathlessness', 'family history', 'mucoid sputum', 'headache', 'dizziness', 'loss of balance', 'lack of concentration', 'stiff neck', 'depression', 'irritability', 'visual disturbances', 'back pain', 'weakness in limbs', 'neck pain', 'weakness of one body side', 'altered sensorium', 'dark urine', 'sweating', 'muscle pain', 'mild fever', 'swelled lymph nodes', 'malaise', 'red spots over body', 'joint pain', 'pain behind the eyes', 'constipation', 'toxic look (typhos)', 'belly pain', 'yellow urine', 'receiving blood transfusion', 'receiving unsterile injections', 'coma', 'stomach bleeding', 'acute liver failure', 'swelling of stomach', 'distention of abdomen', 'history of alcohol consumption', 'fluid overload', 'phlegm', 'blood in sputum', 'throat irritation', 'redness of eyes', 'sinus pressure', 'runny nose', 'congestion', 'loss of smell', 'fast heart rate', 'rusty sputum', 'pain during bowel movements', 'pain in anal region', 'bloody stool', 'irritation in anus', 'cramps', 'bruising', 'swollen legs', 'swollen blood vessels', 'prominent veins on calf', 'weight gain', 'cold hands and feets', 'mood swings', 'puffy face and eyes', 'enlarged thyroid', 'brittle nails', 'swollen extremeties', 'abnormal menstruation', 'muscle weakness', 'anxiety', 'slurred speech', 'palpitations', 'drying and tingling lips', 'knee pain', 'hip joint pain', 'swelling joints', 'painful walking', 'movement stiffness', 'spinning movements', 'unsteadiness', 'pus filled pimples', 'blackheads', 'scurring', 'bladder discomfort', 'foul smell of urine', 'continuous feel of urine', 'skin peeling', 'silver like dusting', 'small dents in nails', 'inflammatory nails', 'blister', 'red sore around nose', 'yellow crust ooze']
+
 
 
 # Return a list of triplet tuples (UMLS concept ID, UMLS Canonical Name, Match score) for each entity that is in the given list of UMLS types
@@ -156,19 +162,18 @@ def pipeline(patient):
 
 def decode_one_hot(pred):
   index = np.argmax(np.array(pred), axis=-1)
-  print(diseases[index]+ "     Probability :"+str(pred[index]*100))
-  return diseases[index]
+  return (diseases[index],pred[index])
   
 
 def predict(nlp_output):
-  return decode_one_hot(new_model.predict([pipeline(nlp_output)])[0])
+  predict = new_model.predict([pipeline(nlp_output)])
+  return decode_one_hot(predict[0])
 
 #----------------------------#
 def main():
     reset_patient()
-    symptoms = process_input('I am 30 and a male, I have a headache, fever. I am also very tired.')
-    print(symptoms)
-    output=predict(symptoms)
 
 if __name__ == '__main__':
     main()
+
+    

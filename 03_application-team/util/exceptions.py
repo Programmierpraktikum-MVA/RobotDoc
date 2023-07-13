@@ -8,3 +8,9 @@ class InvalidPasswordError(Exception):
 
 class OccupiedUsernameError(Exception):
     pass
+
+class InvalidModelError(Exception):
+    pass
+
+class InvalidSymptomError(Exception):
+    pass
