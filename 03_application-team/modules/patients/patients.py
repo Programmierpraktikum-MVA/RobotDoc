@@ -19,7 +19,7 @@ def convertText():
     textToconvert = request.form.get("textToConvert")
     try:
         symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
-        cleanOutput =(getDiagnosis(symptoms, PM.MLTEAM),getDiagnosis(symptoms, PM.MLTEAM2))
+        cleanOutput =getDiagnosis(symptoms, PM.MLTEAM)
     except:
         cleanOutput = "Error"
     print(cleanOutput)

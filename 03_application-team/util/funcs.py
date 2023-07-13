@@ -15,7 +15,6 @@ class NLP(Enum):
 # available prediction models
 class PM(Enum):
     MLTEAM = 1
-    MLTEAM2 =2
 
 def getSymptoms(input, model):
     if model == NLP.HF:   
@@ -32,9 +31,7 @@ def getSymptoms(input, model):
 def getDiagnosis(symptoms, model):
     if model == PM.MLTEAM:
         # NOTE: symptoms need to be in the format: {"symptoms":[]}
-        return ml.predict(symptoms,1) # get diagnosis (prediction)
-    elif model == PM.MLTEAM2:
-        return ml.predict(symptoms,2)
+        return ml.predict(symptoms) # get diagnosis (prediction)
     else: raise InvalidModelError
 
 def convertString(data):
