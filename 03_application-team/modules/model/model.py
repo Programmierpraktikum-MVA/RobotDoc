@@ -195,7 +195,7 @@ def decode_one_hot(pred):
   return (diseases[index],pred[index])
   
 def decode_symp(input_vect):
-    return np.array(possible_sympv2)[np.array(input_vect)==1]
+    return np.array(possible_sympv2)[np.array(input_vect)==1].tolist()
 
 def predict(nlp_output, threshold = 0.4):
     global resetPatientBool 
