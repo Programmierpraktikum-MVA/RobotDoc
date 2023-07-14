@@ -1,5 +1,5 @@
 FROM python:3.8-slim
-RUN apt-get update && apt-get install -y python3-dev libpq-dev gcc musl-dev
+RUN apt-get update && apt-get install -y python3-dev libpq-dev gcc musl-dev 
 
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
@@ -10,7 +10,9 @@ WORKDIR /app
 
 COPY requirements.txt ./
 RUN pip install --upgrade pip
+
 RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . /app
 
 
