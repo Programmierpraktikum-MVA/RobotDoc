@@ -15,7 +15,7 @@ class Accounts(db.Model):
 
 # postgreSQL DB config coming soon
 patientData = [
-    {"id": 1, "name": "John", "age": 35, "weight": 75.5, "sex": "", "symptoms": []},
+    {"id": 1, "name": "John", "age": 35, "weight": 75.5, "sex": "", "symptoms": ["Headache", "Fever", "Coughing"]},
     {"id": 2, "name": "Sarah", "age": 42, "weight": 68.2, "sex": "", "symptoms": []},
     {"id": 3, "name": "Tamer", "age": 22, "weight": 85.2, "sex": "", "symptoms": []},
     {"id": 4, "name": "Noah", "age": 23, "weight": 70.2, "sex": "", "symptoms": []},

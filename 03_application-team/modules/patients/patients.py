@@ -62,3 +62,13 @@ def assignTokens(id,nlp):
 def patients_route(id):
     print("You pressed on: " + str(id))
     return render_template("patientSpec.html", patientData=patientData[id-1])
+
+
+@patients.route("/patients/<int:patientID>/symptoms/<int:symptomID>")
+@login_required
+def deleteSymptoms(symptomID, patientID):
+    print("PatientID: " + str(patientID))
+    print("SymptomID: " + str(symptomID))
+    symptom = next((patient["symptoms"].pop(symptomID) for patient in patientData if patient["id"] == patientID), None)
+    print(patientData)
+    return redirect("/patients/" + str(patientID))
