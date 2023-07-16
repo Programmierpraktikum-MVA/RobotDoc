@@ -16,9 +16,9 @@
             <nav class="navbar">
                 <div class="container">
                     <div class="navbar-brand">
-                        <a class="navbar-item" href="../">
-                            <img src="{{ url_for('static', filename='img/RobotDoc-logo_V1.png') }}" alt="Logo">
-                        </a>
+                        <div class="navbar-item" href="../">
+                            <img src="{{ url_for('static', filename='img/rd_icon.png') }}" alt="Logo">
+                        </div>
                         <span class="navbar-burger burger" data-target="navbarMenu">
                             <span></span>
                             <span></span>
@@ -29,12 +29,12 @@
                         <div class="navbar-start">
                             <span class="navbar-item">
                                 <a class="button is-white is-outlined" href="/home">
-                                    <span>Home</span>
+                                    <span>General</span>
                                 </a>
                             </span>
                             <span class="navbar-item">
                                 <a class="button is-white is-outlined" href="/patients">
-                                    <span>Patienten</span>
+                                    <span>Patients</span>
                                 </a>
                             </span>
                         </div>
@@ -121,7 +121,7 @@
                             {% endfor %}
                         </p>
                         <br>
-                        <p>Prediction: <b>{{prediction}}</b></p>
+                        <p>Prediction: <b id="outputText">{{prediction}}</b></p>
                     </div>
                 </div>
             </div>
