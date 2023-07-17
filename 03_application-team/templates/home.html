@@ -107,6 +107,14 @@
     </section>
 
     <script src="static/js/scripts.js"></script>
+    <script>
+     const slider = document.getElementById("mySlider");
+    const valueDisplay = document.getElementById("sliderValue");
+    slider.addEventListener("input", function () {
+        const sliderValue = slider.value;
+        valueDisplay.textContent = sliderValue + "%";
+    });
+    </script>
 
 </body>
 
