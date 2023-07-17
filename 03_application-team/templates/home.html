@@ -62,11 +62,20 @@
                         Explain who you are and how you are feeling below.
                     </h2>
                     <div class="box">
+    
                         <form action="/sendInput" method="post" accept-charset="UTF-8">
+                            <div>
+                                <p>Choose your threshold for the model:</p>
+                                <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
+                                <span id="sliderValue">50%</span>
+                            </div>
+
                             <div class="field is-grouped">
                                 <p class="control is-expanded">
                                     <input class="input" type="text" name="textToConvert" placeholder="Enter text">
                                 </p>
+
+                                
                                 <button type="submit" class="button is-info">
                                     Process
                                 </button>
@@ -76,8 +85,21 @@
                     <div class="box" id="output">
                         <p>Input: <b>{{initialText}}</b></p>
                         <br>
-                        <p>Prediction: <b id="outputText">{{ output }}</b></p>
+                        <p>Prediction: <b id="outputText">{{ prediction }}</b></p>
+                        <br>
+                        <p>Symptoms: <b id="outputText">{{ symptoms }}</b></p>
+                        <br>
+                        <p>Confidence: <b id="outputText">{{ confidence }}%</b></p>
                     </div>
+                    
+                    <div class="box" id="reset">
+                        <form action="/resetSymptoms" method="post">
+                        <input value = "Reset Symptoms" type="submit" id="resetButton" class="button is-danger is-light is-centered">
+                           
+                        </input>
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </div>
