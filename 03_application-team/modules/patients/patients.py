@@ -3,6 +3,7 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from util.db_model import *
 from util.funcs import *
 import modules.model.model as ml
+import numpy as np
 
 patients = Blueprint("patients", __name__)
 
@@ -21,11 +22,12 @@ def convertText():
     try:
         symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
         cleanOutput =getDiagnosis(symptoms, PM.MLTEAM,threshold)
-    except Exception as e:
+    except:
         cleanOutput = "Error"
     print(cleanOutput)
     
-    return render_template("home.html", user=str(current_user.id), prediction=cleanOutput[0], symptoms=cleanOutput[1],confidence=round(cleanOutput[2]*100,3),initialText=textToconvert)
+    return render_template("home.html", user=str(current_user.id), prediction=cleanOutput[0], symptoms=[s.strip().replace('_',' ') for s  in cleanOutput[1]]
+    ,confidence=round(cleanOutput[2]*100,3),initialText=textToconvert)
 
 @patients.route("/resetSymptoms", methods=["POST"])
 @login_required
@@ -38,6 +40,7 @@ def resetSymptoms():
 @login_required
 def assignTokens(id,nlp):
     textToconvert = request.form.get("textToConvert")
+    threshold = int(request.form.get("threshold"))/100
     try:
         if nlp == 1:
             symptoms = getSymptoms(textToconvert, NLP.HF)
@@ -45,10 +48,17 @@ def assignTokens(id,nlp):
             cleanOutput = 'This model does not support prediction!'
         if nlp == 2:
             symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
-            patientData[id-1]["symptoms"].append(symptoms['symptoms']) # assign symptoms to patient
-            cleanOutput = getDiagnosis(symptoms, PM.MLTEAM) 
-    except:
-        cleanOutput = "Error"
+            ml.reset_patient()
+            patient_symptoms = add_patient_symptoms(id,symptoms['symptoms'])
+            print(patient_symptoms['symptoms'])
+             # assign symptoms to patient
+            cleanOutput = getDiagnosis(patient_symptoms, PM.MLTEAM,threshold) 
+            patientData[id-1]["symptoms"] = [s.strip().replace('_',' ') for s  in cleanOutput[1]]
+            print(cleanOutput[1])
+            
+    except Exception as e :
+        print(e)
+        cleanOutput = ("Error",'','')
     """ old api 
     try:
         output = query({
@@ -61,7 +71,7 @@ def assignTokens(id,nlp):
         print(parsedOutput["Sign_symptom"])
         patientData[id-1]["symptoms"].append(parsedOutput["Sign_symptom"])
     """
-    return render_template("patientSpec.html", patientData=patientData[id-1], prediction=cleanOutput, initialText=textToconvert)
+    return render_template("patientSpec.html", patientData=patientData[id-1], prediction=cleanOutput[0], initialText=textToconvert, confidence =round(cleanOutput[2]*100,3) )
 
 
 @patients.route("/patients/<int:id>")

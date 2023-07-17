@@ -31,9 +31,4 @@ if (outputTextElement.innerHTML.trim() === "" && outputSymptomsElement.innerHTML
 
 
  // Slider for threshold
- const slider = document.getElementById("mySlider");
- const valueDisplay = document.getElementById("sliderValue");
- slider.addEventListener("input", function () {
-     const sliderValue = slider.value;
-     valueDisplay.textContent = sliderValue + "%";
- });
+ 
