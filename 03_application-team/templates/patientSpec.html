@@ -112,7 +112,7 @@
                             Symptoms:
                             {% set counter = 0 %}
                             {% for patient in patientData.symptoms %}
-                            <span class="tag is-info">{{ patient }}
+                            <span class="tag is-info"><span id="outputSymptoms">{{ patient }}</span>
                                 <a href="/patients/{{patientData['id']}}/symptoms/{{counter}}">
                                     <button class="delete is-small"></button>
                                 </a>
