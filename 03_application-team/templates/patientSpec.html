@@ -115,15 +115,17 @@
                         <br>
                         <p>
                             Symptoms:
-                            {% set counter = 0 %}
-                            {% for patient in patientData.symptoms %}
-                            <span class="tag is-info"><span id="outputSymptoms">{{ patient }}</span>
-                                <a href="/patients/{{patientData['id']}}/symptoms/{{counter}}">
-                                    <button class="delete is-small"></button>
-                                </a>
+                            <span id="outputSymptoms">
+                                {% set counter = 0 %}
+                                {% for patient in patientData.symptoms %}
+                                <span class="tag is-info">{{ patient }}
+                                    <a href="/patients/{{patientData['id']}}/symptoms/{{counter}}">
+                                        <button class="delete is-small"></button>
+                                    </a>
+                                </span>
+                                {% set counter = counter + 1 %}
+                                {% endfor %}
                             </span>
-                            {% set counter = counter + 1 %}
-                            {% endfor %}
                         </p>
                         <br>
                         <p>Prediction: <b id="outputText">{{prediction}}</b></p>
