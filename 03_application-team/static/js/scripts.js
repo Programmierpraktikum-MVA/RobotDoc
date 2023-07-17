@@ -15,16 +15,19 @@ var outputTextElement = document.getElementById("outputText");
 // Get the symptoms element
 var outputSymptomsElement = document.getElementById("outputSymptoms");
 
-// Get the output element
+// Get the output elements
 var outputElement = document.getElementById("output");
+var outputResetElement = document.getElementById("outputReset");
 
 // Check if output is empty
 if (outputTextElement.innerHTML.trim() === "" && outputSymptomsElement.innerHTML.trim() === "") {
     // Hide the output element
     outputElement.style.display = "none";
+    outputResetElement.style.display = "none";
 } else {
     // Show the output element
     outputElement.style.display = "block";
+    outputResetElement.style.display = "block";
 }
 
 // END: show / hide output if empty
