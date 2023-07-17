@@ -12,11 +12,14 @@
 // Get the outputText element
 var outputTextElement = document.getElementById("outputText");
 
+// Get the symptoms element
+var outputSymptomsElement = document.getElementById("outputSymptoms");
+
 // Get the output element
 var outputElement = document.getElementById("output");
 
-// Check if outputText is empty
-if (outputTextElement.innerHTML.trim() === "") {
+// Check if output is empty
+if (outputTextElement.innerHTML.trim() === "" && outputSymptomsElement.innerHTML.trim() === "") {
     // Hide the output element
     outputElement.style.display = "none";
 } else {
