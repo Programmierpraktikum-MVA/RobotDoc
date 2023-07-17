@@ -68,13 +68,14 @@
                             <input type="checkbox" id="checkbox1" onchange="toggleDiv(this, 'div1')">
                             HF Model
                         </label>
-                        -->
                         
                         <label>
                             <input type="checkbox" id="checkbox2" onchange="toggleDiv(this, 'div2')">
                             MLT Model
                         </label>    
+                        -->
 
+                        <!--
                         <form action="/assignTokens/{{patientData['id']}}/1" method="post" accept-charset="UTF-8"
                             id="div1" style="display: none;">
                             <div class="field is-grouped">
@@ -87,9 +88,10 @@
                                 </button>
                             </div>
                         </form>
+                        -->
 
                         <form action="/assignTokens/{{patientData['id']}}/2" method="post" accept-charset="UTF-8"
-                            id="div2" style="display: none;">
+                            id="div2" style="display: block;"> <!-- set to none if hide / show should be enabled (together with  checkboxes above) -->
                             <div class="field is-grouped">
                                 <p class="control is-expanded">
                                     <input class="input" type="text" name="textToConvert"
