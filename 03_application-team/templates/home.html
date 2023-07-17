@@ -54,13 +54,17 @@
         <div class="hero-body">
             <div class="container has-text-centered">
                 <div class="column is-6 is-offset-3">
+                    
                     <p>Logged in as <span>{{user}}</span></p>
+
                     <h1 class="title">
                         RobotDoc
                     </h1>
+                    
                     <h2 class="subtitle">
                         Explain who you are and how you are feeling below.
                     </h2>
+                    
                     <div class="box">
     
                         <form action="/sendInput" method="post" accept-charset="UTF-8">
@@ -69,7 +73,6 @@
                                 <p class="control is-expanded">
                                     <input class="input" type="text" name="textToConvert" placeholder="Enter text">
                                 </p>
-
                                 
                                 <button type="submit" class="button is-info">
                                     Process
@@ -84,6 +87,7 @@
                             
                         </form>
                     </div>
+                    
                     <div class="box" id="output">
                         <p>Input: <b>{{initialText}}</b></p>
                         <br>
@@ -93,13 +97,15 @@
                         <br>
                         <p>Confidence: <b>{{ confidence }}%</b></p>
                     </div>
-                    
-                    <div class="box" id="reset">
-                        <form action="/resetSymptoms" method="post">
-                        <input value = "Reset Symptoms" type="submit" id="resetButton" class="button is-danger is-light is-centered">
-                           
-                        </input>
-                        </form>
+
+                    <div id="output">
+                        <div class="box" id="reset">
+                            <form action="/resetSymptoms" method="post">
+                            <input value = "Reset Symptoms" type="submit" id="resetButton" class="button is-danger is-light is-centered">
+                               
+                            </input>
+                            </form>
+                        </div>
                     </div>
 
                 </div>
