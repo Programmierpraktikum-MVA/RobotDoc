@@ -16,9 +16,9 @@
             <nav class="navbar">
                 <div class="container">
                     <div class="navbar-brand">
-                        <a class="navbar-item" href="../">
-                            <img src="{{ url_for('static', filename='img/RobotDoc-logo_V1.png') }}" alt="Logo">
-                        </a>
+                        <div class="navbar-item" href="../">
+                            <img src="{{ url_for('static', filename='img/rd_icon.png') }}" alt="Logo">
+                        </div>
                         <span class="navbar-burger burger" data-target="navbarMenu">
                             <span></span>
                             <span></span>
@@ -29,12 +29,12 @@
                         <div class="navbar-start">
                             <span class="navbar-item">
                                 <a class="button is-white is-outlined" href="/home">
-                                    <span>Home</span>
+                                    <span>General</span>
                                 </a>
                             </span>
                             <span class="navbar-item">
                                 <a class="button is-white is-outlined" href="/patients">
-                                    <span>Patienten</span>
+                                    <span>Patients</span>
                                 </a>
                             </span>
                         </div>
@@ -73,10 +73,12 @@
                             MLT Model
                         </label>
 
-                        <form action="/assignTokens/{{patientData['id']}}/1" method="post" accept-charset="UTF-8" id="div1" style="display: none;">
+                        <form action="/assignTokens/{{patientData['id']}}/1" method="post" accept-charset="UTF-8"
+                            id="div1" style="display: none;">
                             <div class="field is-grouped">
                                 <p class="control is-expanded">
-                                    <input class="input" type="text" name="textToConvert" placeholder="Enter your symptoms">
+                                    <input class="input" type="text" name="textToConvert"
+                                        placeholder="Enter your symptoms">
                                 </p>
                                 <button type="submit" class="button is-info">
                                     Process with HF
@@ -84,23 +86,42 @@
                             </div>
                         </form>
 
-                        <form action="/assignTokens/{{patientData['id']}}/2" method="post" accept-charset="UTF-8" id="div2" style="display: none;">
+                        <form action="/assignTokens/{{patientData['id']}}/2" method="post" accept-charset="UTF-8"
+                            id="div2" style="display: none;">
                             <div class="field is-grouped">
                                 <p class="control is-expanded">
-                                    <input class="input" type="text" name="textToConvert" placeholder="Enter your symptoms">
+                                    <input class="input" type="text" name="textToConvert"
+                                        placeholder="Enter your symptoms">
                                 </p>
                                 <button type="submit" class="button is-info">
                                     Process with MLT
                                 </button>
                             </div>
                         </form>
+                        <br>
+                        <div>
+                            <p>Choose your threshold for the model:</p>
+                            <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" />
+                            <span id="sliderValue">50%</span>
+                        </div>
                     </div>
                     <div class="box" id="output">
                         <p>Input: <b>{{initialText}}</b></p>
                         <br>
-                        <p>Symptoms: {{patientData["symptoms"]}}</p>
+                        <p>
+                            Symptoms:
+                            {% set counter = 0 %}
+                            {% for patient in patientData.symptoms %}
+                            <span class="tag is-info">{{ patient }}
+                                <a href="/patients/{{patientData['id']}}/symptoms/{{counter}}">
+                                    <button class="delete is-small"></button>
+                                </a>
+                            </span>
+                            {% set counter = counter + 1 %}
+                            {% endfor %}
+                        </p>
                         <br>
-                        <p>Prediction: <b>{{prediction}}</b></p>
+                        <p>Prediction: <b id="outputText">{{prediction}}</b></p>
                     </div>
                 </div>
             </div>
@@ -112,38 +133,48 @@
     <script>
         // show or hide forms (reference: https://chat.openai.com)
         function toggleDiv(checkbox, divId) {
-          var div1 = document.getElementById("div1");
-          var div2 = document.getElementById("div2");
-          var checkbox1 = document.getElementById("checkbox1");
-          var checkbox2 = document.getElementById("checkbox2");
-          
-          if (divId === "div1") {
-            div1.style.display = checkbox.checked ? "block" : "none";
-            div2.style.display = checkbox.checked ? "none" : "block";
-            checkbox2.checked = !checkbox.checked; // toggle the other checkbox
-            localStorage.setItem("checkbox1State", checkbox.checked); // store checkbox state
-            localStorage.setItem("checkbox2State", checkbox2.checked); // store the state of the other checkbox
-          } else if (divId === "div2") {
-            div2.style.display = checkbox.checked ? "block" : "none";
-            div1.style.display = checkbox.checked ? "none" : "block";
-            checkbox1.checked = !checkbox.checked; // toggle the other checkbox
-            localStorage.setItem("checkbox2State", checkbox.checked); // store checkbox state
-            localStorage.setItem("checkbox1State", checkbox1.checked); // store the state of the other checkbox
-          }
+            var div1 = document.getElementById("div1");
+            var div2 = document.getElementById("div2");
+            var checkbox1 = document.getElementById("checkbox1");
+            var checkbox2 = document.getElementById("checkbox2");
+
+            if (divId === "div1") {
+                div1.style.display = checkbox.checked ? "block" : "none";
+                div2.style.display = checkbox.checked ? "none" : "block";
+                checkbox2.checked = !checkbox.checked; // toggle the other checkbox
+                localStorage.setItem("checkbox1State", checkbox.checked); // store checkbox state
+                localStorage.setItem("checkbox2State", checkbox2.checked); // store the state of the other checkbox
+            } else if (divId === "div2") {
+                div2.style.display = checkbox.checked ? "block" : "none";
+                div1.style.display = checkbox.checked ? "none" : "block";
+                checkbox1.checked = !checkbox.checked; // toggle the other checkbox
+                localStorage.setItem("checkbox2State", checkbox.checked); // store checkbox state
+                localStorage.setItem("checkbox1State", checkbox1.checked); // store the state of the other checkbox
+            }
         }
-        
+
         // initialize the checkboxes on page load
-        window.onload = function() {
-          var checkbox1 = document.getElementById("checkbox1");
-          var checkbox2 = document.getElementById("checkbox2");
-          var checkbox1State = localStorage.getItem("checkbox1State");
-          var checkbox2State = localStorage.getItem("checkbox2State");
-          
-          checkbox1.checked = checkbox1State === "true"; // set checkbox state from local storage
-          checkbox2.checked = checkbox2State === "true"; // set checkbox state from local storage
-          
-          toggleDiv(checkbox1, "div1"); // show the corresponding div
+        window.onload = function () {
+            var checkbox1 = document.getElementById("checkbox1");
+            var checkbox2 = document.getElementById("checkbox2");
+            var checkbox1State = localStorage.getItem("checkbox1State");
+            var checkbox2State = localStorage.getItem("checkbox2State");
+
+            checkbox1.checked = checkbox1State === "true"; // set checkbox state from local storage
+            checkbox2.checked = checkbox2State === "true"; // set checkbox state from local storage
+
+            toggleDiv(checkbox1, "div1"); // show the corresponding div
         };
+
+
+        // Slider for threshold
+        const slider = document.getElementById("mySlider");
+        const valueDisplay = document.getElementById("sliderValue");
+        slider.addEventListener("input", function () {
+            const sliderValue = slider.value;
+            valueDisplay.textContent = sliderValue + "%";
+        });
+
     </script>
 
 </body>

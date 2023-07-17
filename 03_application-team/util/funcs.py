@@ -28,10 +28,10 @@ def getSymptoms(input, model):
         return ml.process_input(input) # get symptoms (NLP)
     else: raise InvalidModelError
 
-def getDiagnosis(symptoms, model):
+def getDiagnosis(symptoms, model,threshold):
     if model == PM.MLTEAM:
         # NOTE: symptoms need to be in the format: {"symptoms":[]}
-        return ml.predict(symptoms) # get diagnosis (prediction)
+        return ml.predict(symptoms,threshold) # get diagnosis (prediction)
     else: raise InvalidModelError
 
 def convertString(data):
