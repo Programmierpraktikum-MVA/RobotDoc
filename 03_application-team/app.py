@@ -28,4 +28,4 @@ def start():
 @app.route("/home")
 @login_required
 def home():
-    return render_template("home.html", user=str(current_user.id), prediction="", symptoms="",confidence="",initialText="")
+    return render_template("home.html", user=str(current_user.id))

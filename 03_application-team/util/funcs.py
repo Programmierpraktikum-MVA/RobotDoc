@@ -1,6 +1,7 @@
 import requests
 from util.exceptions import *
 import modules.model.model as ml
+from util.db_model import *
 from enum import Enum
 
 # huggingface api (reference: https://huggingface.co/d4data/biomedical-ner-all)
@@ -82,3 +83,14 @@ def validate_password(password):
     if len(password) < 8:
         raise InvalidPasswordError
     return
+
+def add_patient_symptoms(id,symp):
+    data = patientData[id-1]["symptoms"]
+    for s in symp:
+        if s not in data:
+            data.append(s)
+    patientData[id-1]["symptoms"] = data
+    return  patientData[id-1]
+    
+    
+    

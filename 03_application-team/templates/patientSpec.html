@@ -97,13 +97,14 @@
                                     Process with MLT
                                 </button>
                             </div>
+
+                            <div>
+                                <p>Choose your threshold for the model:</p>
+                                <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
+                                <span id="sliderValue">50%</span>
+                            </div>
                         </form>
                         <br>
-                        <div>
-                            <p>Choose your threshold for the model:</p>
-                            <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" />
-                            <span id="sliderValue">50%</span>
-                        </div>
                     </div>
                     <div class="box" id="output">
                         <p>Input: <b>{{initialText}}</b></p>
@@ -122,6 +123,7 @@
                         </p>
                         <br>
                         <p>Prediction: <b id="outputText">{{prediction}}</b></p>
+                        <p>Confidence: <b id="outputText">{{ confidence }}%</b></p>
                     </div>
                 </div>
             </div>
