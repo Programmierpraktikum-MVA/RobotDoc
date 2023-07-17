@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | RobotDoc</title>
     <link rel="stylesheet" href="static/css/bulma.css">
+    <link rel="stylesheet" href="static/css/main.css">
     <link rel="shortcut icon" href="static/img/favicon.jpg">
 </head>
 
@@ -16,9 +17,9 @@
             <nav class="navbar">
                 <div class="container">
                     <div class="navbar-brand">
-                        <a class="navbar-item" href="../">
-                            <img src="static/img/RobotDoc-logo_V1.png" alt="Logo">
-                        </a>
+                        <div class="navbar-item" href="../">
+                            <img src="static/img/rd_icon.png" alt="Logo">
+                        </div>
                         <span class="navbar-burger burger" data-target="navbarMenu">
                             <span></span>
                             <span></span>
@@ -29,12 +30,12 @@
                         <div class="navbar-start">
                             <span class="navbar-item">
                                 <a class="button is-white is-outlined" href="/home">
-                                    <span>Home</span>
+                                    <span>General</span>
                                 </a>
                             </span>
                             <span class="navbar-item">
                                 <a class="button is-white is-outlined" href="/patients">
-                                    <span>Patienten</span>
+                                    <span>Patients</span>
                                 </a>
                             </span>
                         </div>
@@ -61,11 +62,20 @@
                         Explain who you are and how you are feeling below.
                     </h2>
                     <div class="box">
+    
                         <form action="/sendInput" method="post" accept-charset="UTF-8">
+                            <div>
+                                <p>Choose your threshold for the model:</p>
+                                <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
+                                <span id="sliderValue">50%</span>
+                            </div>
+
                             <div class="field is-grouped">
                                 <p class="control is-expanded">
                                     <input class="input" type="text" name="textToConvert" placeholder="Enter text">
                                 </p>
+
+                                
                                 <button type="submit" class="button is-info">
                                     Process
                                 </button>
@@ -75,8 +85,21 @@
                     <div class="box" id="output">
                         <p>Input: <b>{{initialText}}</b></p>
                         <br>
-                        <p>Prediction: <b>{{ output }}</b></p>
+                        <p>Prediction: <b id="outputText">{{ prediction }}</b></p>
+                        <br>
+                        <p>Symptoms: <b id="outputText">{{ symptoms }}</b></p>
+                        <br>
+                        <p>Confidence: <b id="outputText">{{ confidence }}%</b></p>
                     </div>
+                    
+                    <div class="box" id="reset">
+                        <form action="/resetSymptoms" method="post">
+                        <input value = "Reset Symptoms" type="submit" id="resetButton" class="button is-danger is-light is-centered">
+                           
+                        </input>
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </div>

@@ -17,14 +17,21 @@ def patientsView():
 @login_required
 def convertText():
     textToconvert = request.form.get("textToConvert")
+    threshold = int(request.form.get("threshold"))/100
     try:
         symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
-        cleanOutput = getDiagnosis(symptoms, PM.MLTEAM)
-    except:
+        cleanOutput =getDiagnosis(symptoms, PM.MLTEAM,threshold)
+    except Exception as e:
         cleanOutput = "Error"
     print(cleanOutput)
-    return render_template("home.html", user=str(current_user.id), output=cleanOutput, initialText=textToconvert)
+    
+    return render_template("home.html", user=str(current_user.id), prediction=cleanOutput[0], symptoms=cleanOutput[1],confidence=round(cleanOutput[2]*100,3),initialText=textToconvert)
 
+@patients.route("/resetSymptoms", methods=["POST"])
+@login_required
+def resetSymptoms():
+    ml.reset_patient()
+    return render_template("home.html", user=str(current_user.id))
 
 # prediction for user
 @patients.route("/assignTokens/<int:id>/<int:nlp>", methods=["POST"])
@@ -62,3 +69,13 @@ def assignTokens(id,nlp):
 def patients_route(id):
     print("You pressed on: " + str(id))
     return render_template("patientSpec.html", patientData=patientData[id-1])
+
+
+@patients.route("/patients/<int:patientID>/symptoms/<int:symptomID>")
+@login_required
+def deleteSymptoms(symptomID, patientID):
+    print("PatientID: " + str(patientID))
+    print("SymptomID: " + str(symptomID))
+    symptom = next((patient["symptoms"].pop(symptomID) for patient in patientData if patient["id"] == patientID), None)
+    print(patientData)
+    return redirect("/patients/" + str(patientID))
