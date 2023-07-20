@@ -2,6 +2,13 @@
 
 RobotDoc is an AI-based disease diagnosis application – developed by students for the [Modern Distributed Applications](https://moseskonto.tu-berlin.de/moses/modultransfersystem/bolognamodule/beschreibung/anzeigen.html?number=40908&version=2&sprache=1) module at TU Berlin. 
 
+## Architecture
+
+A BPMN diagram overview of our proposed architecture:
+
+![architecture](https://github.com/Programmierpraktikum-MVA/RobotDoc/assets/79874249/1fbda45e-1306-4357-89f4-8283c0843c66)
+
+
 ## Demo
 
 You may try a hosted demo version on our own server: [robotdoc.adastruct.com](robotdoc.adastruct.com)
