@@ -22,4 +22,4 @@ You may try a hosted demo version on our own server: [robotdoc.adastruct.com](ro
 
 [^1]: https://isis.tu-berlin.de/course/view.php?id=33313#section-
 
-> Contributions: Matthieu Decotignie, Noel Kronenberg, Rasan Younis, Tamer Aktas, Daniel Sebastian Aust, David Maximilian Fränkle, Ulas Can Akyildiz, George Badour, Feidi Kallel, Emirhan Sarioglu, Annabelle Elise Kröger, Geri Capo, Irem Kement, Till Friedemann Kurek
+> Contributions: Matthieu Decotignie (Machine Learning Team), Noel Kronenberg (Software Architect & Application Team), Rasan Younis (Machine Learning Team), Tamer Aktas (Application Team), Daniel Sebastian Aust (Application Team), David Maximilian Fränkle (Data Team), Ulas Can Akyildiz, George Badour, Feidi Kallel, Emirhan Sarioglu, Annabelle Elise Kröger, Geri Capo, Irem Kement, Till Friedemann Kurek
