@@ -8,7 +8,6 @@ A BPMN diagram overview of our proposed architecture:
 
 ![architecture](https://github.com/Programmierpraktikum-MVA/RobotDoc/assets/79874249/1fbda45e-1306-4357-89f4-8283c0843c66)
 
-
 ## Demo
 
 You may try a hosted demo version on our own server: [robotdoc.adastruct.com](robotdoc.adastruct.com)
@@ -22,3 +21,5 @@ You may try a hosted demo version on our own server: [robotdoc.adastruct.com](ro
 4. open application: http://127.0.0.1:5000
 
 [^1]: https://isis.tu-berlin.de/course/view.php?id=33313#section-
+
+> Contributions: Matthieu Decotignie, Noel Kronenberg, Rasan Younis, Tamer Aktas, Daniel Sebastian Aust, David Maximilian Fränkle, Ulas Can Akyildiz, George Badour, Feidi Kallel, Emirhan Sarioglu, Annabelle Elise Kröger, Geri Capo, Irem Kement, Till Friedemann Kurek
