@@ -10,7 +10,7 @@ A BPMN diagram overview of our proposed architecture:
 
 ## Demo
 
-You may try a hosted demo version on our own server: [robotdoc.adastruct.com](robotdoc.adastruct.com)
+You may try a hosted demo version on our own server: [robotdoc.adastruct.com](https://robotdoc.adastruct.com/)
 
 ## Set-up
 
