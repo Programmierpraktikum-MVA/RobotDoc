@@ -5,7 +5,7 @@ import itertools
 import random
 import numpy as np 
 from scispacy.linking import EntityLinker
-from transformers import AutoModelForTokenClassification,generate_input_vector, AutoModelForSequenceClassification,AutoTokenizer
+from transformers import AutoModelForTokenClassification,pipeline, AutoModelForSequenceClassification,AutoTokenizer
 #-------------------------------- NLP ----------------------------#
 resetPatientBool = True
 
@@ -13,11 +13,11 @@ access_token='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'
 
 fine_tuned_model =  AutoModelForTokenClassification.from_pretrained("mdecot/RobotDocNLP",use_auth_token=access_token)
 tokenizer = AutoTokenizer.from_pretrained("allenai/scibert_scivocab_uncased")
-fine_tuned_ner = generate_input_vector("ner", model=fine_tuned_model, tokenizer=tokenizer,aggregation_strategy="simple")
+fine_tuned_ner = pipeline("ner", model=fine_tuned_model, tokenizer=tokenizer,aggregation_strategy="simple")
 
 age_tokenizer = AutoTokenizer.from_pretrained("padmajabfrl/Gender-Classification")
 age_model = AutoModelForSequenceClassification.from_pretrained("padmajabfrl/Gender-Classification")
-age_pipeline =generate_input_vector("text-classification",model=age_model, tokenizer=age_tokenizer)
+age_pipeline =pipeline("text-classification",model=age_model, tokenizer=age_tokenizer)
 
 
 patient={"symptoms":[]}
@@ -203,6 +203,7 @@ def symp_to_umls(symptoms ,case):
     tuples =find_similarity('/ ' +" / ".join(symptoms)+' /' )
     for tuple in tuples:
         umls.append(tuple[0])
+    return umls
     
   elif case == 2:
     cleanSymp = [sub.strip().replace('_', ' ') for sub in symptoms]
@@ -212,13 +213,14 @@ def symp_to_umls(symptoms ,case):
         for tuple in tuples:
             subumls.append(tuple[0])
         umls.append(subumls)
+        return umls
 
-    return umls
+    
 
 
     
 #UMLS code list, that will be used as input vector shape
-umls_symp_model_1 = sorted(symp_to_umls(symp_model_1),1)
+umls_symp_model_1 = sorted(symp_to_umls(symp_model_1,1))
 umls_symp_model_2 = symp_to_umls(symp_model_2,2)
 
 
@@ -239,7 +241,7 @@ def generate_input_vector(patient,case):
         input_vector = [0] * len(umls_symp_model_1)
         for i in range(len(symp)+2):
             random.shuffle(symp)
-            umls_vector = symp_to_umls(symp)
+            umls_vector = symp_to_umls(symp,case)
         for word in umls_vector:
             if word in umls_symp_model_1:
                 index = umls_symp_model_1.index(word)
@@ -250,7 +252,7 @@ def generate_input_vector(patient,case):
         input_vector = [0] * len(symp_model_2)
         for i in range(len(symp)+2):
             random.shuffle(symp)
-            umls_vector = symp_to_umls(symp)
+            umls_vector = symp_to_umls(symp,case)
         for word in umls_vector:
             for id,u in enumerate(umls_symp_model_2):
                 if word in u:
