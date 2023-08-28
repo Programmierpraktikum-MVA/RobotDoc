@@ -2,18 +2,19 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+"""
+This represents the table structure of the database.
+The classes' names need to be the exact same as the table name in the database with a capital letter.    
+"""
+
 
 class Accounts(db.Model):
-    """
-    represents the table structure of the PostgreSQL server
-    *DOES NOT create a new if table, if non-existent*
-    """
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String)
     hash = db.Column(db.LargeBinary)
 
 
-# postgreSQL DB config coming soon
+# dummy data, database model to implemented
 patientData = [
     {"id": 1, "name": "John", "age": 35, "weight": 75.5, "sex": "", "symptoms": ["Headache", "Fever", "Coughing"]},
     {"id": 2, "name": "Sarah", "age": 42, "weight": 68.2, "sex": "", "symptoms": []},

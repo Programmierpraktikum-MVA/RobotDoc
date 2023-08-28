@@ -8,7 +8,10 @@ from modules.patients.patients import *
 # default config
 app = Flask(__name__)
 app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
+
+# URI of the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://xqrornwg:QjZBbShdIqvLjHohXXMfvIXoSuc3lnZr@horton.db.elephantsql.com/xqrornwg'
+
 db.init_app(app)
 
 app.register_blueprint(auth)
