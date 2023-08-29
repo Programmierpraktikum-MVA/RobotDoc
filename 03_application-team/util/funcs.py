@@ -24,7 +24,7 @@ def getSymptoms(input, model):
             } # get correct format
         response = convertString(requests.post(API_URL, headers=headers, json=payload).json) # api call
         if "Sign_symptom" in response: return response["Sign_symptom"]
-        else: raise InvalidSymptomError
+        
     if model == NLP.MLTEAM:
         return ml.process_input(input) # get symptoms (NLP)
     else: raise InvalidModelError

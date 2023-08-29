@@ -71,6 +71,7 @@ def assignTokens(id,nlp):
         print(parsedOutput["Sign_symptom"])
         patientData[id-1]["symptoms"].append(parsedOutput["Sign_symptom"])
     """
+    print(cleanOutput)
     return render_template("patientSpec.html", patientData=patientData[id-1], prediction=cleanOutput[0], initialText=textToconvert, confidence =round(cleanOutput[2]*100,3) )
 
 
