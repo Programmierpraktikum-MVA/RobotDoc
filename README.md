@@ -12,6 +12,12 @@ A BPMN diagram overview of our proposed architecture:
 
 You may try a hosted demo version on our own server: [robotdoc.adastruct.com](https://robotdoc.adastruct.com/)
 
+https://github.com/Programmierpraktikum-MVA/RobotDoc/assets/79874249/033af98f-c550-41be-a9c3-088b80c1f80c
+
+https://github.com/Programmierpraktikum-MVA/RobotDoc/assets/79874249/40933a3d-dde6-4a32-bf35-9b1b086e33e7
+
+https://github.com/Programmierpraktikum-MVA/RobotDoc/assets/79874249/0a4e1b43-2413-46a5-b1df-6b4102542412
+
 ## Set-up
 
 0. create and select virtual environment (with Python 3.9.6 or lower)
