@@ -259,7 +259,7 @@ def generate_input_vector(patient,case):
                 for id,u in enumerate(umls_symp_model_2):
                     if word[0] in u:
                      input_vector[id]=1 
-                     print("OUIIII")
+                    
         return input_vector          
 
 def decode_one_hot(model_prediction):
