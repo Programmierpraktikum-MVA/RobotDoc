@@ -106,6 +106,7 @@ def loadSciSpacy():
 nlp,linker = loadSciSpacy()
 
 #Load the 2 prediction models
+
 first_model = tf.keras.models.load_model('modules/model/model_config')
 second_model = tf.keras.models.load_model('modules/model/model_config2')
 
