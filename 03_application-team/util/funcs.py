@@ -3,6 +3,9 @@ from util.exceptions import *
 import modules.model.model as ml
 from util.db_model import *
 from enum import Enum
+#DENEME IMPORTLAR
+from util.knowledge_graph import *
+import matplotlib
 
 # huggingface api (reference: https://huggingface.co/d4data/biomedical-ner-all)
 API_URL = "https://api-inference.huggingface.co/models/d4data/biomedical-ner-all"
@@ -16,6 +19,12 @@ class NLP(Enum):
 # available prediction models
 class PM(Enum):
     MLTEAM = 1
+
+#DENEME: GRAPH ÇİZİMİ BİTMEDİ!!
+
+def drawGraph(input):
+
+    return 0
 
 def getSymptoms(input, model):
     if model == NLP.HF:   
