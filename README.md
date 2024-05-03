@@ -1,4 +1,4 @@
-# RobotDoc 
+# RobotDoc SS23
 
 RobotDoc is an AI-based disease diagnosis application – developed by students for the [Modern Distributed Applications](https://moseskonto.tu-berlin.de/moses/modultransfersystem/bolognamodule/beschreibung/anzeigen.html?number=40908&version=2&sprache=1) module at TU Berlin. 
 
