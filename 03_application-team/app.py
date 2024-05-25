@@ -5,12 +5,36 @@ from util.db_model import *
 from modules.auth.auth import *
 from modules.patients.patients import *
 
+
+from sshtunnel import SSHTunnelForwarder
+
+# Konfigurationsparameter für den SSH-Tunnel und die Datenbank
+SSH_HOST = 'gpu.adastruct.com'
+SSH_PORT = 22
+SSH_USER = 'pp'
+SSH_PASSWORD = "Z7.b'NV9i$n6"  
+DB_HOST = 'localhost'
+
+
+# Aufbau des SSH-Tunnels
+server = SSHTunnelForwarder(
+    (SSH_HOST, SSH_PORT),
+    ssh_username=SSH_USER,
+    ssh_password=SSH_PASSWORD,
+    remote_bind_address=(DB_HOST, 5432),
+    local_bind_address=('localhost', 5432)
+)
+#ssh tunnel wird autom. beendee, wenn das Programm beendet wird
+server.start()
+
 # default config
 app = Flask(__name__)
 app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
 # URI of the database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://xqrornwg:QjZBbShdIqvLjHohXXMfvIXoSuc3lnZr@horton.db.elephantsql.com/xqrornwg'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 db.init_app(app)
 
