@@ -1,0 +1,284 @@
+from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify, Blueprint
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+from util.db_model import *
+from util.funcs import *
+import modules.model.model as ml
+import numpy as np
+
+#Imports for Graph-Drawing
+
+import networkx as nx
+import matplotlib.pyplot as plt
+
+patients = Blueprint("patients", __name__)
+
+
+@patients.route("/patients")
+@login_required
+def patientsView():
+    return render_template("patients.html", patients=patientData)
+
+
+#KNOWLEDGE GRAPH Dummy-Page
+@patients.route("/know")
+@login_required
+def knowView():
+    return render_template("know.html")
+
+
+# general prediction without user ("Home")
+@patients.route("/sendInput", methods=["POST"])
+@login_required
+def convertText():
+    textToconvert = request.form.get("textToConvert")
+    threshold = int(request.form.get("threshold"))/100
+    try:
+        symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
+        cleanOutput =getDiagnosis(symptoms, PM.MLTEAM,threshold)
+    except:
+        cleanOutput = "Error"
+    print(cleanOutput)
+
+     # Add nodes (symptoms) and edges (relationships)
+    symptoms = cleanOutput[1]
+    disease = cleanOutput[0]
+    print(symptoms)
+    print(type(symptoms))
+    # Drawing a Graph
+    # Create a new graph
+
+    G = nx.DiGraph()
+
+    # Add nodes (symptoms) and edges (relationships)
+    # All possible diseases from the dataset
+    all_diseases = ['(vertigo) Paroymsal  Positional Vertigo', 'AIDS', 'Acne', 'Alcoholic hepatitis', 'Allergy',
+                    'Arthritis', 'Bronchial Asthma', 'Cervical spondylosis', 'Chicken pox', 'Chronic cholestasis',
+                    'Common Cold', 'Dengue', 'Diabetes ', 'Dimorphic hemmorhoids(piles)', 'Drug Reaction',
+                    'Fungal infection', 'GERD', 'Gastroenteritis', 'Heart attack', 'Hepatitis B', 'Hepatitis C',
+                    'Hepatitis D', 'Hepatitis E', 'Hypertension ', 'Hyperthyroidism', 'Hypoglycemia', 'Hypothyroidism',
+                    'Impetigo', 'Jaundice', 'Malaria', 'Migraine', 'Osteoarthristis', 'Paralysis (brain hemorrhage)',
+                    'Peptic ulcer diseae', 'Pneumonia', 'Psoriasis', 'Tuberculosis', 'Typhoid',
+                    'Urinary tract infection', 'Varicose veins', 'hepatitis A']
+    # All possible symptoms working with the first and the second model
+    all_symptoms = ['itching', 'skin rash', 'nodal skin eruptions', 'dischromic  patches', 'continuous sneezing',
+                    'shivering', 'chills', 'watering from eyes', 'stomach pain', 'acidity', 'ulcers on tongue',
+                    'vomiting', 'cough', 'chest pain', 'yellowish skin', 'nausea', 'loss of appetite', 'abdominal pain',
+                    'yellowing of eyes', 'burning micturition', 'spotting  urination', 'passage of gases',
+                    'internal itching', 'indigestion', 'muscle wasting', 'patches in throat', 'high fever',
+                    'extra marital contacts', 'fatigue', 'weight loss', 'restlessness', 'lethargy',
+                    'irregular sugar level', 'blurred and distorted vision', 'obesity', 'excessive hunger',
+                    'increased appetite', 'polyuria', 'sunken eyes', 'dehydration', 'diarrhoea', 'breathlessness',
+                    'family history', 'mucoid sputum', 'headache', 'dizziness', 'loss of balance',
+                    'lack of concentration', 'stiff neck', 'depression', 'irritability', 'visual disturbances',
+                    'back pain', 'weakness in limbs', 'neck pain', 'weakness of one body side', 'altered sensorium',
+                    'dark urine', 'sweating', 'muscle pain', 'mild fever', 'swelled lymph nodes', 'malaise',
+                    'red spots over body', 'joint pain', 'pain behind the eyes', 'constipation', 'toxic look (typhos)',
+                    'belly pain', 'yellow urine', 'receiving blood transfusion', 'receiving unsterile injections',
+                    'coma', 'stomach bleeding', 'acute liver failure', 'swelling of stomach', 'distention of abdomen',
+                    'history of alcohol consumption', 'fluid overload', 'phlegm', 'blood in sputum',
+                    'throat irritation', 'redness of eyes', 'sinus pressure', 'runny nose', 'congestion',
+                    'loss of smell', 'fast heart rate', 'rusty sputum', 'pain during bowel movements',
+                    'pain in anal region', 'bloody stool', 'irritation in anus', 'cramps', 'bruising', 'swollen legs',
+                    'swollen blood vessels', 'prominent veins on calf', 'weight gain', 'cold hands and feets',
+                    'mood swings', 'puffy face and eyes', 'enlarged thyroid', 'brittle nails', 'swollen extremeties',
+                    'abnormal menstruation', 'muscle weakness', 'anxiety', 'slurred speech', 'palpitations',
+                    'drying and tingling lips', 'knee pain', 'hip joint pain', 'swelling joints', 'painful walking',
+                    'movement stiffness', 'spinning movements', 'unsteadiness', 'pus filled pimples', 'blackheads',
+                    'scurring', 'bladder discomfort', 'foul smell of urine', 'continuous feel of urine', 'skin peeling',
+                    'silver like dusting', 'small dents in nails', 'inflammatory nails', 'blister',
+                    'red sore around nose', 'yellow crust ooze']
+
+    symptoms = [symptom.strip() for symptom in symptoms]
+    if not isinstance(symptoms, list):
+        symptoms = [symptoms]
+
+    for possible_disease in all_diseases:
+        G.add_node(possible_disease)
+
+
+    # for symptom in all_symptoms:
+    #    G.add_node(symptom)
+
+    for symptom in symptoms:
+        # G.add_node(symptom)
+        G.add_edge(symptom, disease, arrows=True, arrowstyle="-|>", arrowsize=30)
+
+    # create empty list for node colors
+    node_color = []
+
+    # for each node in the graph
+    for node in G.nodes(data=True):
+        if node[0] in all_symptoms:
+            node_color.append("#69A8F5")
+        else:
+            node_color.append("#F79A28")
+
+    #Drawing the graph
+    plt.figure(figsize=(10, 10))
+    outer_nodes = set(G) - set(symptoms)
+    pos = nx.circular_layout(G.subgraph(outer_nodes), scale=3)  #
+    pos2 = nx.circular_layout(G.subgraph(symptoms), center=[0, 0], scale=0.5)
+    pos_fin = {**pos, **pos2}
+    pos_fin
+
+    # nx.draw_shell(G,k=20, with_labels=True, font_size=6, node_size=50, node_color=node_color , font_color='black')
+    nx.draw(G, pos_fin, with_labels=True, font_size=8, node_size=500, node_color=node_color, font_color='black')
+    # nx.draw(G, pos, with_labels=True)
+    plt.title(f"Knowledge Graph for {disease}")
+
+    # plt.show()
+    # Save the graph as an image
+    plt.savefig(
+        "static/img/graph_visualization.png")
+
+    return render_template("home.html", user=str(current_user.id), prediction=cleanOutput[0], symptoms=[s.strip().replace('_',' ') for s  in cleanOutput[1]]
+    ,confidence=round(cleanOutput[2]*100,3),initialText=textToconvert)
+
+
+@patients.route("/resetSymptoms", methods=["POST"])
+@login_required
+def resetSymptoms():
+    ml.reset_patient()
+    return render_template("home.html", user=str(current_user.id))
+
+# prediction for user
+@patients.route("/assignTokens/<int:id>/<int:nlp>", methods=["POST"])
+@login_required
+def assignTokens(id,nlp):
+    textToconvert = request.form.get("textToConvert")
+    threshold = int(request.form.get("threshold"))/100
+    try:
+        if nlp == 1:
+            symptoms = getSymptoms(textToconvert, NLP.HF)
+            patientData[id-1]["symptoms"].append(symptoms)
+            cleanOutput = 'This model does not support prediction!'
+        if nlp == 2:
+            symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
+            ml.reset_patient()
+            patient_symptoms = add_patient_symptoms(id,symptoms['symptoms'])
+            print(patient_symptoms['symptoms'])
+             # assign symptoms to patient
+            cleanOutput = getDiagnosis(patient_symptoms, PM.MLTEAM,threshold) 
+            patientData[id-1]["symptoms"] = [s.strip().replace('_',' ') for s  in cleanOutput[1]]
+            print(cleanOutput[1])
+            
+    except Exception as e :
+        print(e)
+        cleanOutput = ("Error",'','')
+    """ old api 
+    try:
+        output = query({
+            "inputs": textToconvert
+        })
+        parsedOutput = parseString(output)
+    except:
+        parsedOutput = "Error"
+    if "Sign_symptom" in parsedOutput:
+        print(parsedOutput["Sign_symptom"])
+        patientData[id-1]["symptoms"].append(parsedOutput["Sign_symptom"])
+    """
+    print(cleanOutput)
+    # Add nodes (symptoms) and edges (relationships)
+    symptoms = cleanOutput[1]
+    disease = cleanOutput[0]
+    print(symptoms)
+    print(type(symptoms))
+
+    G = nx.DiGraph()
+
+    # Add nodes (symptoms) and edges (relationships)
+    # All possible diseases from the dataset
+    all_diseases = ['(vertigo) Paroymsal  Positional Vertigo', 'AIDS', 'Acne', 'Alcoholic hepatitis', 'Allergy',
+                    'Arthritis', 'Bronchial Asthma', 'Cervical spondylosis', 'Chicken pox', 'Chronic cholestasis',
+                    'Common Cold', 'Dengue', 'Diabetes ', 'Dimorphic hemmorhoids(piles)', 'Drug Reaction',
+                    'Fungal infection', 'GERD', 'Gastroenteritis', 'Heart attack', 'Hepatitis B', 'Hepatitis C',
+                    'Hepatitis D', 'Hepatitis E', 'Hypertension ', 'Hyperthyroidism', 'Hypoglycemia', 'Hypothyroidism',
+                    'Impetigo', 'Jaundice', 'Malaria', 'Migraine', 'Osteoarthristis', 'Paralysis (brain hemorrhage)',
+                    'Peptic ulcer diseae', 'Pneumonia', 'Psoriasis', 'Tuberculosis', 'Typhoid',
+                    'Urinary tract infection', 'Varicose veins', 'hepatitis A']
+    # All possible symptoms working with the first and the second model
+    all_symptoms = ['itching', 'skin rash', 'nodal skin eruptions', 'dischromic  patches', 'continuous sneezing',
+                    'shivering', 'chills', 'watering from eyes', 'stomach pain', 'acidity', 'ulcers on tongue',
+                    'vomiting', 'cough', 'chest pain', 'yellowish skin', 'nausea', 'loss of appetite', 'abdominal pain',
+                    'yellowing of eyes', 'burning micturition', 'spotting  urination', 'passage of gases',
+                    'internal itching', 'indigestion', 'muscle wasting', 'patches in throat', 'high fever',
+                    'extra marital contacts', 'fatigue', 'weight loss', 'restlessness', 'lethargy',
+                    'irregular sugar level', 'blurred and distorted vision', 'obesity', 'excessive hunger',
+                    'increased appetite', 'polyuria', 'sunken eyes', 'dehydration', 'diarrhoea', 'breathlessness',
+                    'family history', 'mucoid sputum', 'headache', 'dizziness', 'loss of balance',
+                    'lack of concentration', 'stiff neck', 'depression', 'irritability', 'visual disturbances',
+                    'back pain', 'weakness in limbs', 'neck pain', 'weakness of one body side', 'altered sensorium',
+                    'dark urine', 'sweating', 'muscle pain', 'mild fever', 'swelled lymph nodes', 'malaise',
+                    'red spots over body', 'joint pain', 'pain behind the eyes', 'constipation', 'toxic look (typhos)',
+                    'belly pain', 'yellow urine', 'receiving blood transfusion', 'receiving unsterile injections',
+                    'coma', 'stomach bleeding', 'acute liver failure', 'swelling of stomach', 'distention of abdomen',
+                    'history of alcohol consumption', 'fluid overload', 'phlegm', 'blood in sputum',
+                    'throat irritation', 'redness of eyes', 'sinus pressure', 'runny nose', 'congestion',
+                    'loss of smell', 'fast heart rate', 'rusty sputum', 'pain during bowel movements',
+                    'pain in anal region', 'bloody stool', 'irritation in anus', 'cramps', 'bruising', 'swollen legs',
+                    'swollen blood vessels', 'prominent veins on calf', 'weight gain', 'cold hands and feets',
+                    'mood swings', 'puffy face and eyes', 'enlarged thyroid', 'brittle nails', 'swollen extremeties',
+                    'abnormal menstruation', 'muscle weakness', 'anxiety', 'slurred speech', 'palpitations',
+                    'drying and tingling lips', 'knee pain', 'hip joint pain', 'swelling joints', 'painful walking',
+                    'movement stiffness', 'spinning movements', 'unsteadiness', 'pus filled pimples', 'blackheads',
+                    'scurring', 'bladder discomfort', 'foul smell of urine', 'continuous feel of urine', 'skin peeling',
+                    'silver like dusting', 'small dents in nails', 'inflammatory nails', 'blister',
+                    'red sore around nose', 'yellow crust ooze']
+
+    symptoms = [symptom.strip() for symptom in symptoms]
+    if not isinstance(symptoms, list):
+        symptoms = [symptoms]
+
+    for possible_disease in all_diseases:
+        G.add_node(possible_disease)
+
+    # for symptom in all_symptoms:
+    #    G.add_node(symptom)
+
+    for symptom in symptoms:
+        # G.add_node(symptom)
+        G.add_edge(symptom, disease, arrows=True, arrowstyle="-|>", arrowsize=30)
+
+    # create empty list for node colors
+    node_color = []
+
+    # for each node in the graph
+    for node in G.nodes(data=True):
+        if node[0] in all_symptoms:
+            node_color.append("#69A8F5")
+        else:
+            node_color.append("#F79A28")
+
+    plt.figure(figsize=(10, 10))
+    outer_nodes = set(G) - set(symptoms)
+    pos = nx.circular_layout(G.subgraph(outer_nodes), scale=3)  #
+    pos2 = nx.circular_layout(G.subgraph(symptoms), center=[0, 0], scale=0.5)
+    pos_fin = {**pos, **pos2}
+    pos_fin
+
+    # nx.draw_shell(G,k=20, with_labels=True, font_size=6, node_size=50, node_color=node_color , font_color='black')
+    nx.draw(G, pos_fin, with_labels=True, font_size=8, node_size=500, node_color=node_color, font_color='black')
+    # nx.draw(G, pos, with_labels=True)
+    plt.title(f"Knowledge Graph for {disease}")
+
+    plt.savefig(
+        "static/img/graph_visualization_patient.png")
+
+    return render_template("patientSpec.html", patientData=patientData[id-1], prediction=cleanOutput[0], initialText=textToconvert, confidence =round(cleanOutput[2]*100,3) )
+
+
+@patients.route("/patients/<int:id>")
+@login_required
+def patients_route(id):
+    print("You pressed on: " + str(id))
+    return render_template("patientSpec.html", patientData=patientData[id-1])
+
+
+@patients.route("/patients/<int:patientID>/symptoms/<int:symptomID>")
+@login_required
+def deleteSymptoms(symptomID, patientID):
+    print("PatientID: " + str(patientID))
+    print("SymptomID: " + str(symptomID))
+    symptom = next((patient["symptoms"].pop(symptomID) for patient in patientData if patient["id"] == patientID), None)
+    print(patientData)
+    return redirect("/patients/" + str(patientID))
