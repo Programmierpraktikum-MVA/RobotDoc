@@ -12,6 +12,9 @@ class Accounts(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String)
     hash = db.Column(db.LargeBinary)
+class Images(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    image_data = db.Column(db.Text)
 
 
 # dummy data, database model to implemented
