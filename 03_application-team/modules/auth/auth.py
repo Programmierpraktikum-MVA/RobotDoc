@@ -4,6 +4,7 @@ from util.db_model import *
 from util.db_access import *
 from util.db_access import *
 import bcrypt as bcr
+import base64
 
 auth = Blueprint('auth', __name__)
 
@@ -66,6 +67,15 @@ def signup():
             return render_template("signup.html", invalidPassword=True)
     else:
         return render_template("signup.html")
+
+@auth.route("/sendImage", methods=["POST"])
+def send_input():
+        if 'image' in request.files:
+            image_file = request.files['image']
+            image_data = image_file.read()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
+            image_id = storeImage(image_base64)
+        return redirect("/home")
 
 
 @auth.route("/logout")
