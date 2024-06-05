@@ -88,7 +88,22 @@
                                 <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
                                 <span id="sliderValue">50%</span>
                             </div>
-                            
+                        </form>
+                        <form action="/sendImage" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
+                        <p>Or upload an image:</p>
+                            <div class="file is-info is-centered" style="margin-top: 10px;"> <!-- File input container -->
+                                <label class="file-label">
+                                    <input class="file-input" type="file" name="image" accept="image/*"> <!-- Input for image upload -->
+                                    <span class="file-cta">
+                                        <span class="file-icon">
+                                            <i class="fas fa-upload"></i> <!-- Icon for upload -->
+                                        </span>
+                                        <span class="file-label">
+                                            Choose an image...
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
                         </form>
                     </div>
                     
@@ -120,14 +135,50 @@
         </div>
 
     </section>
-
+    
     <script src="static/js/scripts.js"></script>
     <script>
-     const slider = document.getElementById("mySlider");
+    const slider = document.getElementById("mySlider");
     const valueDisplay = document.getElementById("sliderValue");
     slider.addEventListener("input", function () {
         const sliderValue = slider.value;
         valueDisplay.textContent = sliderValue + "%";
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileInput = document.querySelector('input[type="file"]');
+        const form = document.querySelector('form[action="/sendImage"]');
+        const uploadContainer = document.querySelector('.file.is-centered');
+
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                event.preventDefault();
+
+                const uploadButton = uploadContainer.querySelector('.file-label .file-label');
+                uploadButton.textContent = 'Image uploaded successfully';
+
+                uploadContainer.classList.remove('is-info');
+                uploadContainer.classList.add('is-success');
+
+                setTimeout(function() {
+                    form.submit();
+                }, 1000);
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const slider = document.getElementById('mySlider');
+        const sliderValue = document.getElementById('sliderValue');
+        function updateSliderValue() {
+            sliderValue.textContent = `${slider.value}%`;
+        }
+        updateSliderValue();
+        slider.addEventListener('input', updateSliderValue);
+        slider.addEventListener('input', function() {
+            const sliderValue = this.value;
+            document.querySelectorAll('input[name="threshold"]').forEach(function(input) {
+                input.value = sliderValue;
+            });
+        });
     });
     </script>
 

@@ -1,3 +1,5 @@
 venv/
 mein_venv/
 .DS_Store
+myenv/
+03_application-team/static/img/graph_visualization.png

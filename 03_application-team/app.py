@@ -19,6 +19,7 @@ DB_HOST = 'localhost'
 # Aufbau des SSH-Tunnels
 server = SSHTunnelForwarder(
     (SSH_HOST, SSH_PORT),
+    ssh_pkey=None,
     ssh_username=SSH_USER,
     ssh_password=SSH_PASSWORD,
     remote_bind_address=(DB_HOST, 5432),
@@ -44,12 +45,25 @@ app.register_blueprint(patients)
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+@app.route("/sendImage", methods=['POST'])
+def uploadHelper():
+    return upload_image()
+    # response = upload_image()
+    # if response.status_code == 201:
+    #     return redirect("/home")
+    # else:
+    #     return Response(status=500)
 
 @app.route("/")
 @login_required
 def start():
     if current_user.is_authenticated:
         return redirect("/home")
+    
+# if __name__ == '__main__':
+#     with app.app_context():
+#         db.create_all()  # Dies stellt sicher, dass die Tabelle 'images' erstellt wird
+#     app.run(debug=True)
 
 
 @app.route("/home")

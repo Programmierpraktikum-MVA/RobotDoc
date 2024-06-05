@@ -16,7 +16,7 @@ patients = Blueprint("patients", __name__)
 @patients.route("/patients")
 @login_required
 def patientsView():
-    return render_template("patients.html", patients=patientData)
+    return render_template("patients.html", patients=Patients.query.all())
 
 
 #KNOWLEDGE GRAPH Dummy-Page

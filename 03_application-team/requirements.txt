@@ -24,4 +24,4 @@ en-core-sci-sm @ https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.
 
 -f https://download.pytorch.org/whl/torch_stable.html
 torch==2.0.1
-//torch==2.0.1+cpu
+#torch==2.0.1+cpu
