@@ -46,7 +46,7 @@ xrefMondoICD10Final.loc[:, 'mondo'] = xrefMondoICD10Final['mondo'].str.lstrip('0
 xrefMondoICD10Final.loc[:, 'mondo'] = xrefMondoICD10Final['mondo'].replace('', '0')
 
 #Save Data
-xrefMondoICD10Final.to_csv('xrefMondoICD10.csv', index=False)
+#xrefMondoICD10Final.to_csv('xrefMondoICD10.csv', index=False)
 
 #Get the diseases of PrimeKG
 kgx = kg[['x_index', 'x_id', 'x_type', 'x_name', 'x_source']]
@@ -115,7 +115,41 @@ symptomDiseaseFinal.reset_index(drop=True, inplace=True)
 
 
 primeKgWithSymptoms = pd.concat([newKg, symptomDiseaseFinal], ignore_index=True).drop_duplicates()
-print(primeKgWithSymptoms)
 
 #save
 #primeKgWithSymptoms.to_csv('newKg.csv', index=False)
+
+#Get the patients
+patients = ftd[['subject_id', 'gender', 'age', 'diagnosis']].drop_duplicates()
+patients.columns = ['subject_id', 'gender', 'age', 'icd10']
+patients['x_type'] = 'patient'
+patients['x_source'] = 'MIMIC IV'
+patients['relation'] = 'patient_disease'
+patients['display_relation'] = 'diagnosedWith'
+
+#Fuse with Primekg Illnesses
+patientDiseaseRaw = pd.merge(patients, fusedDiseases, on='icd10', how='inner').drop_duplicates()
+patientDiseaseRaw['subject_id'] = patientDiseaseRaw['subject_id'].astype(int)
+
+#get x_index and x_id for patients
+onlyPatient = patientDiseaseRaw[['subject_id', 'gender', 'age']].drop_duplicates()
+#Get highest node Id
+highestIndex = onlySymp['x_index'].max() #we previously added new x_index but no y_index so this is bound to be the highest
+onlyPatient['x_index'] = range(highestIndex+1, highestIndex+len(onlyPatient)+1)
+onlyPatient['x_id'] = range(highestIndex+1, highestIndex+len(onlyPatient)+1)
+#we need this for later
+
+patient_features = onlyPatient[['x_index', 'age', 'gender']].drop_duplicates()
+patient_features['gender'] = patient_features['gender'].replace({'M': 'male', 'F': 'female'})
+
+patientDiseaseUnordered = pd.merge(onlyPatient, patientDiseaseRaw, on='subject_id', how='inner').drop_duplicates()
+patientDiseaseFinal = patientDiseaseUnordered[['relation', 'display_relation','x_index', 'x_id', 'x_type', 'subject_id', 'x_source', 'node_index', 'y_id', 'y_type', 'y_name', 'y_source']].drop_duplicates()
+patientDiseaseFinal.columns = ['relation', 'display_relation','x_index', 'x_id', 'x_type', 'x_name', 'x_source', 'y_index', 'y_id', 'y_type', 'y_name', 'y_source']
+
+#the final output
+primeKgWithSymptomsAndPatients = pd.concat([primeKgWithSymptoms, patientDiseaseFinal], ignore_index=True).drop_duplicates()
+
+#saveProgress
+primeKgWithSymptomsAndPatients.to_csv('Mimic_Prime_Fused.csv', index=False)
+patient_features.to_csv('patient_features.csv', index=False)
+
