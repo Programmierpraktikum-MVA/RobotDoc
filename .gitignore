@@ -3,3 +3,4 @@ mein_venv/
 .DS_Store
 myenv/
 03_application-team/static/img/graph_visualization.png
+03_application-team/static/img/graph_visualization_patient.png

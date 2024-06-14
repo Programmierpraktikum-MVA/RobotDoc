@@ -25,6 +25,10 @@ class Patients(db.Model):
     age = db.Column(db.Integer)
     weight = db.Column(db.Float)
     sex = db.Column(db.String)
+    symptoms = db.Column(db.ARRAY(db.String))
+
+    def __repr__(self):
+        return f'<Patient {self.name}>'
 
 
 
