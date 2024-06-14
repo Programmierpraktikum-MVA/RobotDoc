@@ -4,8 +4,8 @@ Flask-SQLAlchemy==3.0.3
 psycopg2==2.9.6
 bcrypt==4.0.1
 sshtunnel==0.4.0
-flask_caching
 requests
+flask_caching
 
 Werkzeug==3.0.0
 

@@ -19,8 +19,12 @@ patients = Blueprint("patients", __name__)
 def getAllPatients():
     with current_app.app_context():
         data = Patients.query.all()
-        dataDict = {patient.id: patient for patient in data}
-        return dataDict
+        return data
+    
+def patients_to_dict(patients):
+    return {patient.id: patient for patient in patients}
+
+
 
 
 @patients.route("/patients")
@@ -289,7 +293,9 @@ def assignTokens(id,nlp):
 @patients.route("/patients/<int:id>")
 @login_required
 def patients_route(id):
-    patientData = getAllPatients()
+    shit = getAllPatients()
+    patientData = patients_to_dict(shit)
+
 
     print("You pressed on: " + str(id))
     return render_template("patientSpec.html", patientData=patientData[id])
@@ -298,7 +304,9 @@ def patients_route(id):
 @patients.route("/patients/<int:patientID>/symptoms/<int:symptomID>")
 @login_required
 def deleteSymptoms(symptomID, patientID):
+    
     patientData = getAllPatients()
+
 
     print("PatientID: " + str(patientID))
     print("SymptomID: " + str(symptomID))

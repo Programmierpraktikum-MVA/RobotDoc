@@ -130,6 +130,14 @@
                         <img src="static/img/graph_visualization.png" alt="Deneme2">
                     </div>
 
+                    <div id="imagePreviewBox" style="display: none;"> <!-- to preview uploaded Image -->
+                        <div class="box image-box"> 
+                            <h2 style="margin-bottom: 10px;">Preview of your Image:</h2>
+                            <img id="imagePreview" src="#" alt="Image Preview"/> 
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
         </div>
@@ -165,6 +173,29 @@
             }
         });
     });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileInput = document.querySelector('input[type="file"]');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewBox = document.getElementById('imagePreviewBox');
+
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files && fileInput.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewBox.style.display = 'block';
+                }
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        });
+    });
+
+
+
+
     document.addEventListener('DOMContentLoaded', function() {
         const slider = document.getElementById('mySlider');
         const sliderValue = document.getElementById('sliderValue');
