@@ -1,22 +1,33 @@
-from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify, Blueprint
+from flask import Flask, Response, app, url_for, request, session, abort, render_template, redirect, jsonify, Blueprint, current_app
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from util.db_model import *
 from util.funcs import *
 import modules.model.model as ml
 import numpy as np
 
+from util.cache_config import cache
 #Imports for Graph-Drawing
 
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
 patients = Blueprint("patients", __name__)
+
+
+@cache.memoize(timeout=300)
+def getAllPatients():
+    with current_app.app_context():
+        data = Patients.query.all()
+        dataDict = {patient.id: patient for patient in data}
+        return dataDict
 
 
 @patients.route("/patients")
 @login_required
 def patientsView():
-    return render_template("patients.html", patients=Patients.query.all())
+    patientData = getAllPatients()
+    return render_template("patients.html", patients=patientData)
 
 
 #KNOWLEDGE GRAPH Dummy-Page
@@ -114,6 +125,8 @@ def convertText():
             node_color.append("#F79A28")
 
     #Drawing the graph
+    matplotlib.use('agg')
+
     plt.figure(figsize=(10, 10))
     outer_nodes = set(G) - set(symptoms)
     pos = nx.circular_layout(G.subgraph(outer_nodes), scale=3)  #
@@ -145,12 +158,14 @@ def resetSymptoms():
 @patients.route("/assignTokens/<int:id>/<int:nlp>", methods=["POST"])
 @login_required
 def assignTokens(id,nlp):
+    patientData = getAllPatients()
+
     textToconvert = request.form.get("textToConvert")
     threshold = int(request.form.get("threshold"))/100
     try:
         if nlp == 1:
             symptoms = getSymptoms(textToconvert, NLP.HF)
-            patientData[id-1]["symptoms"].append(symptoms)
+            patientData[id]["symptoms"].append(symptoms)
             cleanOutput = 'This model does not support prediction!'
         if nlp == 2:
             symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
@@ -159,7 +174,7 @@ def assignTokens(id,nlp):
             print(patient_symptoms['symptoms'])
              # assign symptoms to patient
             cleanOutput = getDiagnosis(patient_symptoms, PM.MLTEAM,threshold) 
-            patientData[id-1]["symptoms"] = [s.strip().replace('_',' ') for s  in cleanOutput[1]]
+            patientData[id]["symptoms"] = [s.strip().replace('_',' ') for s  in cleanOutput[1]]
             print(cleanOutput[1])
             
     except Exception as e :
@@ -249,6 +264,8 @@ def assignTokens(id,nlp):
         else:
             node_color.append("#F79A28")
 
+    matplotlib.use('agg')
+
     plt.figure(figsize=(10, 10))
     outer_nodes = set(G) - set(symptoms)
     pos = nx.circular_layout(G.subgraph(outer_nodes), scale=3)  #
@@ -263,20 +280,26 @@ def assignTokens(id,nlp):
 
     plt.savefig(
         "static/img/graph_visualization_patient.png")
+    patientData = getAllPatients()
 
-    return render_template("patientSpec.html", patientData=patientData[id-1], prediction=cleanOutput[0], initialText=textToconvert, confidence =round(cleanOutput[2]*100,3) )
+
+    return render_template("patientSpec.html", patientData=patientData[id], prediction=cleanOutput[0], initialText=textToconvert, confidence =round(cleanOutput[2]*100,3) )
 
 
 @patients.route("/patients/<int:id>")
 @login_required
 def patients_route(id):
+    patientData = getAllPatients()
+
     print("You pressed on: " + str(id))
-    return render_template("patientSpec.html", patientData=patientData[id-1])
+    return render_template("patientSpec.html", patientData=patientData[id])
 
 
 @patients.route("/patients/<int:patientID>/symptoms/<int:symptomID>")
 @login_required
 def deleteSymptoms(symptomID, patientID):
+    patientData = getAllPatients()
+
     print("PatientID: " + str(patientID))
     print("SymptomID: " + str(symptomID))
     symptom = next((patient["symptoms"].pop(symptomID) for patient in patientData if patient["id"] == patientID), None)

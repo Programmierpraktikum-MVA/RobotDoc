@@ -5,7 +5,7 @@ from util.db_model import *
 from modules.auth.auth import *
 from modules.patients.patients import *
 
-
+from util.cache_config import cache
 from sshtunnel import SSHTunnelForwarder
 
 # Konfigurationsparameter für den SSH-Tunnel und die Datenbank
@@ -36,6 +36,8 @@ app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+cache.init_app(app)
+
 
 db.init_app(app)
 
@@ -44,6 +46,9 @@ app.register_blueprint(patients)
 
 login_manager.init_app(app)
 login_manager.login_view = "login"
+
+
+
 
 @app.route("/sendImage", methods=['POST'])
 def uploadHelper():
