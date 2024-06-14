@@ -58,7 +58,7 @@ def upload_image():
         new_image = Image(file=file.read())
         db.session.add(new_image)
         db.session.commit()
-        return jsonify({'message': 'Image uploaded successfully'}), 201
+        return ('', 204)
 
 
 # def storeImage(image_base64):
