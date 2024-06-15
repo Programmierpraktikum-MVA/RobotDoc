@@ -293,8 +293,8 @@ def assignTokens(id,nlp):
 @patients.route("/patients/<int:id>")
 @login_required
 def patients_route(id):
-    shit = getAllPatients()
-    patientData = patients_to_dict(shit)
+    data = getAllPatients()
+    patientData = patients_to_dict(data)
 
 
     print("You pressed on: " + str(id))
@@ -313,3 +313,13 @@ def deleteSymptoms(symptomID, patientID):
     symptom = next((patient["symptoms"].pop(symptomID) for patient in patientData if patient["id"] == patientID), None)
     print(patientData)
     return redirect("/patients/" + str(patientID))
+
+@patients.route("/editPatient/<int:id>")
+@login_required
+def editPatient(id):
+    data = getAllPatients()
+    patientData = patients_to_dict(data)
+
+
+    print("You pressed on: " + str(id))
+    return render_template("edit-patient.html", patientData=patientData[id])
