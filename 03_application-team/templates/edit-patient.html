@@ -53,15 +53,15 @@
         <div class="hero-body">
             <div class="container has-text-centered">
                 <div class="column is-6 is-offset-3">
-                    <p>Logged in as Patient: <span>{{patientData["id"]}}</span></p>
+                    <p> Patient ID: <span>{{patientData["id"]}}</span></p>
                     <h1 class="title">
-                        Hallo {{patientData["name"]}}
+                        Patients name: {{patientData["name"]}}
                     </h1>
                     <h2 class="subtitle">
                         How are you today?
                     </h2>
 
-                    <div class="box">
+                    <div class="box" style="width: 100%;">
  
                         <!--
                         <label>
@@ -93,45 +93,43 @@
                         <!--<div class="hero-body has-text-centered">
                             <div class="container"> -->
                                 <div class="columns is-multiline">
-                                
                                     <div class="column is-full">
-                                        <a href="/patients/{{patientData['id']}}">
+                                        <form action="/editPatient/{{patientData['id']}}" method="post">
                                             <div class="box">
-                                                <strong>Name:</strong> {{patientData["name"]}}<br>
-                                                <strong>Age:</strong> {{patientData["age"]}}<br>
-                                                <strong>Weight:</strong> {{patientData["weight"]}} kg <br>
-                                                <strong>Sex:</strong> {{patientData["sex"]}}<br>
-                                                <strong>Symptoms:</strong>
-                                                {% if patientData["symptoms"] %}
-                                                    {{ patientData["symptoms"] | join(', ') }}
-                                                            
-                                                {% endif %} 
+                                                <label><strong>Name:</strong></label>
+                                                <input type="text" name="name" value="{{patientData['name']}}" style="display: block; width:100%; margin: 10px 0; padding: 5px;"><br>
+                                
+                                                <label><strong>Age:</strong></label>
+                                                <input type="number" name="age" value="{{patientData['age']}}" style="display: block; width:100%; margin: 10px 0; padding: 5px;"><br>
+                                
+                                                <label><strong>Weight:</strong></label>
+                                                <input type="number" name="weight" value="{{patientData['weight']}}" kg style="display: block; width:100%; margin: 10px 0; padding: 5px;"> <br>
+                                
+                                                <label><strong>Sex:</strong></label>
+                                                <input type="text" name="sex" value="{{patientData['sex']}}" style="display: block; width:100%; margin: 10px 0; padding: 5px;"><br>
+                                
+                                                <label><strong>Symptoms:</strong></label>
+                                                <input type="text" name="symptoms" value="{{patientData['symptoms'] | join(', ')}}" style="display: block; width:100%; margin: 10px 0; padding: 5px;">
                                             </div>
-                                        </a>
-                                        <a class="button is-primary" href="/editPatient/{{patientData[id]}}">SAVE</a>
+                                            <input type="submit" class="button is-primary" value="SAVE" style = "margin-bottom:10px;"> <br>
+                                            
+
+                                
+
+                    <!--    <form action="/assignTokens/{{patientData['id']}}/2" method="post" accept-charset="UTF-8"
+                            id="div2" style="display: block;"> ##set to none if hide / show should be enabled (together with  checkboxes above) -->
+
+                                            <button type="submit" class="button is-info" style = "margin-bottom:10px;">Get Diagnosis </button>
+
+                                            <div>
+                                                <p>Choose your threshold for the model:</p>
+                                                <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
+                                                <span id="sliderValue">50%</span>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <form action="/assignTokens/{{patientData['id']}}/2" method="post" accept-charset="UTF-8"
-                            id="div2" style="display: block;"> <!-- set to none if hide / show should be enabled (together with  checkboxes above) -->
-                            <div class="field is-grouped">
-                                <p class="control is-expanded">
-                                    <input class="input" type="text" name="textToConvert"
-                                        placeholder="Add new symptoms" style = "width: 50%;">
-                                </p>
-                                <button type="submit" class="button is-info">
-                                    Process with MLT
-                                </button>
-                            </div>
-
-                            <div>
-                                <p>Choose your threshold for the model:</p>
-                                <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
-                                <span id="sliderValue">50%</span>
-                            </div>
-                        </form>
                         <br>
                     </div>
                     <div class="box" id="output">
