@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | RobotDoc</title>
+    <link rel="stylesheet" href="static/css/bulma.css">
+    <link rel="shortcut icon" href="static/img/favicon.jpg">
+</head>
+
+<body>
+    <section class="hero is-info is-fullheight">
+        <div class="hero-head">
+            <nav class="navbar">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <div class="navbar-item" href="../">
+                            <img src="static/img/rd_icon.png" alt="Logo">
+                        </div>
+                        <span class="navbar-burger burger" data-target="navbarMenu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </div>
+                    <div id="navbarMenu" class="navbar-menu">
+                        <div class="navbar-start">
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/home">
+                                    <span>General</span>
+                                </a>
+                            </span>
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/patients">
+                                    <span>Patients</span>
+                                </a>
+                            </span>
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/know">
+                                    <span>Knowledge Graph</span>
+                                </a>
+                            </span>
+                        </div>
+                        <div class="navbar-end">
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/logout">
+                                    <span>Logout</span>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <div class="column is-6 is-offset-3">
+                    
+                    <p>Logged in as <span>{{user}}</span></p>
+
+                    <h1 class="title">
+                        RobotDoc
+                    </h1>
+                    
+                    <h2 class="subtitle">
+                        Explain who you are and how you are feeling below.
+                    </h2>
+                    
+                    <div class="box">
+    
+                        <form action="/sendInput" method="post" accept-charset="UTF-8">
+                            
+                            <div class="field is-grouped">
+                                <p class="control is-expanded">
+                                    <input class="input" type="text" name="textToConvert" placeholder="Enter text">
+                                </p>
+                                
+                                <button type="submit" class="button is-info">
+                                    Process
+                                </button>
+                            </div>
+
+                            <div>
+                                <p>Choose your threshold for the model:</p>
+                                <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
+                                <span id="sliderValue">50%</span>
+                            </div>
+                        </form>
+                        <form action="/sendImage" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
+                        <p>Or upload an image:</p>
+                            <div class="file is-info is-centered" style="margin-top: 10px;"> <!-- File input container -->
+                                <label class="file-label">
+                                    <input class="file-input" type="file" name="image" accept="image/*"> <!-- Input for image upload -->
+                                    <span class="file-cta">
+                                        <span class="file-icon">
+                                            <i class="fas fa-upload"></i> <!-- Icon for upload -->
+                                        </span>
+                                        <span class="file-label">
+                                            Choose an image...
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="box" id="output">
+                        <p>Input: <b>{{initialText}}</b></p>
+                        <br>
+                        <p>Prediction: <b id="outputText">{{ prediction }}</b></p>
+                        <br>
+                        <p>Symptoms: <b id="outputSymptoms">{{ symptoms }}</b></p>
+                        <br>
+                        <p>Confidence: <b>{{ confidence }}%</b></p>
+                    </div>
+
+                    <div id="outputReset">
+                        <div class="box" id="reset">
+                            <form action="/resetSymptoms" method="post">
+                            <input value = "Reset Symptoms" type="submit" id="resetButton" class="button is-danger is-light is-centered">
+                               
+                            </input>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="knowledgeGraph">
+                        <img src="static/img/graph_visualization.png" alt="Deneme2">
+                    </div>
+
+                    <div id="imagePreviewBox" style="display: none;"> <!-- to preview uploaded Image -->
+                        <div class="box image-box"> 
+                            <h2 style="margin-bottom: 10px;">Preview of your Image:</h2>
+                            <img id="imagePreview" src="#" alt="Image Preview"/> 
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+    
+    <script src="static/js/scripts.js"></script>
+    <script>
+    const slider = document.getElementById("mySlider");
+    const valueDisplay = document.getElementById("sliderValue");
+    slider.addEventListener("input", function () {
+        const sliderValue = slider.value;
+        valueDisplay.textContent = sliderValue + "%";
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileInput = document.querySelector('input[type="file"]');
+        const form = document.querySelector('form[action="/sendImage"]');
+        const uploadContainer = document.querySelector('.file.is-centered');
+
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                event.preventDefault();
+
+                const uploadButton = uploadContainer.querySelector('.file-label .file-label');
+                uploadButton.textContent = 'Image uploaded successfully';
+
+                uploadContainer.classList.remove('is-info');
+                uploadContainer.classList.add('is-success');
+
+                setTimeout(function() {
+                    form.submit();
+                }, 1000);
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileInput = document.querySelector('input[type="file"]');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewBox = document.getElementById('imagePreviewBox');
+
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files && fileInput.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewBox.style.display = 'block';
+                }
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        });
+    });
+
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const slider = document.getElementById('mySlider');
+        const sliderValue = document.getElementById('sliderValue');
+        function updateSliderValue() {
+            sliderValue.textContent = `${slider.value}%`;
+        }
+        updateSliderValue();
+        slider.addEventListener('input', updateSliderValue);
+        slider.addEventListener('input', function() {
+            const sliderValue = this.value;
+            document.querySelectorAll('input[name="threshold"]').forEach(function(input) {
+                input.value = sliderValue;
+            });
+        });
+    });
+    </script>
+
+</body>
+
+</html>
