@@ -126,11 +126,13 @@
                                 {% set counter = counter + 1 %}
                                 {% endfor %}
                             </span>
+                    
                         </p>
                         <br>
                         <p>Prediction: <b id="outputText">{{prediction}}</b></p>
                         <p>Confidence: <b>{{ confidence }}%</b></p>
                     </div>
+                    <a class="button is-primary" style = "margin-bottom:10px;" href="/editPage/{{patientData['id']}}" >EDIT</a>
                     <div id="knowledgeGraphPatient">
                         <img src="../../static/img/graph_visualization_patient.png" alt="Deneme3">
                     </div>
