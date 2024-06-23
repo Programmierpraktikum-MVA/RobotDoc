@@ -39,6 +39,25 @@ def register_user(username_cand, password):
     db.session.commit()
     return 0
 
+def register_patient(name, age, weight, sex, symptoms):
+    
+    #validate_name(name)
+    #validate_age(age)
+    #validate_weight(weight)
+    #validate_sex(sex)
+
+    new_patient = Patients()
+    new_patient.name = str(name).strip()
+    new_patient.age = age
+    new_patient.weight = weight
+    new_patient.sex = sex
+    new_patient.symptoms = symptoms
+    #new_patient.user_id = user_id
+
+    db.session.add(new_patient)
+    db.session.commit()
+    return 0
+
 
 def upload_image():
     """

@@ -75,3 +75,22 @@ def start():
 @login_required
 def home():
     return render_template("home.html", user=str(current_user.id))
+
+@app.route('/add_patient')
+def add_patient():
+    return render_template('add_patient.html')
+
+@app.route("/createPatient", methods=["GET", "POST"])
+@login_required
+def createPatient():
+    name = request.form["name"]
+    age = int(request.form["age"])
+    weight = float(request.form["weight"])
+    sex = request.form["sex"]
+    symptoms = request.form['symptoms'].split(',')
+
+
+    register_patient(name, age, weight,sex,symptoms)
+    cache.delete_memoized(getAllPatients)
+
+    return render_template("patients.html", patients=Patients.query.all())
