@@ -89,5 +89,8 @@ def createPatient():
     sex = request.form["sex"]
     symptoms = request.form['symptoms'].split(',')
 
+
     register_patient(name, age, weight,sex,symptoms)
+    cache.delete_memoized(getAllPatients)
+
     return render_template("patients.html", patients=Patients.query.all())
