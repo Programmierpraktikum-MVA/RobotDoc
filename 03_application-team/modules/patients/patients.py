@@ -330,24 +330,30 @@ def editPage(id):
 
 @patients.route("/editPatient/<int:id>", methods=["POST"])
 def edit_patient(id):
-    # Get the patient from the database
-    patient = getPatient(id)
-    print(patient.name)
-    print(request.form['name'])
+    with current_app.app_context():
 
-    # Update the patient's data with the form data
-    patient.name = request.form['name']
-    patient.age = request.form['age']
-    patient.weight = request.form['weight']
-    patient.sex = request.form['sex']
-    patient.symptoms = request.form['symptoms']
 
-    # Save the changes to the database
-    try:
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        return str(e), 500
+        # Save the changes to the database
+        try:
+             # Get the patient from the database
+            patient = Patients.query.get(id)
 
-    # Redirect the user to the patient's page
-    return render_template("patientSpec.html", patientData=getPatient(id))
+            print(patient.name)
+            print(request.form['name'])
+
+            # Update the patient's data with the form data
+            patient.name = str(request.form['name']).strip()
+            patient.age = int(request.form['age'])
+            patient.weight =float(request.form['weight'])
+            patient.sex = request.form['sex']
+            patient.symptoms = [symptom.strip() for symptom in request.form['symptoms'].split(',')]
+            
+            db.session.commit()
+            cache.delete_memoized(getAllPatients)
+        except Exception as e:
+            db.session.rollback()
+            return str(e), 500
+
+        # Redirect the user to the patient's page
+        return render_template("patientSpec.html", patientData=getPatient(id))
+       
