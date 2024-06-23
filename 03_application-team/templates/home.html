@@ -80,7 +80,7 @@
                                 <span id="sliderValue">50%</span>
                             </div>
                         </form>
-                        <form action="/sendImage" method="post" accept-charset="UTF-8">
+                        <form action="/sendImage" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
                         <p>Or upload an image:</p>
                             <div class="file is-info is-centered" style="margin-top: 10px;"> <!-- File input container -->
                                 <label class="file-label">
@@ -117,13 +117,24 @@
                             </form>
                         </div>
                     </div>
+                    <div id="knowledgeGraph">
+                        <img src="static/img/graph_visualization.png" alt="Deneme2">
+                    </div>
+
+                    <div id="imagePreviewBox" style="display: none;"> <!-- to preview uploaded Image -->
+                        <div class="box image-box"> 
+                            <h2 style="margin-bottom: 10px;">Preview of your Image:</h2>
+                            <img id="imagePreview" src="#" alt="Image Preview"/> 
+                        </div>
+                    </div>
+
 
                 </div>
             </div>
         </div>
 
     </section>
-
+    
     <script src="static/js/scripts.js"></script>
     <script>
     const slider = document.getElementById("mySlider");
@@ -153,6 +164,29 @@
             }
         });
     });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileInput = document.querySelector('input[type="file"]');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewBox = document.getElementById('imagePreviewBox');
+
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files && fileInput.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewBox.style.display = 'block';
+                }
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        });
+    });
+
+
+
+
     document.addEventListener('DOMContentLoaded', function() {
         const slider = document.getElementById('mySlider');
         const sliderValue = document.getElementById('sliderValue');

@@ -5,7 +5,7 @@ from util.db_model import *
 from modules.auth.auth import *
 from modules.patients.patients import *
 
-
+from util.cache_config import cache
 from sshtunnel import SSHTunnelForwarder
 
 # Konfigurationsparameter für den SSH-Tunnel und die Datenbank
@@ -19,6 +19,7 @@ DB_HOST = 'localhost'
 # Aufbau des SSH-Tunnels
 server = SSHTunnelForwarder(
     (SSH_HOST, SSH_PORT),
+    ssh_pkey=None,
     ssh_username=SSH_USER,
     ssh_password=SSH_PASSWORD,
     remote_bind_address=(DB_HOST, 5432),
@@ -35,6 +36,8 @@ app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+cache.init_app(app)
+
 
 db.init_app(app)
 
@@ -45,14 +48,49 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 
 
+
+
+@app.route("/sendImage", methods=['POST'])
+def uploadHelper():
+    return upload_image()
+    # response = upload_image()
+    # if response.status_code == 201:
+    #     return redirect("/home")
+    # else:
+    #     return Response(status=500)
+
 @app.route("/")
 @login_required
 def start():
     if current_user.is_authenticated:
         return redirect("/home")
+    
+# if __name__ == '__main__':
+#     with app.app_context():
+#         db.create_all()  # Dies stellt sicher, dass die Tabelle 'images' erstellt wird
+#     app.run(debug=True)
 
 
 @app.route("/home")
 @login_required
 def home():
     return render_template("home.html", user=str(current_user.id))
+
+@app.route('/add_patient')
+def add_patient():
+    return render_template('add_patient.html')
+
+@app.route("/createPatient", methods=["GET", "POST"])
+@login_required
+def createPatient():
+    name = request.form["name"]
+    age = int(request.form["age"])
+    weight = float(request.form["weight"])
+    sex = request.form["sex"]
+    symptoms = request.form['symptoms'].split(',')
+
+
+    register_patient(name, age, weight,sex,symptoms)
+    cache.delete_memoized(getAllPatients)
+
+    return render_template("patients.html", patients=Patients.query.all())
