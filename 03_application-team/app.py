@@ -88,6 +88,8 @@ def createPatient():
     weight = float(request.form["weight"])
     sex = request.form["sex"]
     symptoms = request.form['symptoms'].split(',')
+    user_id = current_user.intid
 
-    register_patient(name, age, weight,sex,symptoms)
+    #register_patient(name, age, weight,sex,symptoms)
+    register_patient(name, age, weight,sex,symptoms,user_id)
     return render_template("patients.html", patients=Patients.query.all())
