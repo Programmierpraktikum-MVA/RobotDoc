@@ -90,6 +90,7 @@ def createPatient():
     symptoms = request.form['symptoms'].split(',')
     user_id = current_user.intid
 
-    #register_patient(name, age, weight,sex,symptoms)
+    
     register_patient(name, age, weight,sex,symptoms,user_id)
+    cache.delete_memoized(getAllPatients)
     return render_template("patients.html", patients=Patients.query.all())
