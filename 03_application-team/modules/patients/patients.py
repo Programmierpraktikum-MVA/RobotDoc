@@ -305,18 +305,39 @@ def patients_route(id):
     return render_template("patientSpec.html", patientData=patientData[id])
 
 
-@patients.route("/patients/<int:patientID>/symptoms/<int:symptomID>")
+@patients.route("/patients/<int:patientID>/symptoms/<int:symptomIndex>")
 @login_required
-def deleteSymptoms(symptomID, patientID):
-    
-    patientData = getAllPatients()
+def deleteSymptoms(symptomIndex, patientID):
+     with current_app.app_context():
+        # Save the changes to the database
+        try:
+             # Get the patient from the database
+            patient = Patients.query.get(patientID)
+            # Convert the symptoms from TEXT[] to a list
+            symptoms_list = list(patient.symptoms)
+
+            # Check if symptomIndex is valid
+            if symptomIndex < 0 or symptomIndex >= len(symptoms_list):
+                return "Invalid symptom ID.", 400
+
+            # Remove the symptom at the given index
+            symptoms_list.pop(symptomIndex)
+
+            # Update the patient's symptoms
+            patient.symptoms = symptoms_list
+
+            # Save the changes to the database
+            db.session.commit()
+            cache.delete_memoized(getAllPatients)
+        except Exception as e:
+            db.session.rollback()
+            return str(e), 500
+
+        # Redirect the user to the patient's page
+        return redirect("/patients/" + str(patientID))
 
 
-    print("PatientID: " + str(patientID))
-    print("SymptomID: " + str(symptomID))
-    symptom = next((patient["symptoms"].pop(symptomID) for patient in patientData if patient["id"] == patientID), None)
-    print(patientData)
-    return redirect("/patients/" + str(patientID))
+
 
 @patients.route("/editPage/<int:id>")
 @login_required
@@ -338,8 +359,6 @@ def edit_patient(id):
              # Get the patient from the database
             patient = Patients.query.get(id)
 
-            print(patient.name)
-            print(request.form['name'])
 
             # Update the patient's data with the form data
             patient.name = str(request.form['name']).strip()
