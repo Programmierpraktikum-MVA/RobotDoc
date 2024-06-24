@@ -56,6 +56,7 @@
                     {% for patient in patients %}
                     <div class="column is-one-third">
                         <a href="/patients/{{patient.id}}">
+                        <!--<a href="/patients/{{patient.patient_id}}"></a>-->
                             <div class="box">
                                 <strong>Name:</strong> {{ patient.name }}<br>
                                 <strong>Age:</strong> {{ patient.age }}<br>
@@ -70,6 +71,7 @@
                             </div>
                         </a>
                         <a class="button is-primary" href="/editPage/{{patient.id}}">EDIT</a>
+                        <!--<a class="button is-primary" href="/editPage/{{patient.patient_id}}">EDIT</a>-->
                     </div>
                     {% endfor %}
                 </div>
