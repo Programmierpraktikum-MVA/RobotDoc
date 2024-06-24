@@ -102,8 +102,8 @@
                                                 <label><strong>Age:</strong></label>
                                                 <input type="number" name="age" value="{{patientData['age']}}" style="display: block; width:100%; margin: 10px 0; padding: 5px;"><br>
                                 
-                                                <label><strong>Weight:</strong></label>
-                                                <input type="number" name="weight" value="{{patientData['weight']}}" kg style="display: block; width:100%; margin: 10px 0; padding: 5px;"> <br>
+                                                <label><strong>Weight (kg):</strong></label>
+                                                <input type="number" name="weight" value="{{patientData['weight']}}" step="any" style="display: block; width:100%; margin: 10px 0; padding: 5px;"> <br>
                                 
                                                 <label><strong>Sex:</strong></label>
                                                 <select name="sex" style="display: block; width:100%; margin: 10px 0; padding: 5px;">
@@ -111,7 +111,6 @@
                                                     <option value="Female" {% if patientData['sex'] == 'Female' %}selected{% endif %}>Female</option>
                                                     <option value="Other" {% if patientData['sex'] == 'Other' %}selected{% endif %}>Other</option>
                                                 </select><br>
-                                                <input type="text" name="sex" value="{{patientData['sex']}}" style="display: block; width:100%; margin: 10px 0; padding: 5px;"><br>
                                 
                                                 <label><strong>Symptoms:</strong></label>
                                                 <input type="text" name="symptoms" value="{{patientData['symptoms'] | join(', ')}}" style="display: block; width:100%; margin: 10px 0; padding: 5px;">
