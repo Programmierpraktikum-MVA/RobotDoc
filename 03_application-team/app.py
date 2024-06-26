@@ -59,6 +59,11 @@ def uploadHelper():
     # else:
     #     return Response(status=500)
 
+
+@app.route('/uploadImageForPatient/<int:patient_id>', methods=['POST'])
+def uploadHelperPatient(patient_id):
+    return upload_image_for_patient(patient_id)
+
 @app.route("/")
 @login_required
 def start():
