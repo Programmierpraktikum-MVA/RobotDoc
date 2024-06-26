@@ -16,6 +16,7 @@ class Accounts(db.Model):
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     file = db.Column(db.LargeBinary, nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     def __repr__(self):
         return f'<Image {self.id}>'
 
