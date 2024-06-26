@@ -52,15 +52,16 @@
 
         <div class="hero-body">
             <div class="container has-text-centered">
-                <div class="column is-6 is-offset-3">
-                    <p>Logged in as Patient: <span>{{patientData["id"]}}</span></p>
-                    <h1 class="title">
-                        Hallo {{patientData["name"]}}
-                    </h1>
-                    <h2 class="subtitle">
-                        How are you today?
-                    </h2>
-
+                <p>Logged in as Patient: <span>{{patientData["id"]}}</span></p>
+                <h1 class="title">
+                    Hallo {{patientData["name"]}}
+                </h1>
+                <h2 class="subtitle">
+                    How are you today?
+                </h2>
+                <div class="column is-5 is-pulled-left">
+                   
+                    <!-- show patient stats-->
                     <div class="box">
                         <div class="box">
                             <strong>Name:</strong> {{ patientData.name }}<br>
@@ -102,6 +103,8 @@
                         </form>
                         -->
 
+                        
+
                         <form action="/assignTokens/{{patientData['id']}}/2" method="post" accept-charset="UTF-8"
                             id="div2" style="display: block;"> <!-- set to none if hide / show should be enabled (together with  checkboxes above) -->
                             <div class="field is-grouped">
@@ -120,25 +123,13 @@
                                 <span id="sliderValue">50%</span>
                             </div>
                         </form>
+                    
                         
-
-                        <form action="/sendImage" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
-                            <p>Or upload an image:</p>
-                                <div class="file is-info is-centered" style="margin-top: 10px;"> <!-- File input container -->
-                                    <label class="file-label">
-                                        <input class="file-input" type="file" name="image" accept="image/*"> <!-- Input for image upload -->
-                                        <span class="file-cta">
-                                            <span class="file-icon">
-                                                <i class="fas fa-upload"></i> <!-- Icon for upload -->
-                                            </span>
-                                            <span class="file-label">
-                                                Choose an image...
-                                            </span>
-                                        </span>
-                                    </label>
-                                </div>
-                            </form>
+                                
+                    
+                        
                     </div>
+                    
                     <div class="box" id="output">
                         <p>Input: <b>{{initialText}}</b></p>
                         <br>
@@ -173,6 +164,46 @@
 
                     <div id="knowledgeGraphPatient">
                         <img src="../../static/img/graph_visualization_patient.png" alt="Deneme3">
+                    </div>
+                </div>
+
+                <!-- chat-->
+                <div class="chat column is-6 is-offset-6">
+                    <div class="box" style="height: 500px; display: flex; flex-direction: column;">
+                        <div id="chat-box" class="content" style="flex: 1; overflow-y: auto;">
+
+                            <div class="chat-message is-pulled-left" style="display: flex; ">
+                                <div class="notification is-light">
+                                    <p>Hi there! How can I help you today?</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex;">
+                            <form id="send-message-form" class="field has-addons">
+                                <div class="control is-expanded">
+                                    <input class="input" type="text" id="message-input" placeholder="Describe symptoms here...">
+                                </div>
+                                <div class="control">
+                                    <button class="button is-primary" type="submit" style="border-radius: 0%; ">Send</button>
+                                </div>
+                            </form>
+                            <form action="/sendImage" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
+                                    <div class="file is-info is-centered"> <!-- File input container -->
+                                        <label class="file-label">
+                                            <input class="file-input" type="file" name="image" accept="image/*"> <!-- Input for image upload -->
+                                            <span class="file-cta">
+        
+                                                <span class="file-label">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#ffffff"><path d="M0 0h24v24H0z" fill="none"/><path d="M21 6h-3.17L16 4h-6v2h5.12l1.83 2H21v12H5v-9H3v9c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM8 14c0 2.76 2.24 5 5 5s5-2.24 5-5-2.24-5-5-5-5 2.24-5 5zm5-3c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3zM5 6h3V4H5V1H3v3H0v2h3v3h2z"/></svg>
+                                                </span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </form>
+                        
+                        </div>                        
+
+                        
                     </div>
                 </div>
             </div>
@@ -228,6 +259,7 @@
         });
 
         document.addEventListener("DOMContentLoaded", function() {
+            
             const fileInput = document.querySelector('input[type="file"]');
             const form = document.querySelector('form[action="/sendImage"]');
             const uploadContainer = document.querySelector('.file.is-centered');
@@ -237,7 +269,7 @@
                     event.preventDefault();
 
                     const uploadButton = uploadContainer.querySelector('.file-label .file-label');
-                    uploadButton.textContent = 'Image uploaded successfully';
+                    uploadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 50 50" fill="#ffffff" ><path d="M 42.875 8.625 C 42.84375 8.632813 42.8125 8.644531 42.78125 8.65625 C 42.519531 8.722656 42.292969 8.890625 42.15625 9.125 L 21.71875 40.8125 L 7.65625 28.125 C 7.410156 27.8125 7 27.675781 6.613281 27.777344 C 6.226563 27.878906 5.941406 28.203125 5.882813 28.597656 C 5.824219 28.992188 6.003906 29.382813 6.34375 29.59375 L 21.25 43.09375 C 21.46875 43.285156 21.761719 43.371094 22.050781 43.328125 C 22.339844 43.285156 22.59375 43.121094 22.75 42.875 L 43.84375 10.1875 C 44.074219 9.859375 44.085938 9.425781 43.875 9.085938 C 43.664063 8.746094 43.269531 8.566406 42.875 8.625 Z"></path></svg>';
 
                     uploadContainer.classList.remove('is-info');
                     uploadContainer.classList.add('is-success');
@@ -266,6 +298,37 @@
                     reader.readAsDataURL(fileInput.files[0]);
             }
         });
+    });
+        document.getElementById('send-message-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const messageInput = document.getElementById('message-input');
+            const messageText = messageInput.value.trim();
+            if (messageText !== "") {
+                const chatBox = document.getElementById('chat-box');
+
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'chat-message is-pulled-right';
+                userMessage.innerHTML = `<div class="notification is-primary"><p>${messageText}</p></div>`;
+                chatBox.appendChild(userMessage);
+
+                // Scroll to the bottom of the chat box
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Simulate bot response
+                setTimeout(function() {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'chat-message is-pulled-left';
+                    botMessage.innerHTML = `<div class="notification is-light"><p>Bot response to: ${messageText}</p></div>`;
+                    chatBox.appendChild(botMessage);
+
+                    // Scroll to the bottom of the chat box after bot response
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 1000);
+
+                // Clear the input
+                messageInput.value = "";
+        }
     });
 
 
