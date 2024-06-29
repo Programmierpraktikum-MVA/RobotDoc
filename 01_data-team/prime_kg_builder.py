@@ -1,5 +1,5 @@
 import os
-import openai
+from openai import OpenAI
 import argparse
 import torch
 import pickle
@@ -10,7 +10,6 @@ import networkx as nx
 
 from config import OPENAI_API_KEY, ROOT_DIR
 
-openai.api_key = OPENAI_API_KEY
 
 #parser = argparse.ArgumentParser(description='Preprocess PrimeKG')
 #parser.add_argument('--prime_kg_dataset', type=str, default='datasets/kg.csv', help='PrimeKG csv path')
@@ -43,9 +42,10 @@ class GraphBuilder:
 
         self.embeddings_tensor = None
         self.embeddings_list = []
-        self.nx_graph = nx.Graph()
-        self.model = "text-embedding-ada-002"
         self.save_path = save_path
+        self.nx_graph = pickle.load(open(os.path.join(ROOT_DIR, self.save_path, 'prime_gk_nx_without_embeddings_74219.pickle'),'rb'))
+        print(self.nx_graph)
+        self.model = "text-embedding-ada-002"
 
         self.node_types = ['gene/protein', 'drug', 'effect/phenotype', 'disease', 'biological_process', 'molecular_function',
                            'cellular_component', 'exposure', 'pathway', 'anatomy', 'symptom', 'patient']
@@ -61,8 +61,8 @@ class GraphBuilder:
         self.prime_kg_df = pd.read_csv(os.path.join(ROOT_DIR, prime_kg_path))
         print('PrimeKG csv loaded successfully!')
 
-        if filter_edge_or_node_types is not None:
-            self.create_sub_df(filter_edge_or_node_types)
+        #if filter_edge_or_node_types is not None:
+        #    self.create_sub_df(filter_edge_or_node_types)
 
         self.drug_features_df = pd.read_csv(os.path.join(ROOT_DIR, drug_features_path), low_memory=False)
         self.disease_features_df = pd.read_csv(os.path.join(ROOT_DIR, disease_features_path), low_memory=False)
@@ -100,9 +100,9 @@ class GraphBuilder:
             x_sub_df = self.prime_kg_df.query(f'x_index == {node}')
 
             # get all edge_types and their respective edges
-            if not x_sub_df.empty:
-                for y_index in list(x_sub_df['y_index']):
-                    rel_type = self.nx_graph.get_edge_data(node, y_index, 0)['relation']
+            #if not x_sub_df.empty:
+                #for y_index in list(x_sub_df['y_index']):
+                    #rel_type = self.nx_graph.get_edge_data(node, y_index, 0)['relation']
 
             # create an attributes dictionary for the relevant node
             x_sub_df = x_sub_df[['x_index', 'x_type', 'x_name', 'x_source']].drop_duplicates().rename(
@@ -172,6 +172,7 @@ class GraphBuilder:
         """
         # Store embeddings
         all_embeddings = []
+        client = OpenAI()
 
         nodes = list(self.nx_graph.nodes())
         for i in tqdm(range(0, len(nodes), batch_size)):
@@ -179,9 +180,9 @@ class GraphBuilder:
             batch_data = [self.nx_graph.nodes[node]['raw_data'] for node in batch_nodes]
 
             try:
-                embeddings = openai.Embedding.create(input=batch_data, model=model_name)['data']
+                embeddings = client.embeddings.create(input=batch_data, model=model_name).data
                 for node, embedding in zip(batch_nodes, embeddings):
-                    embedding_tensor = torch.tensor(embedding['embedding'])
+                    embedding_tensor = torch.tensor(embedding.embedding)
                     all_embeddings.append(embedding_tensor)
                     self.nx_graph.nodes[node]['embedding'] = embedding_tensor
 
@@ -189,7 +190,7 @@ class GraphBuilder:
                 print(f"Error processing batch starting at index {i}: {e}")
                 continue
 
-        self.embeddings_tensor = torch.cat(all_embeddings, dim=1)
+        self.embeddings_tensor = torch.cat(all_embeddings, dim=0)
 
         if self.save_path is not None:
             # save embeddings to file
