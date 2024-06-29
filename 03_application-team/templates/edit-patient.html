@@ -112,6 +112,7 @@
                                                 <input type="text" name="symptoms" value="{{patientData['symptoms'] | join(', ')}}" style="display: block; width:100%; margin: 10px 0; padding: 5px;">
                                             </div>
                                             <input type="submit" class="button is-primary" value="SAVE" style = "margin-bottom:10px;"> <br>
+
                                             
 
                                 
@@ -156,6 +157,25 @@
                     <!--<div id="knowledgeGraphPatient">
                         <img src="../../static/img/graph_visualization_patient.png" alt="Deneme3">
                     </div> -->
+                    
+                    <!-- Patient Images Section -->
+                    <div class="box">
+                        <h2 class="title">Patient Images</h2>
+                        <div class="columns is-multiline">
+                            {% for image in imagesOfPatient %}
+                            <div class="column is-one-third" style="position: relative;">
+                                <figure class="image is-4by3">
+                                    <img src="{{ image.url }}" alt="Patient Image">
+                                    <form action="/deleteImage/{{ image.id }}" method="post" onsubmit="return confirmDelete()" style="position: absolute; top: 5px; right: 5px;">
+                                        <button type="submit" class="delete is-small"></button>
+                                    </form>
+                                </figure>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+
                 </div>
             </div>
 
@@ -209,6 +229,11 @@
             const sliderValue = slider.value;
             valueDisplay.textContent = sliderValue + "%";
         });
+
+        // Confirmation before deleting an image
+        function confirmDelete() {
+            return confirm("Do you really want to delete this picture?");
+        }
 
     </script>
 
