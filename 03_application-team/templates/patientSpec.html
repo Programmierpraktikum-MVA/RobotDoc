@@ -150,6 +150,21 @@
                     <div id="knowledgeGraphPatient">
                         <img src="../../static/img/graph_visualization_patient.png" alt="Deneme3">
                     </div>
+
+                    <!-- Patient Images Section -->
+                    <div class="box">
+                        <h2 class="title">Patient Images</h2>
+                        <div class="columns is-multiline">
+                            {% for image in imagesOfPatient %}
+                            <div class="column is-one-third" style="position: relative;">
+                                <figure class="image is-4by3">
+                                    <img src="{{ image.url }}" alt="Patient Image">
+                                </figure>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
