@@ -29,7 +29,16 @@ class Patients(db.Model):
 
     def __repr__(self):
         return f'<Patient {self.name}>'
-
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'age': self.age,
+            'weight': self.weight,
+            'sex': self.sex,
+            'symptoms': self.symptoms,
+        }
 
 
 

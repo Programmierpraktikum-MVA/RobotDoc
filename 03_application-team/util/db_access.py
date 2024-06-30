@@ -80,17 +80,3 @@ def upload_image():
         return ('', 204)
 
 
-# def storeImage(image_base64):
-#     """
-#     Stores the base64 encoded image data into the database.
-#     :param image_base64: base64 encoded image data
-#     :return: ID of the stored image
-#     """
-#     new_image = Images()
-#     new_image.image_data = image_base64
-
-#     db.session.add(new_image)
-#     db.session.commit()
-
-#     return new_image.id
-    
