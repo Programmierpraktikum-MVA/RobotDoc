@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient {{patientData["id"]}} | RobotDoc</title>
+    <title>Patient {{patientData.id}} | RobotDoc</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.jpg') }}">
 </head>
@@ -52,9 +52,9 @@
 
         <div class="hero-body">
             <div class="container has-text-centered">
-                <p>Logged in as Patient: <span>{{patientData["id"]}}</span></p>
+                <p>Logged in as Patient: <span>{{patientData.id}}</span></p>
                 <h1 class="title">
-                    Hallo {{patientData["name"]}}
+                    Hallo {{patientData.name}}
                 </h1>
                 <h2 class="subtitle">
                     How are you today?
@@ -69,11 +69,13 @@
                             <strong>Weight:</strong> {{ patientData.weight }} kg <br>
                             <strong>Sex:</strong> {{ patientData.sex }}<br>
                             <strong>Symptoms:</strong>
-                            {% if patientData.symptoms %}
-                                {{ patientData.symptoms | join(', ') }}
-                            {% else %}
-                                        <!-- Nichts anzeigen, wenn keine Symptome vorhanden sind -->
-                            {% endif %}
+                            <div id="symptoms-display">
+                                {% if patientData.symptoms %}
+                                    {{ patientData.symptoms | join(', ') }}
+                                {% else %}
+                                    <!-- Nichts anzeigen, wenn keine Symptome vorhanden sind -->
+                                {% endif %}
+                            </div>
                         </div>
 
                         <!--
@@ -105,7 +107,7 @@
 
                         
 
-                        <form action="/assignTokens/{{patientData['id']}}/2" method="post" accept-charset="UTF-8"
+                        <form action="/assignTokens/{{patientData.id}}/2" method="post" accept-charset="UTF-8"
                             id="div2" style="display: block;"> <!-- set to none if hide / show should be enabled (together with  checkboxes above) -->
                             <div class="field is-grouped">
                                 <p class="control is-expanded">
@@ -139,7 +141,7 @@
                                 {% set counter = 0 %}
                                 {% for patient in patientData.symptoms %}
                                 <span class="tag is-info">{{ patient }}
-                                    <a href="/patients/{{patientData['id']}}/symptoms/{{counter}}">
+                                    <a href="/patients/{{patientData.id}}/symptoms/{{counter}}">
                                         <button class="delete is-small"></button>
                                     </a>
                                 </span>
@@ -152,7 +154,7 @@
                         <p>Prediction: <b id="outputText">{{prediction}}</b></p>
                         <p>Confidence: <b>{{ confidence }}%</b></p>
                     </div>
-                    <a class="button is-primary" style = "margin-bottom:10px;" href="/editPage/{{patientData['id']}}" >EDIT</a>
+                    <a class="button is-primary" style = "margin-bottom:10px;" href="/editPage/{{patientData.id}}" >EDIT</a>
 
                     <div id="imagePreviewBox" style="display: none;"> <!-- to preview uploaded Image -->
                         <div class="box image-box"> 
@@ -173,13 +175,13 @@
                         <div id="chat-box" class="content" style="flex: 1; overflow-y: auto;">
 
                             <div class="chat-message is-pulled-left" style="display: flex; ">
-                                <div class="notification is-light">
+                                <div class="chatbubble is-light">
                                     <p>Hi there! How can I help you today?</p>
                                 </div>
                             </div>
                         </div>
                         <div style="display: flex;">
-                            <form id="send-message-form" class="field has-addons">
+                            <form action = "/sendMessage" method="post" accept-charset ="UTF-8" id ="send-message-form" class="field has-addons">
                                 <div class="control is-expanded">
                                     <input class="input" type="text" id="message-input" placeholder="Describe symptoms here...">
                                 </div>
@@ -200,10 +202,11 @@
                                         </label>
                                     </div>
                                 </form>
+                                
                         
-                        </div>                        
-
-                        
+                        </div>  
+                            <input type="checkbox" id="symptoms-check" name="symptoms-check">
+                            <label for="symptoms-check">auto update symptoms</label>                      
                     </div>
                 </div>
             </div>
@@ -214,6 +217,10 @@
     <script src="{{ url_for('static', filename='js/scripts.js')}}"></script>
 
     <script>
+        
+
+
+    
         // show or hide forms (reference: https://chat.openai.com)
         function toggleDiv(checkbox, divId) {
             var div1 = document.getElementById("div1");
@@ -299,35 +306,132 @@
             }
         });
     });
+        //convert patientData dict to JSON so Javascript can handle it
+        var patientData = JSON.parse('{{ patientData | tojson | safe }}');
+        
+        //load messages from sessionstorage to chat
+        var messages = JSON.parse(sessionStorage.getItem('messages' + patientData.id)) || [];
+        //adds messages to chat
+        var chatBox = document.getElementById('chat-box');
+        messages.forEach(function(message) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message ' + (message.isBot ? 'is-pulled-left' : 'is-pulled-right');
+            messageDiv.innerHTML = `<div class="chatbubble ${message.isBot ? 'is-light' : 'is-primary'}"><p>${message.text}</p></div>`;
+            chatBox.appendChild(messageDiv);
+    });
+    
         document.getElementById('send-message-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const messageInput = document.getElementById('message-input');
-            const messageText = messageInput.value.trim();
-            if (messageText !== "") {
+            const symptomsCheck = document.getElementById('symptoms-check');
+
+            const message = messageInput.value.trim();
+            if (message !== "") {
                 const chatBox = document.getElementById('chat-box');
 
-                // Add user message
+                 // Add user message
                 const userMessage = document.createElement('div');
                 userMessage.className = 'chat-message is-pulled-right';
-                userMessage.innerHTML = `<div class="notification is-primary"><p>${messageText}</p></div>`;
+                userMessage.innerHTML = `<div class="chatbubble is-primary"><p>${message}</p></div>`;
                 chatBox.appendChild(userMessage);
+
+                messageInput.value = "";
+                messages.push({ text: message, isBot: false });
+                sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
 
                 // Scroll to the bottom of the chat box
                 chatBox.scrollTop = chatBox.scrollHeight;
 
-                // Simulate bot response
-                setTimeout(function() {
+                fetch(`/sendMessage/${patientData.id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message, updateSymptoms: symptomsCheck.checked }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    
+
                     const botMessage = document.createElement('div');
-                    botMessage.className = 'chat-message is-pulled-left';
-                    botMessage.innerHTML = `<div class="notification is-light"><p>Bot response to: ${messageText}</p></div>`;
+                    if(data.type === 'symptoms' && data.reply.length > 0){
+                        botMessage.classList.add('chat-message', 'is-pulled-left');
+                        const symptoms = data.reply.join(', ');
+                        botMessage.innerHTML = `
+                            <div class="chatbubble is-light">
+                                <p>Please confirm updated symptoms:</p>
+                                <input type="text" name="symptoms" value="${patientData.symptoms},${symptoms}">
+                                <button id="confirm-symptoms" class="button is-small">Confirm</button>
+                            </div>`;
+                         // Add response message to sessionStorage
+                        messages.push({ text: "New symptoms added", isBot: true });
+                        sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
+                    }
+                    else{
+                        botMessage.classList.add('chat-message', 'is-pulled-left');
+                        botMessage.innerHTML = `<div class="chatbubble is-light"><p>${data.reply}</p></div>`;
+                    
+                    }
+                    // Add response message to sessionStorage
+                    messages.push({ text: data.reply, isBot: true });
+                    sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
                     chatBox.appendChild(botMessage);
 
-                    // Scroll to the bottom of the chat box after bot response
                     chatBox.scrollTop = chatBox.scrollHeight;
-                }, 1000);
 
-                // Clear the input
-                messageInput.value = "";
+                    const confirmButton = document.getElementById('confirm-symptoms');
+                    if (confirmButton) {
+                        confirmButton.addEventListener('click', function() {
+                            const newSymptoms = document.querySelector('input[name="symptoms"]').value;
+                            console.log(newSymptoms)
+                            fetch(`/updateSymptoms/${patientData.id}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ symptoms: newSymptoms }),
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    patientData.symptoms = newSymptoms;
+                                    // Update the HTML element that displays the symptoms
+                                    const symptomsElement = document.getElementById('symptoms-display');
+                                    symptomsElement.textContent = newSymptoms;
+
+                                    fetch(`/sendMessage/${patientData.id}`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ message: message, updateSymptoms: false }),
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const botMessage = document.createElement('div');
+                                        botMessage.classList.add('chat-message', 'is-pulled-left');
+                                        botMessage.innerHTML = `<div class="chatbubble is-light"><p>${data.reply}</p></div>`;
+                                        chatBox.appendChild(botMessage);
+
+                                        // Add response message to sessionStorage
+                                        messages.push({ text: data.reply, isBot: true });
+                                        sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
+
+                                        chatBox.scrollTop = chatBox.scrollHeight;
+                                    });
+                                    
+
+                                    
+                                }
+                                
+                            });
+                        });
+                    }
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
     });
 

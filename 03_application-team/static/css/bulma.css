@@ -2368,6 +2368,95 @@ div.icon-text {
   padding: 1.25rem 2.5rem 1.25rem 1.5rem;
 }
 
+.chatbubble {
+  background-color: whitesmoke;
+  border-radius: 16px;
+  position: relative;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+}
+
+
+
+.chatbubble.is-white {
+  background-color: white;
+  color: #0a0a0a;
+}
+
+.chatbubble.is-black {
+  background-color: #0a0a0a;
+  color: white;
+}
+
+.chatbubble.is-light {
+  background-color: whitesmoke;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.chatbubble.is-dark {
+  background-color: #363636;
+  color: #fff;
+}
+
+.chatbubble.is-primary {
+  background-color: #00d1b2;
+  color: #fff;
+}
+
+.chatbubble.is-primary.is-light {
+  background-color: #ebfffc;
+  color: #00947e;
+}
+
+.chatbubble.is-link {
+  background-color: #485fc7;
+  color: #fff;
+}
+
+.chatbubble.is-link.is-light {
+  background-color: #eff1fa;
+  color: #3850b7;
+}
+
+.chatbubble.is-info {
+  background-color: #3e8ed0;
+  color: #fff;
+}
+
+.chatbubble.is-info.is-light {
+  background-color: #eff5fb;
+  color: #296fa8;
+}
+
+.chatbubble.is-success {
+  background-color: #48c78e;
+  color: #fff;
+}
+
+.chatbubble.is-success.is-light {
+  background-color: #effaf5;
+  color: #257953;
+}
+
+.chatbubble.is-warning {
+  background-color: #ffe08a;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.chatbubble.is-warning.is-light {
+  background-color: #fffaeb;
+  color: #946c00;
+}
+
+.chatbubble.is-danger {
+  background-color: #f14668;
+  color: #fff;
+}
+
+.chatbubble.is-danger.is-light {
+  background-color: #feecf0;
+  color: #cc0f35;
+}
+
 .notification a:not(.button):not(.dropdown-item) {
   color: currentColor;
   text-decoration: underline;
