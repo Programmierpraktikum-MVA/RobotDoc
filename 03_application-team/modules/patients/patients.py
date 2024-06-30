@@ -2,8 +2,9 @@ from flask import Flask, Response, app, url_for, request, session, abort, render
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from util.db_model import *
 from util.funcs import *
-import modules.model.model as ml
+#import modules.model.model as ml
 import numpy as np
+from modules.newmodel import subgraphExtractor, llm
 
 from util.cache_config import cache
 #Imports for Graph-Drawing
@@ -11,8 +12,19 @@ from util.cache_config import cache
 import networkx as nx
 import matplotlib.pyplot as plt
 
+from transformers import AutoModelForTokenClassification,pipeline, AutoModelForSequenceClassification,AutoTokenizer
+from modules.KnowledgeExtraction import subgraph_builder
+
+
+
+
 
 patients = Blueprint("patients", __name__)
+
+
+fine_tuned_model =  AutoModelForTokenClassification.from_pretrained("mdecot/RobotDocNLP")
+tokenizer = AutoTokenizer.from_pretrained("allenai/scibert_scivocab_uncased")
+finetuned_ner = pipeline("ner", model=fine_tuned_model, tokenizer=tokenizer,aggregation_strategy="simple")
 
 
 @cache.memoize(timeout=300)
@@ -28,6 +40,8 @@ def getPatient(id):
     with current_app.app_context():
         patient = Patients.query.get(id)
         return patient
+    
+
 
 
 
@@ -159,7 +173,7 @@ def convertText():
 @patients.route("/resetSymptoms", methods=["POST"])
 @login_required
 def resetSymptoms():
-    ml.reset_patient()
+    # ml.reset_patient()
     return render_template("home.html", user=str(current_user.id))
 
 # prediction for user
@@ -177,11 +191,11 @@ def assignTokens(id,nlp):
             cleanOutput = 'This model does not support prediction!'
         if nlp == 2:
             symptoms = getSymptoms(textToconvert, NLP.MLTEAM)
-            ml.reset_patient()
-            patient_symptoms = add_patient_symptoms(id,symptoms['symptoms'])
-            print(patient_symptoms['symptoms'])
+            # ml.reset_patient()
+            # patient_symptoms = add_patient_symptoms(id,symptoms['symptoms'])
+            # print(patient_symptoms['symptoms'])
              # assign symptoms to patient
-            cleanOutput = getDiagnosis(patient_symptoms, PM.MLTEAM,threshold) 
+            cleanOutput = [None,None]
             patientData[id]["symptoms"] = [s.strip().replace('_',' ') for s  in cleanOutput[1]]
             print(cleanOutput[1])
             
@@ -297,12 +311,11 @@ def assignTokens(id,nlp):
 @patients.route("/patients/<int:id>")
 @login_required
 def patients_route(id):
-    data = getAllPatients()
-    patientData = patients_to_dict(data)
+    patientData = getPatient(id).to_dict()
 
 
     print("You pressed on: " + str(id))
-    return render_template("patientSpec.html", patientData=patientData[id])
+    return render_template("patientSpec.html", patientData=patientData)
 
 
 @patients.route("/patients/<int:patientID>/symptoms/<int:symptomIndex>")
@@ -374,5 +387,53 @@ def edit_patient(id):
             return str(e), 500
 
         # Redirect the user to the patient's page
-        return render_template("patientSpec.html", patientData=getPatient(id))
+        return render_template("patientSpec.html", patientData=getPatient(id).to_dict())
        
+@patients.route("/sendMessage/<int:id>", methods=["POST"])
+def sendMessage(id):
+    data = request.get_json()
+    message = data['message']
+
+    print(id)
+    if(data['updateSymptoms']):
+        symps = subgraphExtractor.symptomNER(message)
+        if len(symps) > 0:
+            print("symp length works")
+            with current_app.app_context():
+                try:
+                    patient = Patients.query.get(id)
+                    currentSymptoms = patient.symptoms
+                    uniqueSymptoms = []
+                    # Iterate over new symptoms
+                    for s in symps:
+                        # Check if the symptom is not a substring in any of the current symptoms
+                        if not any(s in cs for cs in currentSymptoms):
+                            uniqueSymptoms.append(s)
+                    print(uniqueSymptoms)
+                    if len(uniqueSymptoms) > 0:
+                        return jsonify({"reply": uniqueSymptoms, "type": "symptoms"})
+                except Exception as e:
+                    return jsonify({"reply": e, "type": "message"}), 500
+
+    reply = subgraphExtractor.processMessage(message)
+    return jsonify({"reply": reply, "type": "message"})
+    
+
+
+
+@patients.route("/updateSymptoms/<int:id>", methods=["POST"])
+def updateSymptoms(id):
+    with current_app.app_context():
+        try:
+            data = request.get_json()
+            symp = data['symptoms']
+            patient = Patients.query.get(id)
+            patient.symptoms = [symptom.strip() for symptom in symp.split(',')]
+            db.session.commit()
+            cache.delete_memoized(getAllPatients)
+            return jsonify({"success": True})
+        except Exception as e:
+            db.session.rollback()
+            return str(e), 500
+
+        
