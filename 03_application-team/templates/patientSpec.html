@@ -77,59 +77,16 @@
                                 {% endif %}
                             </div>
                         </div>
-
-                        <!--
-                        <label>
-                            <input type="checkbox" id="checkbox1" onchange="toggleDiv(this, 'div1')">
-                            HF Model
-                        </label>
                         
-                        <label>
-                            <input type="checkbox" id="checkbox2" onchange="toggleDiv(this, 'div2')">
-                            MLT Model
-                        </label>    
-                        -->
-
-                        <!--
-                        <form action="/assignTokens/{{patientData['id']}}/1" method="post" accept-charset="UTF-8"
-                            id="div1" style="display: none;">
-                            <div class="field is-grouped">
-                                <p class="control is-expanded">
-                                    <input class="input" type="text" name="textToConvert"
-                                        placeholder="Enter your symptoms">
-                                </p>
-                                <button type="submit" class="button is-info">
-                                    Process with HF
-                                </button>
-                            </div>
-                        </form>
-                        -->
-
-                        
-
-                        <form action="/assignTokens/{{patientData.id}}/2" method="post" accept-charset="UTF-8"
-                            id="div2" style="display: block;"> <!-- set to none if hide / show should be enabled (together with  checkboxes above) -->
-                            <div class="field is-grouped">
-                                <p class="control is-expanded">
-                                    <input class="input" type="text" name="textToConvert"
-                                        placeholder="Enter your symptoms">
-                                </p>
-                                <button type="submit" class="button is-info">
-                                    Process with MLT
-                                </button>
-                            </div>
 
                             <div>
                                 <p>Choose your threshold for the model:</p>
                                 <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
-                                <span id="sliderValue">50%</span>
+                                <span id="sliderValue">50%</span> 
                             </div>
-                        </form>
-                    
-                        
-                                
-                    
-                        
+
+                        <br>
+                   
                     </div>
                     
                     <div class="box" id="output">
@@ -167,6 +124,24 @@
                     <div id="knowledgeGraphPatient">
                         <img src="../../static/img/graph_visualization_patient.png" alt="Deneme3">
                     </div>
+
+                    <!-- Patient Images Section -->
+                    <div class="box">
+                        <h2 class="title">Patient Images</h2>
+                        <div class="columns is-multiline">
+                            {% for image in imagesOfPatient %}
+                            <div class="column is-one-third" style="position: relative;">
+                                <figure class="image is-4by3">
+                                    <img src="{{ image.url }}" alt="Patient Image">
+                                </figure>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+               
+
+        
                 </div>
 
                 <!-- chat-->
@@ -189,7 +164,7 @@
                                     <button class="button is-primary" type="submit" style="border-radius: 0%; ">Send</button>
                                 </div>
                             </form>
-                            <form action="/sendImage" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
+                            <form id="patientImageForm" action="/uploadImageForPatient/{{patientData.id}}" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
                                     <div class="file is-info is-centered"> <!-- File input container -->
                                         <label class="file-label">
                                             <input class="file-input" type="file" name="image" accept="image/*"> <!-- Input for image upload -->
@@ -201,7 +176,9 @@
                                             </span>
                                         </label>
                                     </div>
-                                </form>
+                            </form>
+
+                                
                                 
                         
                         </div>  
@@ -217,31 +194,27 @@
     <script src="{{ url_for('static', filename='js/scripts.js')}}"></script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const fileInput = document.querySelector('input[type="file"]');
+            const form = document.getElementById('patientImageForm'); 
+            const uploadContainer = document.querySelector('.file.is-centered');
         
-
-
-    
-        // show or hide forms (reference: https://chat.openai.com)
-        function toggleDiv(checkbox, divId) {
-            var div1 = document.getElementById("div1");
-            var div2 = document.getElementById("div2");
-            var checkbox1 = document.getElementById("checkbox1");
-            var checkbox2 = document.getElementById("checkbox2");
-
-            if (divId === "div1") {
-                div1.style.display = checkbox.checked ? "block" : "none";
-                div2.style.display = checkbox.checked ? "none" : "block";
-                checkbox2.checked = !checkbox.checked; // toggle the other checkbox
-                localStorage.setItem("checkbox1State", checkbox.checked); // store checkbox state
-                localStorage.setItem("checkbox2State", checkbox2.checked); // store the state of the other checkbox
-            } else if (divId === "div2") {
-                div2.style.display = checkbox.checked ? "block" : "none";
-                div1.style.display = checkbox.checked ? "none" : "block";
-                checkbox1.checked = !checkbox.checked; // toggle the other checkbox
-                localStorage.setItem("checkbox2State", checkbox.checked); // store checkbox state
-                localStorage.setItem("checkbox1State", checkbox1.checked); // store the state of the other checkbox
-            }
-        }
+            fileInput.addEventListener('change', function(event) { 
+                if (fileInput.files.length > 0) {
+                    event.preventDefault();
+        
+                    const uploadButton = uploadContainer.querySelector('.file-label .file-label');
+                    uploadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 50 50" fill="#ffffff" ><path d="M 42.875 8.625 C 42.84375 8.632813 42.8125 8.644531 42.78125 8.65625 C 42.519531 8.722656 42.292969 8.890625 42.15625 9.125 L 21.71875 40.8125 L 7.65625 28.125 C 7.410156 27.8125 7 27.675781 6.613281 27.777344 C 6.226563 27.878906 5.941406 28.203125 5.882813 28.597656 C 5.824219 28.992188 6.003906 29.382813 6.34375 29.59375 L 21.25 43.09375 C 21.46875 43.285156 21.761719 43.371094 22.050781 43.328125 C 22.339844 43.285156 22.59375 43.121094 22.75 42.875 L 43.84375 10.1875 C 44.074219 9.859375 44.085938 9.425781 43.875 9.085938 C 43.664063 8.746094 43.269531 8.566406 42.875 8.625 Z"></path></svg>';        
+                    uploadContainer.classList.remove('is-info');
+                    uploadContainer.classList.add('is-success');
+        
+                    setTimeout(function() {
+                        form.submit();
+                    }, 1000);
+                }
+            });
+        });
+ 
 
         // initialize the checkboxes on page load
         window.onload = function () {
@@ -265,47 +238,47 @@
             valueDisplay.textContent = sliderValue + "%";
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
+    //     document.addEventListener("DOMContentLoaded", function() {
             
-            const fileInput = document.querySelector('input[type="file"]');
-            const form = document.querySelector('form[action="/sendImage"]');
-            const uploadContainer = document.querySelector('.file.is-centered');
+    //         const fileInput = document.querySelector('input[type="file"]');
+    //         const form = document.querySelector('form[action="/sendImage"]');
+    //         const uploadContainer = document.querySelector('.file.is-centered');
 
-            fileInput.addEventListener('change', function() {
-                if (fileInput.files.length > 0) {
-                    event.preventDefault();
+    //         fileInput.addEventListener('change', function() {
+    //             if (fileInput.files.length > 0) {
+    //                 event.preventDefault();
 
-                    const uploadButton = uploadContainer.querySelector('.file-label .file-label');
-                    uploadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 50 50" fill="#ffffff" ><path d="M 42.875 8.625 C 42.84375 8.632813 42.8125 8.644531 42.78125 8.65625 C 42.519531 8.722656 42.292969 8.890625 42.15625 9.125 L 21.71875 40.8125 L 7.65625 28.125 C 7.410156 27.8125 7 27.675781 6.613281 27.777344 C 6.226563 27.878906 5.941406 28.203125 5.882813 28.597656 C 5.824219 28.992188 6.003906 29.382813 6.34375 29.59375 L 21.25 43.09375 C 21.46875 43.285156 21.761719 43.371094 22.050781 43.328125 C 22.339844 43.285156 22.59375 43.121094 22.75 42.875 L 43.84375 10.1875 C 44.074219 9.859375 44.085938 9.425781 43.875 9.085938 C 43.664063 8.746094 43.269531 8.566406 42.875 8.625 Z"></path></svg>';
+    //                 const uploadButton = uploadContainer.querySelector('.file-label .file-label');
+    //                 uploadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 50 50" fill="#ffffff" ><path d="M 42.875 8.625 C 42.84375 8.632813 42.8125 8.644531 42.78125 8.65625 C 42.519531 8.722656 42.292969 8.890625 42.15625 9.125 L 21.71875 40.8125 L 7.65625 28.125 C 7.410156 27.8125 7 27.675781 6.613281 27.777344 C 6.226563 27.878906 5.941406 28.203125 5.882813 28.597656 C 5.824219 28.992188 6.003906 29.382813 6.34375 29.59375 L 21.25 43.09375 C 21.46875 43.285156 21.761719 43.371094 22.050781 43.328125 C 22.339844 43.285156 22.59375 43.121094 22.75 42.875 L 43.84375 10.1875 C 44.074219 9.859375 44.085938 9.425781 43.875 9.085938 C 43.664063 8.746094 43.269531 8.566406 42.875 8.625 Z"></path></svg>';
 
-                    uploadContainer.classList.remove('is-info');
-                    uploadContainer.classList.add('is-success');
+    //                 uploadContainer.classList.remove('is-info');
+    //                 uploadContainer.classList.add('is-success');
 
-                    setTimeout(function() {
-                        form.submit();
-                    }, 1000);
-            }
-        });
-    });
+    //                 setTimeout(function() {
+    //                     form.submit();
+    //                 }, 1000);
+    //         }
+    //     });
+    // });
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const fileInput = document.querySelector('input[type="file"]');
-            const imagePreview = document.getElementById('imagePreview');
-            const imagePreviewBox = document.getElementById('imagePreviewBox');
+    //     document.addEventListener("DOMContentLoaded", function() {
+    //         const fileInput = document.querySelector('input[type="file"]');
+    //         const imagePreview = document.getElementById('imagePreview');
+    //         const imagePreviewBox = document.getElementById('imagePreviewBox');
 
-            fileInput.addEventListener('change', function() {
-                if (fileInput.files && fileInput.files[0]) {
-                    var reader = new FileReader();
+    //         fileInput.addEventListener('change', function() {
+    //             if (fileInput.files && fileInput.files[0]) {
+    //                 var reader = new FileReader();
 
-                    reader.onload = function (e) {
-                        imagePreview.src = e.target.result;
-                        imagePreviewBox.style.display = 'block';
-                    }
+    //                 reader.onload = function (e) {
+    //                     imagePreview.src = e.target.result;
+    //                     imagePreviewBox.style.display = 'block';
+    //                 }
 
-                    reader.readAsDataURL(fileInput.files[0]);
-            }
-        });
-    });
+    //                 reader.readAsDataURL(fileInput.files[0]);
+    //         }
+    //     });
+    // });
         //convert patientData dict to JSON so Javascript can handle it
         var patientData = JSON.parse('{{ patientData | tojson | safe }}');
         
@@ -336,6 +309,7 @@
                 chatBox.appendChild(userMessage);
 
                 messageInput.value = "";
+                // Add user message to sessionStorage
                 messages.push({ text: message, isBot: false });
                 sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
 

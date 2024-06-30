@@ -58,6 +58,12 @@ def uploadHelper():
     # else:
     #     return Response(status=500)
 
+
+@app.route('/uploadImageForPatient/<int:patient_id>', methods=['POST'])
+def uploadHelperPatient(patient_id):
+    upload_image_for_patient(patient_id)
+    return redirect("/patients/" + str(patient_id))
+
 @app.route("/")
 @login_required
 def start():
@@ -87,9 +93,9 @@ def createPatient():
     weight = float(request.form["weight"])
     sex = request.form["sex"]
     symptoms = request.form['symptoms'].split(',')
+    user_id = current_user.intid
 
-
-    register_patient(name, age, weight,sex,symptoms)
+    
+    register_patient(name, age, weight,sex,symptoms,user_id)
     cache.delete_memoized(getAllPatients)
-
     return render_template("patients.html", patients=Patients.query.all())

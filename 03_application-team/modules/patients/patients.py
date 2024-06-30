@@ -12,6 +12,9 @@ from util.cache_config import cache
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
+import base64
+
 from transformers import AutoModelForTokenClassification,pipeline, AutoModelForSequenceClassification,AutoTokenizer
 from modules.KnowledgeExtraction import subgraph_builder
 
@@ -313,9 +316,19 @@ def assignTokens(id,nlp):
 def patients_route(id):
     patientData = getPatient(id).to_dict()
 
+    imagesOfPatient = Image.query.filter_by(patient_id=id).all()
+
+    # Convert the bytea data to base64
+    image_data = []
+    for image in imagesOfPatient:
+        encoded_image = base64.b64encode(image.file).decode('utf-8')  # Assuming `image.file` contains the binary data
+        image_data.append({
+            "id": image.id,
+            "url": f"data:image/jpeg;base64,{encoded_image}"  # Adjust the MIME type if necessary
+        })
 
     print("You pressed on: " + str(id))
-    return render_template("patientSpec.html", patientData=patientData)
+    return render_template("patientSpec.html", patientData=patientData, imagesOfPatient=image_data)
 
 
 @patients.route("/patients/<int:patientID>/symptoms/<int:symptomIndex>")
@@ -357,10 +370,19 @@ def deleteSymptoms(symptomIndex, patientID):
 def editPage(id):
     data = getAllPatients()
     patientData = patients_to_dict(data)
+    imagesOfPatient = Image.query.filter_by(patient_id=id).all()
 
+    # Convert the bytea data to base64
+    image_data = []
+    for image in imagesOfPatient:
+        encoded_image = base64.b64encode(image.file).decode('utf-8')  # Assuming `image.file` contains the binary data
+        image_data.append({
+            "id": image.id,
+            "url": f"data:image/jpeg;base64,{encoded_image}"  # Adjust the MIME type if necessary
+        })
 
     print("You pressed on: " + str(id))
-    return render_template("edit-patient.html", patientData=patientData[id])
+    return render_template("edit-patient.html", patientData=patientData[id], imagesOfPatient=image_data)
 
 @patients.route("/editPatient/<int:id>", methods=["POST"])
 def edit_patient(id):
@@ -385,10 +407,29 @@ def edit_patient(id):
         except Exception as e:
             db.session.rollback()
             return str(e), 500
+    
+    imagesOfPatient = Image.query.filter_by(patient_id=id).all()
 
-        # Redirect the user to the patient's page
-        return render_template("patientSpec.html", patientData=getPatient(id).to_dict())
-       
+    # Convert the bytea data to base64
+    image_data = []
+    for image in imagesOfPatient:
+        encoded_image = base64.b64encode(image.file).decode('utf-8')  # Assuming `image.file` contains the binary data
+        image_data.append({
+            "id": image.id,
+            "url": f"data:image/jpeg;base64,{encoded_image}"  # Adjust the MIME type if necessary
+        })
+
+    # Redirect the user to the patient's page
+    return render_template("patientSpec.html", patientData=getPatient(id).to_dict(), imagesOfPatient=image_data)
+
+@patients.route("/deleteImage/<int:image_id>", methods=["POST"])
+@login_required
+def deleteImage(image_id):
+    image = Image.query.get_or_404(image_id)
+    db.session.delete(image)
+    db.session.commit()
+    return redirect(request.referrer)  # Redirect back to the previous page
+
 @patients.route("/sendMessage/<int:id>", methods=["POST"])
 def sendMessage(id):
     data = request.get_json()
@@ -435,5 +476,3 @@ def updateSymptoms(id):
         except Exception as e:
             db.session.rollback()
             return str(e), 500
-
-        
