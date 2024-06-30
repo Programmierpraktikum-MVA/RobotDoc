@@ -43,7 +43,7 @@ class GraphBuilder:
         self.embeddings_tensor = None
         self.embeddings_list = []
         self.save_path = save_path
-        self.nx_graph = pickle.load(open(os.path.join(ROOT_DIR, self.save_path, 'prime_gk_nx_without_embeddings_74219.pickle'),'rb'))
+        self.nx_graph = nx.Graph()
         print(self.nx_graph)
         self.model = "text-embedding-ada-002"
 
