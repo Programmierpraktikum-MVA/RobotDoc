@@ -39,7 +39,8 @@ def register_user(username_cand, password):
     db.session.commit()
     return 0
 
-def register_patient(name, age, weight, sex, symptoms):
+#def register_patient(name, age, weight, sex, symptoms:
+def register_patient(name, age, weight, sex, symptoms, user_id):
     
     #validate_name(name)
     #validate_age(age)
@@ -52,11 +53,35 @@ def register_patient(name, age, weight, sex, symptoms):
     new_patient.weight = weight
     new_patient.sex = sex
     new_patient.symptoms = symptoms
-    #new_patient.user_id = user_id
+    new_patient.user_id = user_id
 
     db.session.add(new_patient)
     db.session.commit()
     return 0
+
+def upload_image_for_patient(patient_id):
+    """
+    Receives the image data from the client, stores it in the database, and links it to the user who uploaded it.
+    :param user_id: ID of the patient uploading the image
+    :return: ID of the stored image
+    """
+    
+    if 'image' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['image']
+
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    print(patient_id)
+    if file:
+        new_image = Image()
+        new_image.file = file.read()
+        new_image.patient_id = patient_id
+        db.session.add(new_image)
+        db.session.commit()
+        return ('', 204)
+
 
 
 def upload_image():
