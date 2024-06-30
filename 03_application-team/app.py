@@ -1,6 +1,5 @@
 from flask import Flask, Response, url_for, request, session, abort, render_template, redirect, jsonify
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from util.funcs import *
 from util.db_model import *
 from modules.auth.auth import *
 from modules.patients.patients import *
@@ -17,16 +16,16 @@ DB_HOST = 'localhost'
 
 
 # Aufbau des SSH-Tunnels
-server = SSHTunnelForwarder(
-    (SSH_HOST, SSH_PORT),
-    ssh_pkey=None,
-    ssh_username=SSH_USER,
-    ssh_password=SSH_PASSWORD,
-    remote_bind_address=(DB_HOST, 5432),
-    local_bind_address=('localhost', 5432)
-)
+# server = SSHTunnelForwarder(
+#     (SSH_HOST, SSH_PORT),
+#     ssh_pkey=None,
+#     ssh_username=SSH_USER,
+#     ssh_password=SSH_PASSWORD,
+#     remote_bind_address=(DB_HOST, 5432),
+#     local_bind_address=('localhost', 5432)
+# )
 #ssh tunnel wird autom. beendee, wenn das Programm beendet wird
-server.start()
+#server.start()
 
 # default config
 app = Flask(__name__)
