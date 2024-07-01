@@ -4,6 +4,7 @@ import pickle
 import networkx as nx
 import matplotlib.pyplot as plt
 from modules.newmodel import llm
+import os
 
 from modules.KnowledgeExtraction.trie_structure import Trie
 from modules.KnowledgeExtraction.knowledge_extractor import KnowledgeExtractor
@@ -15,6 +16,7 @@ fine_tuned_model =  AutoModelForTokenClassification.from_pretrained("mdecot/Robo
 tokenizer = AutoTokenizer.from_pretrained("allenai/scibert_scivocab_uncased")
 sympPipeline = pipeline("ner", model=fine_tuned_model, tokenizer=tokenizer,aggregation_strategy="simple")
 
+llm_instance = llm.LLM()
 
 def symptomNER(text):
         prev = ''
@@ -39,13 +41,20 @@ def symptomNER(text):
         return symptoms
 
 # Extract the knowledge from the input and create subgraph
-def extract_knowledge(input):
+def extract_knowledge(patient_id, input):
     subgraph = subgraph_builder.SubgraphBuilder('util/datasets/prime_kg_nx_63960.pickle', 'util/datasets/prime_kg_embeddings_tensor_63960.pt', meta_relations_dict, embedding.create_embedding, None, None)
-    edges, edge_indices = subgraph.extract_knowledge_from_kg(input, entities_list= subgraph.medNER(input))
-   
+    graph_filename = f'util/datasets/graph_{patient_id}.p'
+    if os.path.exists(graph_filename):
+      with open(graph_filename, 'rb') as f:
+        subgraph.nx_subgraph = pickle.load(f)
+    
+
+    edges, edge_indices = subgraph.extract_knowledge_from_kg(input, entities_list = subgraph.medNER(input))
     subgraph.expand_graph_with_knowledge(edge_indices)
-    subgraph.save_graph('util/datasets','graph','01')
+    subgraph.save_graph('util/datasets','graph', patient_id)
+    
     return None
+
 
 
 # Load the graph object
@@ -55,42 +64,49 @@ def load_graph(file_path):
   return graph
 
 # Extract the content from the graph
-def draw_graph(graph):
-  pos = nx.spring_layout(graph)
-  # Zeichnen der Knoten mit Namen
-  node_labels = nx.get_node_attributes(graph, 'name')
-  nx.draw(graph, pos, with_labels=True, labels=node_labels, node_color='lightblue', edge_color='pink', node_size=500, font_size=10)
 
-  # Zeichnen der Kanten mit Beziehungen
-  edge_labels = nx.get_edge_attributes(graph, 'relation')
-  nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_color='red')
+def draw_graph(graph, patient_id):
+    pos = nx.spring_layout(graph)
+    # Draw the nodes with names
+    node_labels = nx.get_node_attributes(graph, 'name')
+    nx.draw(graph, pos, with_labels=True, labels=node_labels, node_color='lightblue', edge_color='pink', node_size=500, font_size=10)
 
-  plt.show()
+    # Draw the edges with relations
+    edge_labels = nx.get_edge_attributes(graph, 'relation')
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_color='red')
 
-def processMessage(message):
+    # Save the graph as an image
+    plt.savefig(os.path.join('static', 'img', f'graph_{patient_id}.png'))
+
+    plt.show()
+
+def processMessage(patient_id, patient_info, message):
+  
     # Extract the knowledge from the input and create subgraph
-    try:
-      
-      subgraph = extract_knowledge(message)
-       # Load the graph object
-      graph = load_graph('util/datasets/graph_01.p')
-      node_strings = []
-      for node in graph.nodes(data=True):
-        name = node[1]['name']
-        type = node[1]['type']
-        context_prompt = f"The Content: {name}, {type}"
-        node_strings.append(context_prompt)
-      
-      print(node_strings)
-        
-      input, res = llm.chat_with_robodoc(message, node_strings)
+  try:
 
-      return res
+      
+    subgraph = extract_knowledge(patient_id, message)
+     # Load the graph object
+    graph_filename = f'util/datasets/graph_{patient_id}.p'
+
+    graph = load_graph(graph_filename)
+    node_strings = []
+    for node in graph.nodes(data=True):
+      name = node[1]['name']
+      type = node[1]['type']
+      context_prompt = f"The Content: {name}, {type}"
+      node_strings.append(context_prompt)
+      
+
+      
+    input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, node_strings)
+    draw_graph(graph, patient_id)
+    return res
       
     #Extract the content from the graph
-    except Exception as e:
-        input, res = llm.chat_with_robodoc(message, None)
+  except Exception as e:
+        input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, None)
         return (f"No knowledge extraction possible with given input. \n{res}")
       
     
-   

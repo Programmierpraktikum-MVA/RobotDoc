@@ -122,7 +122,7 @@
                     <br>
 
                     <div id="knowledgeGraphPatient">
-                        <img src="../../static/img/graph_visualization_patient.png" alt="Deneme3">
+                        <img src="{{ url_for('static', filename='img/graph_' + patientData.id|string + '.png') }}" alt="No KG found">
                     </div>
 
                     <!-- Patient Images Section -->
