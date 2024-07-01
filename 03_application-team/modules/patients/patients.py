@@ -11,7 +11,7 @@ from util.cache_config import cache
 
 import networkx as nx
 import matplotlib.pyplot as plt
-
+import traceback
 
 import base64
 
@@ -432,17 +432,17 @@ def deleteImage(image_id):
 
 @patients.route("/sendMessage/<int:id>", methods=["POST"])
 def sendMessage(id):
-    data = request.get_json()
-    message = data['message']
+    with current_app.app_context():
+        try:
+            patient = Patients.query.get(id)
+            data = request.get_json()
+            message = data['message']
 
-    print(id)
-    if(data['updateSymptoms']):
-        symps = subgraphExtractor.symptomNER(message)
-        if len(symps) > 0:
-            print("symp length works")
-            with current_app.app_context():
-                try:
-                    patient = Patients.query.get(id)
+
+            if(data['updateSymptoms']):
+                symps = subgraphExtractor.symptomNER(message)
+                if len(symps) > 0:
+             
                     currentSymptoms = patient.symptoms
                     uniqueSymptoms = []
                     # Iterate over new symptoms
@@ -453,12 +453,15 @@ def sendMessage(id):
                     print(uniqueSymptoms)
                     if len(uniqueSymptoms) > 0:
                         return jsonify({"reply": uniqueSymptoms, "type": "symptoms"})
-                except Exception as e:
-                    return jsonify({"reply": e, "type": "message"}), 500
+       
+            
+            patientInfo = patient.to_dict()
 
-    reply = subgraphExtractor.processMessage(message)
-    return jsonify({"reply": reply, "type": "message"})
-    
+
+            reply = subgraphExtractor.processMessage(id, patientInfo, message)
+            return jsonify({"reply": reply, "type": "message"})
+        except Exception as e:
+            return jsonify({"reply": str(e), "type": "message"})    
 
 
 
@@ -475,4 +478,4 @@ def updateSymptoms(id):
             return jsonify({"success": True})
         except Exception as e:
             db.session.rollback()
-            return str(e), 500
+            return str(e)
