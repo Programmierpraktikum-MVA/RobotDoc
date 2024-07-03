@@ -8,7 +8,7 @@ from util.cache_config import cache
 from sshtunnel import SSHTunnelForwarder
 
 # Konfigurationsparameter für den SSH-Tunnel und die Datenbank
-SSH_HOST = 'gpu.adastruct.com'
+SSH_HOST = 'newgpu.adastruct.com'
 SSH_PORT = 22
 SSH_USER = 'pp'
 SSH_PASSWORD = "Z7.b'NV9i$n6"  
