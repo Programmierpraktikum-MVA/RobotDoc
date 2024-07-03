@@ -344,11 +344,18 @@
                     else{
                         botMessage.classList.add('chat-message', 'is-pulled-left');
                         botMessage.innerHTML = `<div class="chatbubble is-light"><p>${data.reply}</p></div>`;
+                         // Add response message to sessionStorage
+
+                        messages.push({ text: data.reply, isBot: true });
+                        sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
                     
                     }
-                    // Add response message to sessionStorage
-                    messages.push({ text: data.reply, isBot: true });
-                    sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
+
+                    const knowledgeGraphImage = document.getElementById('knowledgeGraphPatient').querySelector('img');
+                    let imagePath = knowledgeGraphImage.src;
+                    knowledgeGraphImage.src = ''; // Clear the current image path
+                    knowledgeGraphImage.src = imagePath + '?' + new Date().getTime(); // Append a timestamp to force reload
+                  
                     chatBox.appendChild(botMessage);
 
                     chatBox.scrollTop = chatBox.scrollHeight;
@@ -390,6 +397,11 @@
                                         // Add response message to sessionStorage
                                         messages.push({ text: data.reply, isBot: true });
                                         sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
+
+                                        const knowledgeGraphImage = document.getElementById('knowledgeGraphPatient').querySelector('img');
+                                        let imagePath = knowledgeGraphImage.src;
+                                        knowledgeGraphImage.src = ''; // Clear the current image path
+                                        knowledgeGraphImage.src = imagePath + '?' + new Date().getTime(); // Append a timestamp to force reload
 
                                         chatBox.scrollTop = chatBox.scrollHeight;
                                     });
