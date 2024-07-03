@@ -88,7 +88,10 @@ def load_user(username):
         return
     user = User()
     user.id = username
-    user.intid =  db.select(Accounts.id).filter_by(username=username)
+    #user.intid =  db.select(Accounts.id).filter_by(username=username)
+    user.intid = db.session.scalar(
+        db.select(Accounts.id).filter_by(username=username)
+    )
     return user
 
 
