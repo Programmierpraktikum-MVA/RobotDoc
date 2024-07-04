@@ -5,9 +5,9 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
 # Load configuration data
 config_data = json.load(open("./config.json"))
-HF_TOKEN = config_data["HF_TOKEN"]
+# HF_TOKEN = config_data["HF_TOKEN"] nicht mehr nötig, da Repo öffentlich
 
-model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
+model_name = "KennyDain/Llama3_MedQA_bnb_4bit"
 save_directory = "./model"  # Specify your desired save directory
 
 # Quantization Configuration
@@ -41,8 +41,7 @@ def load_model():
     if not model_loaded:
         print("Loading model into VRAM...")
         try:
-            model = AutoModelForCausalLM.from_pretrained(save_directory, device="cuda", quantization_config=bnb_config,
-                                                         token=HF_TOKEN)
+            model = AutoModelForCausalLM.from_pretrained(save_directory, device="cuda", quantization_config=bnb_config)
             model_loaded = True
             print("Model loaded successfully.")
         except Exception as e:
@@ -82,7 +81,7 @@ def chat_with_robodoc(user_input, chat_history, nodes_from_subgraph=None, image_
     try:
         load_model()
 
-        tokenizer = AutoTokenizer.from_pretrained(save_directory, token=HF_TOKEN)
+        tokenizer = AutoTokenizer.from_pretrained(save_directory)
 
         textgen = pipeline(
             "text-generation",
