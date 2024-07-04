@@ -4,7 +4,7 @@ import socket
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
 
 # Load configuration data
-config_data = json.load(open("./config.json"))
+# config_data = json.load(open("./config.json"))
 # HF_TOKEN = config_data["HF_TOKEN"] nicht mehr nötig, da Repo öffentlich
 
 model_name = "KennyDain/Llama3_MedQA_bnb_4bit"
