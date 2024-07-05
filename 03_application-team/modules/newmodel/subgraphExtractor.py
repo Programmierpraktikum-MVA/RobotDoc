@@ -63,7 +63,8 @@ def load_graph(file_path):
     graph = pickle.load(file)
   return graph
 
-# Extract the content from the graph
+# plt.switch_backend('Agg')
+plt.switch_backend('Agg')
 
 def draw_graph(graph, patient_id):
     pos = nx.spring_layout(graph)
@@ -72,13 +73,13 @@ def draw_graph(graph, patient_id):
     nx.draw(graph, pos, with_labels=True, labels=node_labels, node_color='lightblue', edge_color='pink', node_size=500, font_size=10)
 
     # Draw the edges with relations
-    edge_labels = nx.get_edge_attributes(graph, 'relation')
-    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_color='red')
+
 
     # Save the graph as an image
     plt.savefig(os.path.join('static', 'img', f'graph_{patient_id}.png'))
 
-    plt.show()
+    plt.close()  # Close the figure to free up resources
+
 
 def processMessage(patient_id, patient_info, message):
   
@@ -107,6 +108,6 @@ def processMessage(patient_id, patient_info, message):
     #Extract the content from the graph
   except Exception as e:
         input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, None)
-        return (f"No knowledge extraction possible with given input. \n{res}")
+        return res
       
     

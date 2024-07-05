@@ -4,56 +4,19 @@ import transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import pickle
 import traceback
+from modules.newmodel.Llama import inference
 
 class LLM:
     def __init__(self):
         self.patients = {}
         self.patInfo = {}
 
-        self.bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True, 
-            bnb_4bit_use_double_quant=True, 
-            bnb_4bit_quant_type="nf4", 
-            bnb_4bit_compute_dtype=torch.bfloat16
-        )
-        self.model = AutoModelForCausalLM.from_pretrained(
-            "meta-llama/Meta-Llama-3-8B-Instruct", 
-            quantization_config=self.bnb_config, 
-            device_map="auto"
-        )
-        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
-        self.pipeline = transformers.pipeline(
-            "text-generation",
-            model=self.model,
-            tokenizer=self.tokenizer,
-            model_kwargs={"torch_dtype": torch.bfloat16},
-        )
-
-        # self.graph = self.load_graph('datasets/graph_22.p')
         self.system_message = {
             "role": "system",
             "content": "You are an AI assistant supporting a doctor. The user describes patient symptoms. You receive node names and node types from a knowledge graph. Limit responses to 200 characters. For suspected diseases, ask for specific details."
         }
 
 
-        # self.chat_history = [self.system_message]
-        # self.content = self.extract_content(self.graph)
-
-    # def load_graph(self, path):
-    #     with open(path, 'rb') as f:
-    #         return pickle.load(f)
-
-    # def extract_content(self, graph):
-    #     prompts_with_context = []
-    #     nodes = list(graph.nodes(data=True))
-    #     for node in nodes:
-    #         name = node[1]['name']
-    #         type = node[1]['type']
-    #         context_prompt = f"The Content: {name}, {type}"
-    #         prompts_with_context.append(context_prompt)
-    #     return prompts_with_context
-
-####
 
     def add_message(self, patient_id, message):
         if patient_id not in self.patients:
@@ -65,47 +28,20 @@ class LLM:
         return self.patients.get(patient_id, [])
     
 
-    def generate_response(self, messages):
-        prompt = self.pipeline.tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True,
-        )
+  
 
-        terminators = [
-            self.pipeline.tokenizer.eos_token_id,
-            self.pipeline.tokenizer.convert_tokens_to_ids("")
-        ]
+    def chat_with_robodoc(self, patient_id,patient_info, user_input, nodes_from_subgraph=None, image_captioning=None):
 
-        outputs = self.pipeline(
-            prompt,
-            max_new_tokens=256,
-            eos_token_id=terminators,
-            do_sample=True,
-            temperature=0.6,
-            top_p=0.9,
-        )
-        return outputs[0]["generated_text"][len(prompt):]
-
-    def chat_with_robodoc(self, patient_id,patient_info, user_input, nodes_from_subgraph=None):
-        if nodes_from_subgraph:
-            system_message_with_node_info = {
-                "role": "system",
-                "content": f"{self.system_message['content']}\n\nNode Info:\n{nodes_from_subgraph}"
-            }
-        else:
-            system_message_with_node_info = self.system_message
    
 
         
-        self.add_message(patient_id, {"role": "user", "content": user_input})
 
         #patient_info = self.get_patient_info(patient_id)
         patient_info_str = str(patient_info)
 
         chat_history = self.get_chat_history(patient_id)
             
-        messages = [system_message_with_node_info, {"role": "user", "content": patient_info_str}] + chat_history
+        messages = [{"role": "user", "content": patient_info_str}] + chat_history
 
 
         # content_str = "\n".join([f"{message['role'].capitalize()}: {message['content']}" for message in self.chat_history])
@@ -115,13 +51,15 @@ class LLM:
         # ]
 
         try:
-            model_response = self.generate_response(messages).strip()
+            model_response = inference.chat_with_robodoc(user_input=user_input, chat_history=messages, nodes_from_subgraph=nodes_from_subgraph, image_captioning=image_captioning)
+            response = model_response["model_response"]
         except Exception as e:
             print(f"Exception occurred during model generation: {str(e)}")
-            model_response = "Sorry, I couldn't process your request at the moment."
-
-        #self.add_message(patient_id, {"role": "assistant", "content": model_response})
-        return user_input, model_response
+            response = "Sorry, I couldn't process your request at the moment."
+        
+        self.add_message(patient_id, {"role": "user", "content": user_input})
+        self.add_message(patient_id, {"role": "assistant", "content": response})
+        return user_input, response
 
             
 
