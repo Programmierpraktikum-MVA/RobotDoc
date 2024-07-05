@@ -1,10 +1,10 @@
-
 import torch
 import transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import pickle
 import traceback
 from modules.newmodel.Llama import inference
+
 
 class LLM:
     def __init__(self):
@@ -16,33 +16,22 @@ class LLM:
             "content": "You are an AI assistant supporting a doctor. The user describes patient symptoms. You receive node names and node types from a knowledge graph. Limit responses to 200 characters. For suspected diseases, ask for specific details."
         }
 
-
-
     def add_message(self, patient_id, message):
         if patient_id not in self.patients:
             self.patients[patient_id] = []
         self.patients[patient_id].append(message)
 
-    
     def get_chat_history(self, patient_id):
         return self.patients.get(patient_id, [])
-    
 
-  
+    def chat_with_robodoc(self, patient_id, patient_info, user_input, nodes_from_subgraph=None, image_captioning=None):
 
-    def chat_with_robodoc(self, patient_id,patient_info, user_input, nodes_from_subgraph=None, image_captioning=None):
-
-   
-
-        
-
-        #patient_info = self.get_patient_info(patient_id)
+        # patient_info = self.get_patient_info(patient_id)
         patient_info_str = str(patient_info)
 
         chat_history = self.get_chat_history(patient_id)
-            
-        messages = [{"role": "user", "content": patient_info_str}] + chat_history
 
+        # messages = [{"role": "user", "content": patient_info_str}] + chat_history
 
         # content_str = "\n".join([f"{message['role'].capitalize()}: {message['content']}" for message in self.chat_history])
         # messages = [
@@ -51,21 +40,17 @@ class LLM:
         # ]
 
         try:
-            model_response = inference.chat_with_robodoc(user_input=user_input, chat_history=messages, nodes_from_subgraph=nodes_from_subgraph, image_captioning=image_captioning)
+            model_response = inference.chat_with_robodoc(user_input=user_input, chat_history=chat_history,
+                                                         nodes_from_subgraph=nodes_from_subgraph,
+                                                         image_captioning=image_captioning)
             response = model_response["model_response"]
         except Exception as e:
             print(f"Exception occurred during model generation: {str(e)}")
             response = "Sorry, I couldn't process your request at the moment."
-        
+
         self.add_message(patient_id, {"role": "user", "content": user_input})
         self.add_message(patient_id, {"role": "assistant", "content": response})
         return user_input, response
-
-            
-
-
-
-
 
 # # Example usage
 # llm = LLM()
