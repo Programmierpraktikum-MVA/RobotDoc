@@ -15,7 +15,6 @@ tokenizer = None
 def download_and_save_model(model_name, save_directory):
     global model, tokenizer
     try:
-
         model, tokenizer = FastLanguageModel.from_pretrained(
             model_name=model_name,
             max_seq_length=2048,
@@ -97,7 +96,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
 
         # Generate output
         outputs = model.generate(
-            **inputs,  # Use ** to unpack the dictionary
+            **inputs,
             max_new_tokens=200,
             use_cache=True,
             pad_token_id=tokenizer.eos_token_id,  # Ensure padding token is set to EOS token ID
@@ -111,8 +110,8 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
         model_response = model_response.split("### Response:")[1].strip()
 
         # Update chat_history with user_input and model_response
-        chat_history.append(f"user:{user_input}")
-        chat_history.append(f"model_response:{model_response}")
+        chat_history.append({"role": "user", "content": user_input})
+        chat_history.append({"role": "model_response", "content": model_response})
 
         unload_model()
         # Return user_input, model_response, and updated chat_history

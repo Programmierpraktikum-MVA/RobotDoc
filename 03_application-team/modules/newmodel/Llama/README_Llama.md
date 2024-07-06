@@ -35,6 +35,7 @@
 
 4. **Hugging Face Token konfigurieren**
 
+   Falls das Meta Llama Modell von Hugging Face heruntergeladen werden soll, ist ein Hugging Face Token erforderlich.
    In der `config.json` ersetzen Sie `TOKEN_HERE` in der mit Ihrem tatsächlichen Hugging Face Token.
 
    ```json
@@ -44,7 +45,7 @@
 
 5. **Anwendung starten**
 
-   Starten Sie die Anwendung durch Ausführen der `startup.py` Datei:
+   Starten Sie die Anwendung durch Ausführen der `setup_llama.py` Datei:
 
    ```bash
    python setup_llama.py
@@ -53,7 +54,7 @@
 
 ## Nutzung
 
-Nachdem Sie LLama3 installiert und die `startup.py` ausgeführt haben, sollte die Anwendung laufen und bereit für die Nutzung sein, die Datei `inference.py` stelle dabei die Schnittstelle dar, welche von Applikationen zum Abrufen verwendet wird.
+Nachdem Sie LLama3 installiert und die `setup_llama.py` ausgeführt haben, sollte die Anwendung laufen und bereit für die Nutzung sein, die Datei `inference.py` stelle dabei die Schnittstelle dar, welche von Applikationen zum Abrufen verwendet wird.
 
 Die Erste Ausführung kann einige Zeit dauern, da das Modell zunächst heruntergeladen und gespeichert werden muss, anschließend wird es nur noch zum Bearbeiten von Anfragen in den VRAM geladen und anschließend unloaded.
 
