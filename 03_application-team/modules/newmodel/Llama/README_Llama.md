@@ -47,7 +47,7 @@
    Starten Sie die Anwendung durch Ausführen der `startup.py` Datei:
 
    ```bash
-   python setup.py
+   python setup_llama.py
    ```
       
 

@@ -4,10 +4,10 @@ import socket
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
 
 # Load configuration data
-# config_data = json.load(open("./config.json"))
-# HF_TOKEN = config_data["HF_TOKEN"] nicht mehr nötig, da Repo öffentlich
+config_data = json.load(open("./config.json"))
+HF_TOKEN = config_data["HF_TOKEN"]
 
-model_name = "KennyDain/Llama3_MedQA_bnb_4bit"
+model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
 save_directory = "./model"  # Specify your desired save directory
 
 # Quantization Configuration
