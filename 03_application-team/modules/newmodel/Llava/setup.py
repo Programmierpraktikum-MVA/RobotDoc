@@ -124,7 +124,7 @@ def image_captioning_with_robodoc(image_file):
 
 def listen_for_prompts():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('127.0.0.1', 65633))
+        s.bind(('127.0.0.1', 65533))
         s.listen()
         print("Waiting for connections...")
         while True:  # Keep listening for connections indefinitely
