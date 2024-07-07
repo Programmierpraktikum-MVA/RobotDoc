@@ -14,7 +14,7 @@
    Erstellen Sie eine neue virtuelle Umgebung namens `robodoc_llava`:
 
    ```bash
-   virtualenv robodoc_llava
+   python3.10 -m venv robodoc_llava
    ```
 
 2. **Virtuelle Umgebung aktivieren**
