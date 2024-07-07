@@ -81,7 +81,7 @@ def draw_graph(graph, patient_id):
     plt.close()  # Close the figure to free up resources
 
 
-def processMessage(patient_id, patient_info, message):
+def processMessage(patient_id, patient_info, message, imgCaptioning = None):
   
     # Extract the knowledge from the input and create subgraph
   try:
@@ -101,13 +101,13 @@ def processMessage(patient_id, patient_info, message):
       
 
       
-    input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, node_strings)
+    input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, node_strings, image_captioning=imgCaptioning)
     draw_graph(graph, patient_id)
     return res
       
     #Extract the content from the graph
   except Exception as e:
-        input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, None)
+        input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, nodes_from_subgraph=None, image_captioning=imgCaptioning)
         return res
       
     

@@ -3,6 +3,9 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from util.db_model import *
 from modules.auth.auth import *
 from modules.patients.patients import *
+from modules.newmodel.LLAVA.Llava_Reddit_Basemodel_Test import *
+import os
+
 
 from util.cache_config import cache
 from sshtunnel import SSHTunnelForwarder
@@ -32,7 +35,8 @@ app = Flask(__name__)
 app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
 # URI of the database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 cache.init_app(app)
@@ -51,6 +55,7 @@ login_manager.login_view = "login"
 
 @app.route("/sendImage", methods=['POST'])
 def uploadHelper():
+    
     return upload_image()
     # response = upload_image()
     # if response.status_code == 201:
@@ -61,8 +66,29 @@ def uploadHelper():
 
 @app.route('/uploadImageForPatient/<int:patient_id>', methods=['POST'])
 def uploadHelperPatient(patient_id):
-    upload_image_for_patient(patient_id)
-    return redirect("/patients/" + str(patient_id))
+    with current_app.app_context():
+        try:
+            upload_image_for_patient(patient_id)
+
+            file = request.files['image']
+            img = load_image_from_bytes(file)
+
+         
+            message = request.form['imgcontext']
+
+            patient = Patients.query.get(patient_id)
+            patientInfo = patient.to_dict()
+
+            llava_ouput = inference(img)
+       
+
+            reply = subgraphExtractor.processMessage(patient_id, patientInfo, message, imgCaptioning=llava_ouput)
+            return jsonify({"reply": reply, "type": "message"})
+        except Exception as e:
+            return jsonify({"reply": str(e), "type": "message"})  
+  
+
+
 
 @app.route("/")
 @login_required
