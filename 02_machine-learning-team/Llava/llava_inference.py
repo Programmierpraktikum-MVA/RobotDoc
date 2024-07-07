@@ -4,7 +4,7 @@ from PIL import Image
 
 def send_prompt(user_input):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect(('127.0.0.1', 65633))
+        s.connect(('127.0.0.1', 65533))
         data = {
             "user_input": user_input
         }
