@@ -194,71 +194,87 @@
     <script src="{{ url_for('static', filename='js/scripts.js')}}"></script>
 
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    const fileInput = document.querySelector('input[type="file"]');
-    const form = document.getElementById('patientImageForm'); 
-    const uploadContainer = document.querySelector('.file.is-centered');
+        var patientData = JSON.parse('{{ patientData | tojson | safe }}');
+        
+        //load messages from sessionstorage to chat
+        var messages = JSON.parse(sessionStorage.getItem('messages' + patientData.id)) || [];
+        //adds messages to chat
+        var chatBox = document.getElementById('chat-box');
+        messages.forEach(function(message) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message ' + (message.isBot ? 'is-pulled-left' : 'is-pulled-right');
+            messageDiv.innerHTML = `<div class="chatbubble ${message.isBot ? 'is-light' : 'is-primary'}"><p>${message.text}</p></div>`;
+            chatBox.appendChild(messageDiv);
+    });
 
-    // Add a hidden input field to the form
-    const hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.name = 'imgcontext';
-    form.appendChild(hiddenInput);
 
-    fileInput.addEventListener('change', function(event) {
-        if (fileInput.files.length > 0) {
-            event.preventDefault();
-            console.log('File input changed');
+        document.addEventListener("DOMContentLoaded", function() {
+            const fileInput = document.querySelector('input[type="file"]');
+            const form = document.getElementById('patientImageForm'); 
+            const uploadContainer = document.querySelector('.file.is-centered');
 
-            const chatBox = document.getElementById('chat-box');
+            // Add a hidden input field to the form
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'imgcontext';
+            form.appendChild(hiddenInput);
 
-            // Add bot message
-            const botMessage = document.createElement('div');
-            botMessage.classList.add('chat-message', 'is-pulled-left');
-            botMessage.innerHTML = `
-                <div class="chatbubble is-light">
-                    <p>Please provide context to the image:</p>
-                    <input type="text" id="context-input" name="imgcontext" value="">
-                    <button id="confirm-context" class="button is-small">Confirm</button>
-                </div>`;
-            chatBox.appendChild(botMessage);
+            fileInput.addEventListener('change', function(event) {
+                if (fileInput.files.length > 0) {
+                    event.preventDefault();
+                    console.log('File input changed');
 
-            const uploadButton = uploadContainer.querySelector('.file-label .file-label');
-            uploadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 50 50" fill="#ffffff" ><path d="M 42.875 8.625 C 42.84375 8.632813 42.8125 8.644531 42.78125 8.65625 C 42.519531 8.722656 42.292969 8.890625 42.15625 9.125 L 21.71875 40.8125 L 7.65625 28.125 C 7.410156 27.8125 7 27.675781 6.613281 27.777344 C 6.226563 27.878906 5.941406 28.203125 5.882813 28.597656 C 5.824219 28.992188 6.003906 29.382813 6.34375 29.59375 L 21.25 43.09375 C 21.46875 43.285156 21.761719 43.371094 22.050781 43.328125 C 22.339844 43.285156 22.59375 43.121094 22.75 42.875 L 43.84375 10.1875 C 44.074219 9.859375 44.085938 9.425781 43.875 9.085938 C 43.664063 8.746094 43.269531 8.566406 42.875 8.625 Z"></path></svg>';        
-            uploadContainer.classList.remove('is-info');
-            uploadContainer.classList.add('is-success');
-
-            const confirmButton = document.getElementById('confirm-context');
-            
-            confirmButton.addEventListener('click', function() {
-                console.log('Confirm button clicked');
-                const context = document.getElementById('context-input').value;
-                hiddenInput.value = context;
-                console.log('Context set to:', hiddenInput.value);
-                
-                // Manually trigger form submission
-                const formData = new FormData(form);
-                fetch(form.action, {
-                    method: form.method,
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Response received:', data.reply);
                     const chatBox = document.getElementById('chat-box');
+
+                    // Add bot message
                     const botMessage = document.createElement('div');
                     botMessage.classList.add('chat-message', 'is-pulled-left');
-                    botMessage.innerHTML = `<div class="chatbubble is-light"><p>${data.reply}</p></div>`;
+                    botMessage.innerHTML = `
+                        <div class="chatbubble is-light">
+                            <p>Please provide context to the image:</p>
+                            <input type="text" id="context-input" name="imgcontext" value="">
+                            <button id="confirm-context" class="button is-small">Confirm</button>
+                        </div>`;
                     chatBox.appendChild(botMessage);
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+
+                    const uploadButton = uploadContainer.querySelector('.file-label .file-label');
+                    uploadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 50 50" fill="#ffffff" ><path d="M 42.875 8.625 C 42.84375 8.632813 42.8125 8.644531 42.78125 8.65625 C 42.519531 8.722656 42.292969 8.890625 42.15625 9.125 L 21.71875 40.8125 L 7.65625 28.125 C 7.410156 27.8125 7 27.675781 6.613281 27.777344 C 6.226563 27.878906 5.941406 28.203125 5.882813 28.597656 C 5.824219 28.992188 6.003906 29.382813 6.34375 29.59375 L 21.25 43.09375 C 21.46875 43.285156 21.761719 43.371094 22.050781 43.328125 C 22.339844 43.285156 22.59375 43.121094 22.75 42.875 L 43.84375 10.1875 C 44.074219 9.859375 44.085938 9.425781 43.875 9.085938 C 43.664063 8.746094 43.269531 8.566406 42.875 8.625 Z"></path></svg>';        
+                    uploadContainer.classList.remove('is-info');
+                    uploadContainer.classList.add('is-success');
+
+                    const confirmButton = document.getElementById('confirm-context');
+                    
+                    confirmButton.addEventListener('click', function() {
+                        console.log('Confirm button clicked');
+                        const context = document.getElementById('context-input').value;
+                        hiddenInput.value = context;
+                        console.log('Context set to:', hiddenInput.value);
+                        
+                        // Manually trigger form submission
+                        const formData = new FormData(form);
+                        fetch(form.action, {
+                            method: form.method,
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Response received:', data.reply);
+                            const chatBox = document.getElementById('chat-box');
+                            const botMessage = document.createElement('div');
+                            botMessage.classList.add('chat-message', 'is-pulled-left');
+                            botMessage.innerHTML = `<div class="chatbubble is-light"><p>${data.reply}</p></div>`;
+                            chatBox.appendChild(botMessage);
+                            chatBox.scrollTop = chatBox.scrollHeight;
+                            messages.push({ text: data.reply, isBot: true });
+                            sessionStorage.setItem('messages' + patientData.id, JSON.stringify(messages));
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    });
+                }
             });
-        }
-    });
-});
+        });
 
         // Slider for threshold
         const slider = document.getElementById("mySlider");
@@ -310,18 +326,7 @@
     //     });
     // });
         //convert patientData dict to JSON so Javascript can handle it
-        var patientData = JSON.parse('{{ patientData | tojson | safe }}');
-        
-        //load messages from sessionstorage to chat
-        var messages = JSON.parse(sessionStorage.getItem('messages' + patientData.id)) || [];
-        //adds messages to chat
-        var chatBox = document.getElementById('chat-box');
-        messages.forEach(function(message) {
-            var messageDiv = document.createElement('div');
-            messageDiv.className = 'chat-message ' + (message.isBot ? 'is-pulled-left' : 'is-pulled-right');
-            messageDiv.innerHTML = `<div class="chatbubble ${message.isBot ? 'is-light' : 'is-primary'}"><p>${message.text}</p></div>`;
-            chatBox.appendChild(messageDiv);
-    });
+
     
         document.getElementById('send-message-form').addEventListener('submit', function(event) {
             event.preventDefault();
