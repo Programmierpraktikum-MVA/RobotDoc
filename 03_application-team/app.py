@@ -3,7 +3,6 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from util.db_model import *
 from modules.auth.auth import *
 from modules.patients.patients import *
-from modules.newmodel.LLAVA.Llava_Reddit_Basemodel_Test import *
 import os
 
 
