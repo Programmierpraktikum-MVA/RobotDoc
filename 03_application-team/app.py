@@ -36,7 +36,7 @@ app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
 
 # URI of the database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://admin:0gKtt43obCX7@db:5432/robotdb')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 cache.init_app(app)
