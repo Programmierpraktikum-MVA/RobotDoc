@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Access</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #videoElement {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+        #controls {
+            margin-top: 10px;
+        }
+        #canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Webcam Access</h1>
+    <div id="controls">
+        <button id="toggleButton">Disable Webcam</button>
+    </div>
+    <video id="videoElement" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        // Get the video element and button
+        const video = document.getElementById('videoElement');
+        const toggleButton = document.getElementById('toggleButton');
+        const canvas = document.getElementById('canvas');
+        let stream;
+
+        // Function to start the webcam
+        function startWebcam() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(s => {
+                    stream = s;
+                    video.srcObject = stream;
+                    toggleButton.textContent = 'Disable Webcam';
+                })
+                .catch(error => {
+                    console.error('Error accessing webcam:', error);
+                });
+        }
+
+        function photo() {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            //create a link and simulate click on it to download the image
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'photo.png';
+            link.click();
+        }
+
+        // Function to stop the webcam
+        function stopWebcam() {
+            if (stream) {
+                photo(); // Take a picture before stopping webcam
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                toggleButton.textContent = 'Enable Webcam';
+            }
+        }
+
+        // Initially start the webcam
+        startWebcam();
+
+        // Add event listener to the button
+        toggleButton.addEventListener('click', () => {
+            if (stream) {
+                stopWebcam();
+                stream = null;
+            } else {
+                startWebcam();
+            }
+        });
+
+    </script>
+</body>
+</html>
