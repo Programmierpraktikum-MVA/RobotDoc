@@ -44,15 +44,15 @@
 
 5. **Anwendung starten**
 
-   Starten Sie die Anwendung durch Ausführen der `.py` Datei:
+   Starten Sie die Anwendung durch Ausführen der `setup.py` Datei:
 
    ```bash
-   python .py
+   python setup.py
    ```
       
 
 ## Nutzung
 
-Nachdem Sie LLava installiert und die `.py` ausgeführt haben, sollte die Anwendung laufen und bereit für die Nutzung sein, die Datei `llava_inference.py` stelle dabei die Schnittstelle dar, welche von Applikationen zum Abrufen verwendet wird.
+Nachdem Sie LLava installiert und die `setup.py` ausgeführt haben, sollte die Anwendung laufen und bereit für die Nutzung sein, die Datei `llava_inference.py` stelle dabei die Schnittstelle dar, welche von Applikationen zum Abrufen verwendet wird.
 
 Die Erste Ausführung kann einige Zeit dauern, da das Modell zunächst heruntergeladen und gespeichert werden muss, anschließend wird es nur noch zum Bearbeiten von Anfragen in den VRAM geladen und anschließend unloaded.
