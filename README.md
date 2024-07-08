@@ -45,7 +45,7 @@
 
 	Zeigt flask Prozesse auf dem Server an
 	```bash
-		ps aux | grep flask
+	ps aux | grep flask
 	```
 	Herraussuchen aus der robodocvenv und "killen"
 	```bash
@@ -53,7 +53,7 @@
 	```
 
 7. **Starten und Bereitstellen von LLama und Llava**
-    
+    	
 	https://github.com/Programmierpraktikum-MVA/RobotDoc/tree/KennyDev/03_application-team/modules/newmodel/Llama
 
-https://github.com/Programmierpraktikum-MVA/RobotDoc/tree/KennyDev/03_application-team/modules/newmodel/Llava
+	https://github.com/Programmierpraktikum-MVA/RobotDoc/tree/KennyDev/03_application-team/modules/newmodel/Llava
