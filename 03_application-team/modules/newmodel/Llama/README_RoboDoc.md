@@ -2,7 +2,7 @@
 # LLama3 Installation und Startanleitung
 
 ## Voraussetzungen
-- Python 2.10
+- Python 3.10
 - pip
 - virtualenv
 - cuda 12.1
