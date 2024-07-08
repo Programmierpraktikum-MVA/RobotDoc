@@ -1,3 +1,4 @@
+import os
 import io
 import json
 import torch
@@ -13,22 +14,31 @@ HF_TOKEN = config_data["HF_TOKEN"]
 model_name = "llava-hf/llava-1.5-7b-hf"
 save_directory = "./model"  # Specify your desired save directory
 
-# Quantization Configuration
-
-
 # Define quantization config
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16
 )
-
 
 # Global variable to track if model is loaded
 model_loaded = False
 processor = None
 model = None
 
+def unload_model():
+    global model, model_loaded
+    if model_loaded:
+        del processor
+        del model
+        torch.cuda.empty_cache()
+        model_loaded = False
+        print("Model unloaded from VRAM.")
+
 def download_and_save_model(model_name, save_directory):
     try:
+        if os.path.exists(save_directory):
+            print("Model already downloaded")
+            return True
+        
         # Load the processor and model with adapters on top
         processor = AutoProcessor.from_pretrained(model_name)
 
@@ -43,6 +53,9 @@ def download_and_save_model(model_name, save_directory):
         model.save_pretrained(save_directory)
 
         print(f"Model saved to {save_directory}")
+
+        unload_model()
+
         return True
 
     except Exception as e:
@@ -67,19 +80,6 @@ def load_model():
         except Exception as e:
             print(f"Failed to load model: {str(e)}")
 
-def unload_model():
-    global model, model_loaded
-    if model_loaded:
-        del processor
-        del model
-        torch.cuda.empty_cache()
-        model_loaded = False
-        print("Model unloaded from VRAM.")
-
-def load_image_from_bytes(image_data):
-    image = Image.open(io.BytesIO(image_data)).convert("RGB")
-    return image
-
 #transform output list into string
 def list_to_string(llava_out):
     if not isinstance(llava_out, list):
@@ -96,10 +96,8 @@ def cut_string(llava_out):
   else:
     return ""
 
-def image_captioning_with_robodoc(image_file):
+def image_captioning_with_robodoc(img):
     global model_loaded, generated_texts
-
-    img = load_image_from_bytes(image_file)
 
     try:
         load_model()

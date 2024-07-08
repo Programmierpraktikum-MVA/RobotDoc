@@ -1,7 +1,11 @@
 import torch
 import openai
 import os
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+from dotenv import load_dotenv
+
+load_dotenv()
+
+openai.api_key = os.getenv('OPEN_AI_KEY')
 
 def create_embedding(text):
     #Erstelle Sentence embeddings mit openaiApi, analog zu Node embeddings im KG

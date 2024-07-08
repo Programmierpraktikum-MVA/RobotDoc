@@ -1,11 +1,14 @@
 import json
 import torch
+from dotenv import load_dotenv
 import socket
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
 
+load_dotenv()
+
 # Load configuration data
-config_data = json.load(open("./config.json"))
-HF_TOKEN = config_data["HF_TOKEN"]
+#config_data = json.load(open("./config.json"))
+HF_TOKEN = os.getenv("META_LLAMA_KEY") 
 
 model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
 save_directory = "./model"  # Specify your desired save directory
@@ -22,8 +25,8 @@ model = None
 def download_and_save_model(model_name, save_directory):
     try:
         # Load tokenizer and model from Hugging Face
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name)
+        tokenizer = AutoTokenizer.from_pretrained(model_name,token=HF_TOKEN)
+        model = AutoModelForCausalLM.from_pretrained(model_name,token=HF_TOKEN)
 
         # Save tokenizer and model to disk
         tokenizer.save_pretrained(save_directory)
@@ -41,7 +44,7 @@ def load_model():
     if not model_loaded:
         print("Loading model into VRAM...")
         try:
-            model = AutoModelForCausalLM.from_pretrained(save_directory, device="cuda", quantization_config=bnb_config)
+            model = AutoModelForCausalLM.from_pretrained(save_directory, quantization_config=bnb_config)
             model_loaded = True
             print("Model loaded successfully.")
         except Exception as e:
@@ -84,7 +87,7 @@ def chat_with_robodoc(user_input, chat_history, nodes_from_subgraph=None, image_
         tokenizer = AutoTokenizer.from_pretrained(save_directory)
 
         textgen = pipeline(
-            "text-generation",
+                "text-generation",
             model=model,
             tokenizer=tokenizer,
             model_kwargs={"torch_dtype": torch.bfloat16},

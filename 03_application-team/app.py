@@ -3,39 +3,42 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from util.db_model import *
 from modules.auth.auth import *
 from modules.patients.patients import *
+from modules.newmodel.Llava.llava_inference import *
 import os
-
+import io
+from dotenv import load_dotenv
 
 from util.cache_config import cache
 from sshtunnel import SSHTunnelForwarder
+
+load_dotenv()
 
 # Konfigurationsparameter für den SSH-Tunnel und die Datenbank
 SSH_HOST = 'newgpu.adastruct.com'
 SSH_PORT = 22
 SSH_USER = 'pp'
-SSH_PASSWORD = "Z7.b'NV9i$n6"  
+SSH_PASSWORD = os.getenv('SSH_PWD')  
 DB_HOST = 'localhost'
 
 
-# Aufbau des SSH-Tunnels
-# server = SSHTunnelForwarder(
-#     (SSH_HOST, SSH_PORT),
-#     ssh_pkey=None,
-#     ssh_username=SSH_USER,
-#     ssh_password=SSH_PASSWORD,
-#     remote_bind_address=(DB_HOST, 5432),
-#     local_bind_address=('localhost', 5432)
+#Aufbau des SSH-Tunnels
+#server = SSHTunnelForwarder(
+#    (SSH_HOST, SSH_PORT),
+#    ssh_pkey=None,
+#    ssh_username=SSH_USER,
+#    ssh_password=SSH_PASSWORD,
+#    remote_bind_address=(DB_HOST, 5432),
+#    local_bind_address=('localhost', 5432)
 # )
 #ssh tunnel wird autom. beendee, wenn das Programm beendet wird
 #server.start()
 
 # default config
 app = Flask(__name__)
-app.secret_key = "~((<SH,jM_YU9_x3$2f!_x2"
+app.secret_key = os.getenv("APP_SCRT_KEY")
 
 # URI of the database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://admin:0gKtt43obCX7@localhost:5432/robotdb')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 cache.init_app(app)
@@ -78,7 +81,7 @@ def uploadHelperPatient(patient_id):
             patient = Patients.query.get(patient_id)
             patientInfo = patient.to_dict()
 
-            llava_ouput = inference(img)
+            llava_ouput = image_captioning_with_robodoc(img)
        
 
             reply = subgraphExtractor.processMessage(patient_id, patientInfo, message, imgCaptioning=llava_ouput)

@@ -1,7 +1,7 @@
 Flask==3.0.0
 Flask-Login==0.6.3
 Flask-SQLAlchemy==3.0.3
-psycopg2==2.9.6
+psycopg2-binary
 bcrypt==4.0.1
 sshtunnel==0.4.0
 requests
@@ -9,7 +9,7 @@ flask_caching
 
 Werkzeug==3.0.0
 
-
+python-dotenv
 tensorflow
 
 
