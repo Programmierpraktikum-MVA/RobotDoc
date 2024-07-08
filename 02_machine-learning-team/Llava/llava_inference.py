@@ -2,11 +2,11 @@ import socket
 import json
 from PIL import Image
 
-def send_prompt(user_input):
+def send_prompt(image_file):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect(('127.0.0.1', 65533))
         data = {
-            "user_input": user_input
+            "image_file": image_file
         }
 
         s.sendall(json.dumps(data).encode('utf-8'))

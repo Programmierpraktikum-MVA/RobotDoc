@@ -15,6 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
+#ENV DATABASE_URL: postgresql://admin:0gKtt43obCX7@db:5432/robotdb
 
 EXPOSE 5000
 CMD [ "flask","--app","app.py","run","-h","0.0.0.0"]

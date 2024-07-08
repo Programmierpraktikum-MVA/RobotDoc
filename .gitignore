@@ -4,3 +4,14 @@ mein_venv/
 myenv/
 03_application-team/static/img/graph_visualization.png
 03_application-team/static/img/graph_visualization_patient.png
+
+robodocvenv
+robodoc_llava
+roboenv_llama
+
+__pycache__/
+
+**/model/
+**/datasets/
+
+.env

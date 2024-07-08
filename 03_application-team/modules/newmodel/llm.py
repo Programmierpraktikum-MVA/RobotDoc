@@ -49,7 +49,7 @@ class LLM:
             response = "Sorry, I couldn't process your request at the moment."
 
         self.add_message(patient_id, {"role": "user", "content": user_input})
-        self.add_message(patient_id, {"role": "assistant", "content": response})
+        self.add_message(patient_id, {"role": "model_response", "content": response})
         return user_input, response
 
 # # Example usage
