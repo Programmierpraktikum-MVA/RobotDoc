@@ -1,6 +1,6 @@
-venv/
-mein_venv/
-myenv/
+**/venv/
+**/mein_venv/
+**/myenv/
 
 .DS_Store
 .idea
@@ -8,9 +8,9 @@ myenv/
 03_application-team/static/img/graph_visualization.png
 03_application-team/static/img/graph_visualization_patient.png
 
-robodocvenv
-robodoc_llava
-roboenv_llama
+**/robodocvenv
+**/robodoc_llava
+**/roboenv_llama
 
 __pycache__/
 
