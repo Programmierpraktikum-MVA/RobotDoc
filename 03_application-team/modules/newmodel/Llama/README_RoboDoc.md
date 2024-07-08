@@ -2,10 +2,10 @@
 # LLama3 Installation und Startanleitung
 
 ## Voraussetzungen
-- Python 3.8 oder höher
+- Python 2.10
 - pip
 - virtualenv
-- cuda
+- cuda 12.1
 
 ## Installation
 
@@ -14,7 +14,7 @@
    Erstellen Sie eine neue virtuelle Umgebung namens `roboenv`:
 
    ```bash
-   virtualenv roboenv
+   python3.10 -m venv roboenv_llama
    ```
 
 2. **Virtuelle Umgebung aktivieren**
@@ -38,7 +38,7 @@
    Starten Sie die Anwendung durch Ausführen der `setup_robodoc.py` Datei:
 
    ```bash
-   python setup_robodoc.py
+   python3.10 setup_robodoc.py
    ```
 
 
