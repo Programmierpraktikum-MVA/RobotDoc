@@ -32,7 +32,8 @@ finetuned_ner = pipeline("ner", model=fine_tuned_model, tokenizer=tokenizer,aggr
 @cache.memoize(timeout=300)
 def getAllPatients():
     with current_app.app_context():
-        data = Patients.query.all()
+        user_id = current_user.intid
+        data = Patients.query.filter(user_id = user_id).all()
         return data
     
 def patients_to_dict(patients):
