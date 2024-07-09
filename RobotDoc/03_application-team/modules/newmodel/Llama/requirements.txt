@@ -1,8 +1,0 @@
-torch==2.3.0 
-transformers
-trl<0.9.0
-peft
-accelerate
-bitsandbytes
-xformers
-git+https://github.com/unslothai/unsloth.git
