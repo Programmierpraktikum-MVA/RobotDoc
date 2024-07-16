@@ -5,7 +5,7 @@ import socket
 import torch
 from unsloth import FastLanguageModel
 
-model_name = "KennyDain/Llama3_medQA_bnb_4bit"
+model_name = "KennyDain/Llama3_unsloth_8B_bnb_4bit_RoboDoc"
 save_directory = "./model"
 
 # Global variables to track if model is loaded
@@ -52,7 +52,8 @@ def load_model():
                 load_in_4bit=True,
             )
 
-            
+            FastLanguageModel.for_inference(model)
+
             model_loaded = True
             print("Model loaded successfully.")
         except Exception as e:
