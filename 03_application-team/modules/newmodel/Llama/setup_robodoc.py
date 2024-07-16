@@ -86,7 +86,7 @@ def cut_string_hash(llama_out):
 
 
 def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, image_captioning=None):
-
+    global model, tokenizer
     # Initialize chat_history if None
     if chat_history is None:
         chat_history = []
