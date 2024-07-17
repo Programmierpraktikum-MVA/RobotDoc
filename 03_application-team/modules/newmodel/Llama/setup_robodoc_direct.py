@@ -25,7 +25,17 @@ try:
 except Exception as e:
     print(f"Failed to load model: {str(e)}")
 
-
+def brechstange(llama_out, cutpoints):
+    start_idx = -1
+    for cutpoint in cutpoints:
+        idx = llama_out.find(cutpoint)
+        if idx != -1:
+            if start_idx == -1 or idx < start_idx:
+                start_idx = idx
+    if start_idx != -1:
+        return llama_out[:start_idx]
+    else:
+        return llama_out
 
 def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, image_captioning=None):
     global model, tokenizer
@@ -78,7 +88,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
             #eos_token_id=tokenizer.eos_token_id   # Specify EOS token ID for proper handling
         )
 
-        test_decode = tokenizer.batch_decode(outputs, skip_special_tokens = True)
+        #test_decode = tokenizer.batch_decode(outputs, skip_special_tokens = True)
         #print("tokenizer.batch_decode: ")
         #print(test_decode)
 
@@ -88,7 +98,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
         print(model_response)
 
 
-        test_decode = tokenizer.batch_decode(outputs, skip_special_tokens = True)
+        #test_decode = tokenizer.batch_decode(outputs, skip_special_tokens = True)
         #print("tokenizer.batch_decode: ")
         #print(model_response)
 
@@ -97,7 +107,8 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
         model_response = model_response.split("### Response:")[1].strip()
         #print("model_response2: ")
         #print(model_response)
-
+        cutpoints = [" You are an AI assistant", "### Instruction:", "### Input:"]
+        model_response = brechstange(model_response, cutpoints)
         #response_split = model_response.split("### Response:")
         #if len(response_split) > 1:
         #    model_response = response_split[1].strip()
@@ -106,7 +117,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
 
         # Update chat_history with user_input and model_response
         chat_history.append(f"user:{user_input}")
-        chat_history.append(f"model_response:{model_response}")
+        chat_history.append(f"assistant:{model_response}")
 
         print("chatHistory: ")
         print(chat_history)
