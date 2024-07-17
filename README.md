@@ -8,7 +8,7 @@
 
    ```bash
    git clone https://github.com/Programmierpraktikum-MVA/RobotDoc.git
-   git checkout KennyDev
+   git checkout main
    ```
 
 2. **Virtuelle Umgebung einrichten**
