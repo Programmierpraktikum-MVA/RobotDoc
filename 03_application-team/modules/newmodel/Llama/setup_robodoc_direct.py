@@ -6,7 +6,6 @@ import torch
 from unsloth import FastLanguageModel
 
 model_name = "KennyDain/Llama3_unsloth_8B_bnb_4bit_RoboDoc"
-save_directory = "./directmodel"
 
 # Global variables to track if model is loaded
 model = None
@@ -14,7 +13,7 @@ tokenizer = None
 
 try:
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=save_directory,
+        model_name=model_name,
         max_seq_length=2048,
         dtype=torch.bfloat16,
         load_in_4bit=True,
