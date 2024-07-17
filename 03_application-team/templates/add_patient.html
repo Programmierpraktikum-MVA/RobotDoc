@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Patient | RobotDoc</title>
+    <link rel="stylesheet" href="static/css/bulma.css">
+    <link rel="shortcut icon" href="static/img/favicon.jpg">
+</head>
+
+<body>
+    <section class="hero is-info is-fullheight">
+        <div class="hero-head">
+            <nav class="navbar">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <div class="navbar-item" href="../">
+                            <img src="static/img/rd_icon.png" alt="Logo">
+                        </div>
+                        <span class="navbar-burger burger" data-target="navbarMenu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </div>
+                    
+                    <div id="navbarMenu" class="navbar-menu">
+                        <div class="navbar-start">
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/home">
+                                    <span>General</span>
+                                </a>
+                            </span>
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/patients">
+                                    <span>Patients</span>
+                                </a>
+                            </span>
+                        </div>
+                        <div class="navbar-end">
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/logout">
+                                    <span>Logout</span>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="hero-body has-text-centered">
+            <div class="container">
+                <div class="columns">
+                    <div class="column is-half is-offset-one-quarter">
+                        <div class="box">
+                            <form action="/createPatient" method="POST">
+                                <div class="field">
+                                    <label class="label">Name</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="name" placeholder="Patient Name" required>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label">Weight</label>
+                                    <div class="control">
+                                        <input class="input" type="number" step="any" name="weight" placeholder="Patient Weight" required>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label">Age</label>
+                                    <div class="control">
+                                        <input class="input" type="number" name="age" placeholder="Patient Age" required>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label">Sex</label>
+                                    <div class="control">
+                                        <div class="select">
+                                            <select name="sex" required>
+                                                <option value="">Select Sex</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label">Symptoms</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="symptoms" placeholder="Enter symptoms separated by commas" required>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <div class="control">
+                                        <button class="button is-link" type="submit">Add Patient</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="static/js/scripts.js"></script>
+
+</body>
+
+</html>
