@@ -1,4 +1,3 @@
-
 # Installation und Startanleitung
 
 ## 1. Klonen und Starten der Flask Anwendung auf dem GPU Server
