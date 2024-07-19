@@ -10,7 +10,8 @@ flask_caching
 Werkzeug==3.0.0
 scipy==1.10.0
 python-dotenv
-tensorflow
+tensorflow==2.9.1
+
 
 
 transformers
