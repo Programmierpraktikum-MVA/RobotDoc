@@ -42,16 +42,16 @@ def symptomNER(text):
 
 # Extract the knowledge from the input and create subgraph
 def extract_knowledge(patient_id, input):
-    subgraph = subgraph_builder.SubgraphBuilder('util/datasets/prime_kg_nx_63960.pickle', 'util/datasets/prime_kg_embeddings_tensor_63960.pt', meta_relations_dict, embedding.create_embedding, None, None)
-    graph_filename = f'util/datasets/graph_{patient_id}.p'
+    subgraph = subgraph_builder.SubgraphBuilder(os.path.join('util', 'datasets', 'prime_kg_nx_63960.pickle'), os.path.join('util', 'datasets', 'prime_kg_embeddings_tensor_63960.pt'), meta_relations_dict, embedding.create_embedding, None, None)
+    graph_filename = os.path.join('util', 'datasets', f'graph_{patient_id}.p')
     if os.path.exists(graph_filename):
       with open(graph_filename, 'rb') as f:
         subgraph.nx_subgraph = pickle.load(f)
     
-
     edges, edge_indices = subgraph.extract_knowledge_from_kg(input, entities_list = subgraph.medNER(input))
     subgraph.expand_graph_with_knowledge(edge_indices)
-    subgraph.save_graph('util/datasets','graph', patient_id)
+
+    subgraph.save_graph(os.path.join('util', 'datasets'),'graph', patient_id)
     
     return None
 
@@ -89,7 +89,7 @@ def processMessage(patient_id, patient_info, message, imgCaptioning = None):
       
     subgraph = extract_knowledge(patient_id, message)
      # Load the graph object
-    graph_filename = f'util/datasets/graph_{patient_id}.p'
+    graph_filename = os.path.join('util', 'datasets', f'graph_{patient_id}.p')
 
     graph = load_graph(graph_filename)
     node_strings = []
@@ -98,6 +98,7 @@ def processMessage(patient_id, patient_info, message, imgCaptioning = None):
       type = node[1]['type']
       context_prompt = f"The Content: {name}, {type}"
       node_strings.append(context_prompt)
+      print(name)
       
 
       
@@ -109,5 +110,9 @@ def processMessage(patient_id, patient_info, message, imgCaptioning = None):
   except Exception as e:
         input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, nodes_from_subgraph=None, image_captioning=imgCaptioning)
         return res
+  
+def processWithoutKG(patient_id, patient_info, message, imgCaptioning = None):
+    input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, nodes_from_subgraph=None, image_captioning=imgCaptioning)
+    return res
       
     

@@ -153,6 +153,7 @@
                                 <div class="chatbubble is-light">
                                     <p>Hi there! How can I help you today?</p>
                                 </div>
+                        
                             </div>
                         </div>
                         <div style="display: flex;">
@@ -181,9 +182,16 @@
                                 
                                 
                         
-                        </div>  
+                        </div>
+                        <div> 
                             <input type="checkbox" id="symptoms-check" name="symptoms-check">
-                            <label for="symptoms-check">auto update symptoms</label>                      
+                            <label for="symptoms-check">Auto update symptoms</label>
+                        </div> 
+                        <div>
+                            <input type="checkbox" id="kg-check" name="kg-check" checked>
+                            <label for="symptoms-check">Use KnowledgeGraph extraction</label>   
+                        </div> 
+                                                   
                     </div>
                 </div>
             </div>
@@ -332,6 +340,7 @@
             event.preventDefault();
             const messageInput = document.getElementById('message-input');
             const symptomsCheck = document.getElementById('symptoms-check');
+            const kgCheck = document.getElementById('kg-check');
 
             const message = messageInput.value.trim();
             if (message !== "") {
@@ -356,7 +365,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ message: message, updateSymptoms: symptomsCheck.checked }),
+                    body: JSON.stringify({ message: message, updateSymptoms: symptomsCheck.checked, useKG: kgCheck.checked }),
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -420,7 +429,7 @@
                                         headers: {
                                             'Content-Type': 'application/json',
                                         },
-                                        body: JSON.stringify({ message: message, updateSymptoms: false }),
+                                        body: JSON.stringify({ message: message, updateSymptoms: false, useKG: kgCheck.checked }),
                                     })
                                     .then(response => response.json())
                                     .then(data => {
