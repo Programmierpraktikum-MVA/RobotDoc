@@ -5,7 +5,7 @@ import socket
 import torch
 from unsloth import FastLanguageModel
 
-model_name = "KennyDain/Llama3_unsloth_8B_bnb_4bit_RoboDoc"
+model_name = "KennyDain/RoboDoc_Llama3_bnb_4bit"
 
 # Global variables to track if model is loaded
 model = None
@@ -18,6 +18,10 @@ try:
         dtype=torch.bfloat16,
         load_in_4bit=True,
     )
+    # change the padding tokenizer value
+    #tokenizer.add_special_tokens({"pad_token": "<|reserved_special_token_0|>"})
+    #model.config.pad_token_id = tokenizer.pad_token_id # updating model config
+    #tokenizer.padding_side = 'right' # padding to right (otherwise SFTTrainer shows warning)
 
     FastLanguageModel.for_inference(model)
 
@@ -44,7 +48,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
         chat_history = []
 
     # Construct instruction based on chat history, nodes, and image captioning
-    instruction = "The following is a chathistory with a doctor and his AI assistant, the following Input is the newest question regarding this conversation, help him cure/diagnose the patient.\n"
+    instruction = "Answer the users question regarding this Patient."
     if len(chat_history) > 0:
         formatted_history = [f"{msg['role']}:{msg['content']}" for msg in chat_history if msg['role'] != 'system']
         instruction += "\n".join(formatted_history)
@@ -55,7 +59,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
 
     try:
         # Define the prompt template
-        alpaca_prompt = """You are an AI assistant supporting a doctor. The user describes patient symptoms. If the Doctor chooses to you receive node names and node types from a knowledge graph for further reference. These are not confirmed diseases or drugs. Limit responses to 200 characters. For suspected diseases, ask for specific details.
+        alpaca_prompt = """You are an AI assistant supporting a doctor.
 
         ### Instruction:
         {}
@@ -83,7 +87,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
             max_new_tokens=200,
             use_cache=True,
             pad_token_id=tokenizer.eos_token_id,  # Ensure padding token is set to EOS token ID
-            #eos_token_id=tokenizer.eos_token_id   # Specify EOS token ID for proper handling
+           # eos_token_id=tokenizer.eos_token_id   # Specify EOS token ID for proper handling
         )
 
         #test_decode = tokenizer.batch_decode(outputs, skip_special_tokens = True)
@@ -92,8 +96,8 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
 
         # Decode the output tokens
         model_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        print("model_response before ###ResponseSplit: ")
-        print(model_response)
+        #print("model_response before ###ResponseSplit: ")
+        #print(model_response)
 
 
         #test_decode = tokenizer.batch_decode(outputs, skip_special_tokens = True)
@@ -112,7 +116,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
         #    model_response = response_split[1].strip()
         #else:
         #    model_response = model_response.strip()
-
+     
         # Update chat_history with user_input and model_response
         chat_history.append(f"user:{user_input}")
         chat_history.append(f"assistant:{model_response}")
