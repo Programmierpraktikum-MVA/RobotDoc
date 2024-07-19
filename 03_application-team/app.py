@@ -73,7 +73,7 @@ def uploadHelperPatient(patient_id):
             upload_image_for_patient(patient_id)
 
             file = request.files['image']
-            img = load_image_from_bytes(file)
+            #img = load_image_from_bytes(file)
 
          
             message = request.form['imgcontext']
@@ -81,7 +81,7 @@ def uploadHelperPatient(patient_id):
             patient = Patients.query.get(patient_id)
             patientInfo = patient.to_dict()
 
-            llava_ouput = image_captioning_with_robodoc(img)
+            llava_ouput = image_captioning_with_robodoc(file)
        
 
             reply = subgraphExtractor.processMessage(patient_id, patientInfo, message, imgCaptioning=llava_ouput)
