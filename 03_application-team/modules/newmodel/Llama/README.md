@@ -38,7 +38,7 @@
    Starten Sie die Anwendung durch Ausführen der `setup_robodoc.py` Datei:
 
    ```bash
-   python3.10 setup_robodoc.py
+   python3.10 setup_robodoc_direct.py
    ```
 
 
