@@ -1,5 +1,6 @@
 import os
 import io
+from io import BytesIO
 import json
 import torch
 import socket
@@ -120,6 +121,11 @@ def image_captioning_with_robodoc(img):
 
     return generated_string
 
+def load_image_from_bytes(image_bytes):
+    img_stream = BytesIO(image_bytes)
+    image = Image.open(img_stream).convert("RGB")
+    return image
+
 def listen_for_prompts():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(('127.0.0.1', 65533))
@@ -130,16 +136,27 @@ def listen_for_prompts():
             with conn:
                 print('Connected by', addr)
                 while True:  # Keep processing prompts within the connection
-                    data = conn.recv(4096)
+                    data = conn.recv(8192)
                     if not data:
                         break
-                    received_data = json.loads(data.decode('utf-8'))
-                    user_input = received_data['image_file']
-                    model_response = image_captioning_with_robodoc(user_input)
-                    response_data = {
-                        "model_response": model_response
-                    }
-                    conn.sendall(json.dumps(response_data).encode('utf-8'))
+                    try:
+                        received_data = json.loads(data.decode('utf-8'))
+                        image_hex = received_data['image_file']
+                        try:
+                            image_bytes = bytes.fromhex(image_hex)
+                            #image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+                            image = load_image_from_bytes(image_bytes)
+                            model_response = image_captioning_with_robodoc(image)
+                        except Exception as e:
+                            print(f"Error processing img: {e}")
+                            model_response = "Error processing img."
+                        response_data = {
+                            "model_response": model_response
+                        }
+                        conn.sendall(json.dumps(response_data).encode('utf-8'))
+                    except Exception as e:
+                        print(f"Error decoding JSON: {e}")
+                        conn.sendall(json.dumps({"model_response": "Error decoding JSON."}).encode('utf-8'))
 
 if __name__ == "__main__":
     # Download and save the model if not already saved
