@@ -96,18 +96,13 @@ def uploadHelperPatient(patient_id):
 @login_required
 def start():
     if current_user.is_authenticated:
-        return redirect("/home")
+        return redirect("/patients")
     
 # if __name__ == '__main__':
 #     with app.app_context():
 #         db.create_all()  # Dies stellt sicher, dass die Tabelle 'images' erstellt wird
 #     app.run(debug=True)
 
-
-@app.route("/home")
-@login_required
-def home():
-    return render_template("home.html", user=str(current_user.id))
 
 @app.route('/add_patient')
 def add_patient():
