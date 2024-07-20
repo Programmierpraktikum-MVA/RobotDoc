@@ -18,7 +18,7 @@ class User (UserMixin):
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect("/home")
+        return redirect("/patietns")
     if request.method == "POST":
         username = request.form["username"]
         remember_me = request.form.get("remember_me")
@@ -39,7 +39,7 @@ def login():
                 login_user(user, remember=True)
             else:
                 login_user(user)
-            return redirect("/home")
+            return redirect("/patients")
         return render_template("index.html", loginFailed=True)
     else:
         return render_template("index.html")
@@ -48,7 +48,7 @@ def login():
 @auth.route("/signup", methods=["GET", "POST"])
 def signup():
     if current_user.is_authenticated:
-        return redirect("/home")
+        return redirect("/patients")
     if request.method == "POST":
         username = request.form["username"]
         pw = request.form["password"]

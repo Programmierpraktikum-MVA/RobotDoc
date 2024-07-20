@@ -28,11 +28,6 @@
                     <div id="navbarMenu" class="navbar-menu">
                         <div class="navbar-start">
                             <span class="navbar-item">
-                                <a class="button is-white is-outlined" href="/home">
-                                    <span>General</span>
-                                </a>
-                            </span>
-                            <span class="navbar-item">
                                 <a class="button is-white is-outlined" href="/patients">
                                     <span>Patients</span>
                                 </a>
@@ -126,11 +121,6 @@
 
                                             <button type="submit" class="button is-info" style = "margin-bottom:10px;">Get Diagnosis </button>
 
-                                            <div>
-                                                <p>Choose your threshold for the model:</p>
-                                                <input type="range" min="1" max="100" value="50" class="slider" id="mySlider" name="threshold" />
-                                                <span id="sliderValue">50%</span>
-                                            </div>
                                         </form>
                                     </div>
                                 </div>
@@ -224,15 +214,6 @@
 
             toggleDiv(checkbox2, "div2"); // show the corresponding div
        };
-
-
-        // Slider for threshold
-        const slider = document.getElementById("mySlider");
-        const valueDisplay = document.getElementById("sliderValue");
-        slider.addEventListener("input", function () {
-            const sliderValue = slider.value;
-            valueDisplay.textContent = sliderValue + "%";
-        });
 
         // Confirmation before deleting an image
         function confirmDelete() {

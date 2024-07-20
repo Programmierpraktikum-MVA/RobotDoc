@@ -32,6 +32,8 @@ finetuned_ner = pipeline("ner", model=fine_tuned_model, tokenizer=tokenizer,aggr
 @cache.memoize(timeout=300)
 def getAllPatients():
     with current_app.app_context():
+        #userid = current_user.intid
+        #data = Patients.query.filter_by(user_id=userid).all()
         data = Patients.query.all()
         return data
     
@@ -176,7 +178,7 @@ def knowView():
 @login_required
 def resetSymptoms():
     # ml.reset_patient()
-    return render_template("home.html", user=str(current_user.id))
+    return render_template("patients.html", user=str(current_user.id))
 
 
 
