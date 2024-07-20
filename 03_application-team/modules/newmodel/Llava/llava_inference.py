@@ -12,39 +12,29 @@ def load_image_from_bytes(image_data):
         print(f"error loading img: {e}")
         raise
 
-def transform_image_to_hex(image_file):
-    image = Image.open(image_file).convert("RGB")
-    byte_io = BytesIO()
-    image.save(byte_io, format='PNG')
-    image_bytes = byte_io.getvalue()
-    image_hex = image_bytes.hex
-    return image_hex
-
-def send_prompt(image_file):
+def send_prompt(image_name):
     try:
-        image_hex = transform_image_to_hex(image_file)
-
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect(('127.0.0.1', 65533))
             data = {
-                "image_file": image_hex
+                "image_file": image_name
             }
 
             s.sendall(json.dumps(data).encode('utf-8'))
-            response = s.recv(8192)
+            response = s.recv(4096)
             return json.loads(response.decode('utf-8'))
     except Exception as e:
         print(f"Error send prompt: {e}")
 
-def image_captioning_with_robodoc(image_file):
+def image_captioning_with_robodoc(image_name):
 
     """
     Acts as the interface for image_captioning with RoboDoc.
 
         Params:
-            user_input: Image bytes
+            user_input (str): Image Name
 
         Returns:
             llava_output (str): Image Caption
     """
-    return send_prompt(image_file)
+    return send_prompt(image_name)
