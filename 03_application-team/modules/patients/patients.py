@@ -322,9 +322,15 @@ def sendMessage(id):
                     print(uniqueSymptoms)
                     if len(uniqueSymptoms) > 0:
                         return jsonify({"reply": uniqueSymptoms, "type": "symptoms"})
-       
-            
+                    
             patientInfo = patient.to_dict()
+                    
+            if(not data['useKG']):
+                reply = subgraphExtractor.processWithoutKG(id, patientInfo, message)
+                return jsonify({"reply": reply, "type": "message"})
+
+
+            
 
 
             reply = subgraphExtractor.processMessage(id, patientInfo, message)
