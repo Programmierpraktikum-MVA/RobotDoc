@@ -73,7 +73,19 @@ def uploadHelperPatient(patient_id):
             upload_image_for_patient(patient_id)
 
             file = request.files['image']
-            #img = load_image_from_bytes(file)
+            # img = load_image_from_bytes(file)
+
+            # Define the directory for saving the image
+            #UPLOAD_FOLDER = os.path.expanduser('~/modules/newmodel/Llava/img')
+            UPLOAD_FOLDER = os.path.join('modules', 'newmodel', 'Llava', 'img')
+            # Make sure the directory exists
+            if not os.path.exists(UPLOAD_FOLDER):
+                os.makedirs(UPLOAD_FOLDER)
+            
+            file.seek(0)
+
+            # Save the image
+            file.save(os.path.join(UPLOAD_FOLDER, file.filename))
 
          
             message = request.form['imgcontext']
@@ -81,7 +93,7 @@ def uploadHelperPatient(patient_id):
             patient = Patients.query.get(patient_id)
             patientInfo = patient.to_dict()
 
-            llava_ouput = image_captioning_with_robodoc(file)
+            llava_ouput = image_captioning_with_robodoc(file.filename)
        
 
             reply = subgraphExtractor.processMessage(patient_id, patientInfo, message, imgCaptioning=llava_ouput)
