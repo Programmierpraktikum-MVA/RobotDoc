@@ -1,3 +1,9 @@
+# Overview
+
+![ablauf_anfrage](https://github.com/user-attachments/assets/e576f69c-1c46-4f1b-9145-0ba88681bcb9)
+
+
+
 # Installation und Startanleitung
 
 ## 1. Klonen und Starten der Flask Anwendung auf dem GPU Server
