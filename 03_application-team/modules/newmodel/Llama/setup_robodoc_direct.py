@@ -5,7 +5,7 @@ import socket
 import torch
 from unsloth import FastLanguageModel
 
-model_name = "KennyDain/RoboDoc_Llama3_bnb_4bit"
+model_name = "KennyDain/RoboDoc_Llama3_4bit_bnb"
 
 # Global variables to track if model is loaded
 model = None
@@ -41,6 +41,15 @@ def brechstange(llama_out, cutpoints):
     else:
         return llama_out
 
+#cut string for the relevant part:
+def cut_string(llama_out, user_input):
+  cutpoint = user_input
+  start_idx = llama_out.find(cutpoint)
+  if start_idx != -1:
+    return llama_out[start_idx + len(cutpoint):]
+  else:
+    return llama_out
+
 def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, image_captioning=None):
     global model, tokenizer
     # Initialize chat_history if None
@@ -48,7 +57,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
         chat_history = []
 
     # Construct instruction based on chat history, nodes, and image captioning
-    instruction = "Answer the users question regarding this Patient."
+    instruction = "Answer the users question regarding this Patient, if you cant suggest something try to understand the patients situation"
     if len(chat_history) > 0:
         formatted_history = [f"{msg['role']}:{msg['content']}" for msg in chat_history if msg['role'] != 'system']
         instruction += "\n".join(formatted_history)
@@ -59,7 +68,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
 
     try:
         # Define the prompt template
-        alpaca_prompt = """You are an AI assistant supporting a doctor.
+        alpaca_prompt = """You are an AI assistant supporting a doctor. Limit your response to 100 character.
 
         ### Instruction:
         {}
@@ -109,8 +118,11 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
         model_response = model_response.split("### Response:")[1].strip()
         #print("model_response2: ")
         #print(model_response)
-        #cutpoints = [" You are an AI assistant", "### Instruction:", "### Input:"]
-        #model_response = brechstange(model_response, cutpoints)
+        cutpoints = [" You are an AI assistant", "### Instruction:", "### Input:"]
+        model_response = brechstange(model_response, cutpoints)
+
+
+        
         #response_split = model_response.split("### Response:")
         #if len(response_split) > 1:
         #    model_response = response_split[1].strip()
