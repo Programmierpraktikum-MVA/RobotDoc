@@ -5,7 +5,7 @@ import socket
 import torch
 from unsloth import FastLanguageModel
 
-model_name = "KennyDain/RoboDoc_Llama3_4bit_bnb"
+model_name = "KennyDain/Llama3_RoboDoc_4bit_bnb"
 
 # Global variables to track if model is loaded
 model = None
