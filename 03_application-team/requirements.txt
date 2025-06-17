@@ -41,7 +41,7 @@ tqdm~=4.65.0
 
 
 -f https://download.pytorch.org/whl/torch_stable.html
-torch==2.7.1
+torch==2.4.1
 
 
 
