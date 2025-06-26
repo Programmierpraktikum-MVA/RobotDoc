@@ -1,0 +1,31 @@
+# Cookie-Richtlinie
+
+Diese Cookie-Richtlinie erklärt, wie unsere Webanwendung Cookies und ähnliche Technologien verwendet.
+
+#Was sind Cookies?
+
+Cookies sind kleine Textdateien, die auf deinem Gerät gespeichert werden, wenn du eine Website besuchst. Sie werden von deinem Browser verwaltet und enthalten Informationen, die bei späteren Besuchen wieder an den Server gesendet werden können.
+
+# Welche Cookies verwenden wir?
+
+Unsere Anwendung verwendet ausschließlich technisch notwendige Cookies, die von der Flask-Plattform gesetzt werden. Diese Cookies sind essenziell, damit die grundlegenden Funktionen der Anwendung ordnungsgemäß funktionieren.
+
+Insbesondere verwenden wir ein Session-Cookie. Dieses Cookie ist temporär und wird automatisch gelöscht, wenn du deinen Browser schließt. Es dient dazu, deine Sitzung zu verwalten und sicherzustellen, dass du während deiner Nutzung der Anwendung angemeldet bleibst und deine Aktionen korrekt zugeordnet werden können.
+
+#Welche Daten werden gespeichert?
+
+Das Session-Cookie enthält keine persönlichen Informationen wie deinen Namen, dein Alter oder deine Symptome. Es speichert lediglich eine anonyme, zufällig generierte ID, die deine aktuelle Sitzung identifiziert.
+
+#Wie kannst du Cookies verwalten?
+
+Da wir nur technisch notwendige Cookies verwenden, die für den Betrieb der Anwendung unerlässlich sind, können sie nicht deaktiviert werden. Wenn du die Verwendung dieser Cookies nicht akzeptierst, kannst du die Anwendung leider nicht nutzen.
+
+Du hast jedoch jederzeit die Möglichkeit, Cookies in den Einstellungen deines Browsers zu löschen. Beachte, dass dies dazu führt, dass du dich erneut anmelden musst, wenn du die Anwendung das nächste Mal besuchst. Eine Sitzung kann jedoch nicht wiederhergestellt werden, nicht gespeicherte Interaktionen mit dieser Webseite gehen unter Umständen verloren.
+
+#Änderungen an dieser Richtlinie
+
+Wir behalten uns das Recht vor, diese Cookie-Richtlinie jederzeit zu ändern. Wir empfehlen, diese Seite regelmäßig zu überprüfen, um über etwaige Aktualisierungen informiert zu bleiben. 
+
+#Haftung 
+
+RobotDoc ist keine offizielle Anwendung, es wird ausschließlich zu akademischen Zwecken von Laien entwickelt. Wir schließen jeden Rechtsanpruch aus und es wird keine Haftung übernommen. (lol)
