@@ -1,11 +1,0 @@
---2024-07-07 11:59:06--  https://www.dropbox.com/scl/fo/l61d8hckoeawr9p4o5ym5/ANfhfP0T8P_-B4WHuDPYhaE?e=1
-Resolving www.dropbox.com (www.dropbox.com)... 162.125.6.18, 2620:100:601c:18::a27d:612
-Connecting to www.dropbox.com (www.dropbox.com)|162.125.6.18|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: unspecified [text/html]
-Saving to: ‘ANfhfP0T8P_-B4WHuDPYhaE?e=1’
-
-ANfhfP0T8P_-B4WHuDPYhaE?e=1                            [<=>                                                                                                             ]       0  --.-KB/s               ANfhfP0T8P_-B4WHuDPYhaE?e=1                            [ <=>                                                                                                            ] 179.66K  --.-KB/s    in 0.1s    
-
-2024-07-07 11:59:08 (1.41 MB/s) - ‘ANfhfP0T8P_-B4WHuDPYhaE?e=1’ saved [183972]
-

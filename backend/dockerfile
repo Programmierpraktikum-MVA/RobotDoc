@@ -1,0 +1,39 @@
+FROM python:3.10-slim
+
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3-dev \
+    libpq-dev \
+    gcc \
+    musl-dev \
+    git \
+ && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /
+
+# Copy requirements
+COPY requirements.txt .
+
+RUN pip install --upgrade pip
+
+# Pre-install critical large libraries
+#RUN pip install torch==2.3.0 -f https://download.pytorch.org/whl/torch_stable.html && \
+#    pip install transformers==4.38.2 trl==0.8.6 peft==0.7.1 accelerate==0.30.1 bitsandbytes==0.43.1 xformers==0.0.25
+
+
+
+# Install rest from pinned requirements
+RUN pip install -r requirements.txt
+
+
+# Copy rest of the application code
+COPY . .
+
+# Expose Flask port
+EXPOSE 5000
+
+# Run setup script and start Flask
+#CMD ["sh", "-c", "python modules/Llama/setup_robodoc_direct.py && flask --app app.py run -h 0.0.0.0"]
+CMD [ "flask","--app","app.py","run","-h","0.0.0.0"]
