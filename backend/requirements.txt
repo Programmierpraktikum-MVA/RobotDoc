@@ -5,6 +5,19 @@ bcrypt==4.1.2
 flask_cors==4.0.0
 Werkzeug==2.3.7
 psycopg2==2.9.9
-#unsloth_zoo
-#git+https://github.com/unslothai/unsloth.git
+triton==2.2.0
+networkx
+unsloth_zoo
+matplotlib
+faiss-gpu
+numpy==1.26.4
+pandas>=1.4.3
+openpyxl
+openai~=0.27.8
+nltk~=3.8.1
+torch-geometric~=2.4.0
+datasets>=2.18.0
+tqdm>=4.66.3
+gensim
+git+https://github.com/unslothai/unsloth.git
 

@@ -20,18 +20,19 @@ services:
     environment:
       - DATABASE_URL=postgresql://dev_user:dev_pass@db:5432/robotdb
       - APP_SCRT_KEY=dev_secret_key
-     # - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_VISIBLE_DEVICES=all
     ports:
       - "5000:5000"
     depends_on:
       - db
     volumes:
       - .:/app
-    #deploy:
-     # resources:
-     #   reservations:
-      #    devices:
-       #     - capabilities: [gpu]
+      - pip_cache:/root/.cache/pip
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
 
   frontend:
     build:
@@ -46,3 +47,4 @@ services:
 
 volumes:
   pgdata:
+  pip_cache:
