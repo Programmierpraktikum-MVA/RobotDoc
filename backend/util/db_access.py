@@ -1,5 +1,5 @@
 from flask import jsonify, send_file, request
-from util.db_model import db, Patients, Accounts, Image
+from util.db_model import db, Patients, Accounts, Image, ChatMessage
 from util.exceptions import OccupiedUsernameError, InvalidUsernameError, InvalidPasswordError
 from io import BytesIO
 #from modules.subgraphExtractor import symptomNER, processMessage, processWithoutKG
@@ -138,6 +138,14 @@ def delete_image_by_id(image_id):
     db.session.delete(image)
     db.session.commit()
     return ('', 204)
+
+
+def save_chat_message(patient_id, sender, message):
+    chat = ChatMessage(patient_id=patient_id, sender=sender, message=message)
+    db.session.add(chat)
+    db.session.commit()
+    return ('', 204)
+
 
 
 ###

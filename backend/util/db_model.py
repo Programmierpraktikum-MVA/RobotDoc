@@ -14,6 +14,16 @@ class Image(db.Model):
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     def __repr__(self):
         return f'<Image {self.id}>'
+    
+
+class ChatMessage(db.Model):
+    __tablename__ = 'chat_messages'
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), nullable=False)
+    sender = db.Column(db.String(20), nullable=False)  # 'RoboDoc' or 'Patient'
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
+
 
 
 class Patients(db.Model):

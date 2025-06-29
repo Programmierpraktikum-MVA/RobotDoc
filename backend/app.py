@@ -5,7 +5,7 @@ from util.db_model import db, Accounts
 from util.db_access import (
     get_patient, get_patient_amount, get_all_patients,
     update_patient_by_id, create_patient, delete_patient_by_id,
-    get_image_urls_for_patient, get_image_blob,upload_image_for_patient, delete_image_by_id #,respond_to_message
+    get_image_urls_for_patient, get_image_blob,upload_image_for_patient, delete_image_by_id, save_chat_message #,respond_to_message
 )
 from util.auth import login_route, register_route, logout
 import os
@@ -98,6 +98,19 @@ def delete_image_route(image_id):
 @login_required
 def upload_image_for_patient_route(patient_id):
     return upload_image_for_patient(patient_id)
+
+
+@app.route('/api/patient/<int:patient_id>/chat', methods=['POST'])
+@login_required
+def save_chat_message_route(patient_id):
+    data = request.get_json()
+    sender = data.get('sender')
+    message = data.get('message')
+
+    if not sender or not message:
+        return jsonify({'error': 'Missing sender or message'}), 400
+
+    return save_chat_message(patient_id, sender, message)
 
 
 
