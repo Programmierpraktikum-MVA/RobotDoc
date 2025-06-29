@@ -4,7 +4,8 @@ from flask_cors import CORS
 from util.db_model import db, Accounts
 from util.db_access import (
     get_patient, get_patient_amount, get_all_patients,
-    update_patient_by_id, create_patient, delete_patient_by_id #, respond_to_message
+    update_patient_by_id, create_patient, delete_patient_by_id,
+    get_image_urls_for_patient, get_image_blob,upload_image_for_patient, delete_image_by_id #,respond_to_message
 )
 from util.auth import login_route, register_route, logout
 import os
@@ -80,6 +81,23 @@ def get_all_patients_route():
 def update_patient_route(patient_id):
     return update_patient_by_id(patient_id, request.get_json())
 
+@app.route('/api/patient/<int:patient_id>/images', methods=['GET'])
+def get_patient_images_route(patient_id):
+    return get_image_urls_for_patient(patient_id)
+
+@app.route('/api/image/<int:image_id>', methods=['GET'])
+def serve_image_route(image_id):
+    return get_image_blob(image_id)
+
+@app.route('/api/image/<int:image_id>', methods=['DELETE'])
+@login_required
+def delete_image_route(image_id):
+    return delete_image_by_id(image_id)
+
+@app.route('/api/patient/<int:patient_id>/images', methods=['POST'])
+@login_required
+def upload_image_for_patient_route(patient_id):
+    return upload_image_for_patient(patient_id)
 
 
 

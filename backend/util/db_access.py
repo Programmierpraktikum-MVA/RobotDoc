@@ -1,6 +1,7 @@
-from flask import jsonify
-from util.db_model import db, Patients, Accounts
+from flask import jsonify, send_file, request
+from util.db_model import db, Patients, Accounts, Image
 from util.exceptions import OccupiedUsernameError, InvalidUsernameError, InvalidPasswordError
+from io import BytesIO
 #from modules.subgraphExtractor import symptomNER, processMessage, processWithoutKG
 
 def get_patient(patient_id):
@@ -90,6 +91,54 @@ def delete_patient_by_id(patient_id):
     db.session.delete(patient)
     db.session.commit()
     return jsonify({'message': 'Patient deleted successfully'}), 200
+
+def get_image_urls_for_patient(patient_id):
+    images = Image.query.filter_by(patient_id=patient_id).all()
+    image_urls = [f'/api/image/{img.id}' for img in images]
+    return jsonify([{'url': url} for url in image_urls])
+
+
+def get_image_blob(image_id):
+    image = db.session.get(Image, image_id)
+    if not image:
+        return jsonify({'error': 'Image not found'}), 404
+
+    # Serve binary image from memory
+    return send_file(
+        BytesIO(image.file),
+        mimetype='image/jpeg',  # You can make this dynamic if you store MIME types
+        as_attachment=False,
+        download_name=f'image_{image_id}.jpg'
+    )
+
+
+def upload_image_for_patient(patient_id):
+    if 'image' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    image_data = file.read()
+    if not image_data:
+        return jsonify({'error': 'Empty image'}), 400
+
+    new_image = Image(file=image_data, patient_id=patient_id)
+    db.session.add(new_image)
+    db.session.commit()
+    return ('', 204)
+
+
+def delete_image_by_id(image_id):
+    image = db.session.get(Image, image_id)
+    if not image:
+        return jsonify({'error': 'Image not found'}), 404
+
+    db.session.delete(image)
+    db.session.commit()
+    return ('', 204)
+
 
 ###
 # def respond_to_message(patient_id, data):
