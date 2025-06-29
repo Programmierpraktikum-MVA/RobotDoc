@@ -2,7 +2,7 @@ from flask import jsonify, send_file, request
 from util.db_model import db, Patients, Accounts, Image, ChatMessage
 from util.exceptions import OccupiedUsernameError, InvalidUsernameError, InvalidPasswordError
 from io import BytesIO
-#from modules.subgraphExtractor import symptomNER, processMessage, processWithoutKG
+from modules.subgraphExtractor import symptomNER, processMessage, processWithoutKG
 
 def get_patient(patient_id):
     patient = db.session.get(Patients, patient_id)
@@ -149,33 +149,33 @@ def save_chat_message(patient_id, sender, message):
 
 
 ###
-# def respond_to_message(patient_id, data):
-#     try:
-#         patient = db.session.get(Patients, patient_id)
-#         if not patient:
-#             return jsonify({'error': 'Patient not found'}), 404
+def respond_to_message(patient_id, data):
+    try:
+        patient = db.session.get(Patients, patient_id)
+        if not patient:
+            return jsonify({'error': 'Patient not found'}), 404
 
-#         message = data.get('message', '')
-#         update_symptoms = data.get('updateSymptoms', False)
-#         use_kg = data.get('useKG', True)
+        message = data.get('message', '')
+        update_symptoms = data.get('updateSymptoms', False)
+        use_kg = data.get('useKG', True)
 
-#         if update_symptoms:
-#             symps = symptomNER(message)
-#             current_symptoms = patient.symptoms
-#             unique_symptoms = [
-#                 s for s in symps if not any(s in cs for cs in current_symptoms)
-#             ]
-#             if unique_symptoms:
-#                 return jsonify({"reply": unique_symptoms, "type": "symptoms"}), 200
+        if update_symptoms:
+            symps = symptomNER(message)
+            current_symptoms = patient.symptoms
+            unique_symptoms = [
+                s for s in symps if not any(s in cs for cs in current_symptoms)
+            ]
+            if unique_symptoms:
+                return jsonify({"reply": unique_symptoms, "type": "symptoms"}), 200
 
-#         patient_info = patient.to_dict()
+        patient_info = patient.to_dict()
 
-#         if not use_kg:
-#             reply = processWithoutKG(patient_id, patient_info, message)
-#         else:
-#             reply = processMessage(patient_id, patient_info, message)
+        if not use_kg:
+            reply = processWithoutKG(patient_id, patient_info, message)
+        else:
+            reply = processMessage(patient_id, patient_info, message)
 
-#         return jsonify({"reply": reply, "type": "message"}), 200
+        return jsonify({"reply": reply, "type": "message"}), 200
 
-#     except Exception as e:
-#         return jsonify({"reply": str(e), "type": "error"}), 500
+    except Exception as e:
+        return jsonify({"reply": str(e), "type": "error"}), 500

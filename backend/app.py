@@ -5,7 +5,7 @@ from util.db_model import db, Accounts
 from util.db_access import (
     get_patient, get_patient_amount, get_all_patients,
     update_patient_by_id, create_patient, delete_patient_by_id,
-    get_image_urls_for_patient, get_image_blob,upload_image_for_patient, delete_image_by_id, save_chat_message #,respond_to_message
+    get_image_urls_for_patient, get_image_blob,upload_image_for_patient, delete_image_by_id, save_chat_message,respond_to_message
 )
 from util.auth import login_route, register_route, logout
 import os
@@ -17,7 +17,6 @@ login_manager.init_app(app)
 app.secret_key = os.getenv("APP_SCRT_KEY")
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db.init_app(app)
 
 
@@ -120,9 +119,9 @@ def save_chat_message_route(patient_id):
 
 
 
-#@app.route('/api/respond/<int:patient_id>', methods=['POST'])
-#@login_required
-#def respond_to_message_route(patient_id):
-#    data = request.get_json()
-#    return respond_to_message(patient_id, data)
+@app.route('/api/respond/<int:patient_id>', methods=['POST'])
+@login_required
+def respond_to_message_route(patient_id):
+    data = request.get_json()
+    return respond_to_message(patient_id, data)
     
