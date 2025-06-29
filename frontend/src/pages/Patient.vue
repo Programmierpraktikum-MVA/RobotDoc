@@ -55,6 +55,22 @@
               </div>
             </v-card>
           </v-col>
+
+          <!-- Images Panel -->
+          <v-col cols="12">
+            <v-card color="surface" class="pa-4 mt-4" elevation="4">
+              <h3 class="text-h6 font-weight-bold mb-4">Patient Images</h3>
+              <v-row>
+                <v-col
+                  v-for="(image, index) in patientImages"
+                  :key="index"
+                  cols="12" sm="6" md="4" lg="3"
+                >
+                  <v-img :src="image.url" class="rounded" contain />
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
         </v-row>
       </v-container>
     </v-main>
@@ -78,6 +94,8 @@ const patient = ref({
   symptoms: []
 })
 
+const patientImages = ref([])
+
 const messages = ref([
   { from: 'RoboDoc', text: 'Hello, how are you feeling today?' },
   { from: 'Patient', text: 'A bit tired and dizzy.' }
@@ -86,6 +104,7 @@ const messages = ref([
 const newMessage = ref('')
 const chatContainer = ref(null)
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+
 function scrollToBottom() {
   nextTick(() => {
     if (chatContainer.value) {
@@ -97,7 +116,7 @@ function scrollToBottom() {
 function sendMessage() {
   if (newMessage.value.trim()) {
     messages.value.push({ from: 'You', text: newMessage.value })
-    messages.value.push({ from: 'RoboDoc', text: 'Thanks for your update. We will monitor that.' })
+    messages.value.push({ from: 'RobotDoc', text: 'Thanks for your update. We will monitor that.' })
     newMessage.value = ''
     scrollToBottom()
   }
@@ -106,11 +125,20 @@ function sendMessage() {
 onMounted(async () => {
   const id = Number(route.params.id)
   try {
+    // Fetch patient data
     const response = await axios.get(`${API_BASE_URL}/api/patient/${id}`)
     patient.value = response.data
+
+    // Fetch patient image URLs and prepend backend URL
+    const imgResponse = await axios.get(`${API_BASE_URL}/api/patient/${id}/images`)
+    patientImages.value = imgResponse.data.map(img => ({
+      url: `${API_BASE_URL}${img.url}`
+    }))
   } catch (error) {
-    console.error('Failed to fetch patient:', error)
+    console.error('Failed to fetch patient or images:', error)
   }
+
   scrollToBottom()
 })
+
 </script>

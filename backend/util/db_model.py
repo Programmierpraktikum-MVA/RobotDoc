@@ -8,6 +8,13 @@ class Accounts(db.Model, UserMixin):
     username = db.Column(db.String)
     hash = db.Column(db.LargeBinary)
 
+class Image(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    file = db.Column(db.LargeBinary, nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
+    def __repr__(self):
+        return f'<Image {self.id}>'
+
 
 class Patients(db.Model):
     id = db.Column(db.Integer, primary_key=True)
