@@ -37,7 +37,7 @@
                   v-for="(msg, i) in messages"
                   :key="i"
                   class="mb-2 px-3 py-2 rounded"
-                  :class="msg.from === 'RoboDoc' ? 'align-self-start bg-grey-darken-3' : 'align-self-end bg-primary text-white'"
+                  :class="msg.from === 'RobotDoc' ? 'align-self-start bg-grey-darken-3' : 'align-self-end bg-primary text-white'"
                   style="max-width: 75%; white-space: pre-line;"
                 >
                   {{ msg.text }}
@@ -113,14 +113,36 @@ function scrollToBottom() {
   })
 }
 
-function sendMessage() {
-  if (newMessage.value.trim()) {
-    messages.value.push({ from: 'You', text: newMessage.value })
-    messages.value.push({ from: 'RobotDoc', text: 'Thanks for your update. We will monitor that.' })
-    newMessage.value = ''
-    scrollToBottom()
+async function sendMessage() {
+  if (!newMessage.value.trim()) return
+
+  const patientId = Number(route.params.id)
+  const userMsg = newMessage.value.trim()
+
+  // Show message in UI
+  messages.value.push({ from: 'You', text: userMsg })
+  messages.value.push({ from: 'RobotDoc', text: 'Thanks for your update. We will monitor that.' })
+
+  // Reset input
+  newMessage.value = ''
+  scrollToBottom()
+
+  // Send both messages to backend
+  try {
+    await axios.post(`${API_BASE_URL}/api/patient/${patientId}/chat`, {
+      sender: 'Patient',
+      message: userMsg
+    }, { withCredentials: true })
+
+    await axios.post(`${API_BASE_URL}/api/patient/${patientId}/chat`, {
+      sender: 'RoboDoc',
+      message: 'Thanks for your update. We will monitor that.'
+    }, { withCredentials: true })
+  } catch (err) {
+    console.error('Failed to save chat message:', err)
   }
 }
+
 
 onMounted(async () => {
   const id = Number(route.params.id)

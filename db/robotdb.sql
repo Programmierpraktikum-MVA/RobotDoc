@@ -64,6 +64,9 @@ CREATE TABLE public.image (
 
 
 
+
+
+
 --
 -- Name: image_id_seq; Type: SEQUENCE; Schema: public; Owner: admin
 --
@@ -98,6 +101,9 @@ CREATE TABLE public.patients (
     symptoms text[] NOT NULL,
     user_id integer NOT NULL
 );
+
+
+
 
 
 
@@ -141,6 +147,9 @@ ALTER TABLE ONLY public.image ALTER COLUMN id SET DEFAULT nextval('public.image_
 --
 
 ALTER TABLE ONLY public.patients ALTER COLUMN id SET DEFAULT nextval('public.patients_id_seq'::regclass);
+
+
+
 
 
 --
@@ -319,6 +328,15 @@ ALTER TABLE ONLY public.patients
 ALTER TABLE ONLY public.image
     ADD CONSTRAINT image_patients_fk FOREIGN KEY (patient_id) REFERENCES public.patients(id);
 
+
+
+CREATE TABLE public.chat_messages (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER NOT NULL REFERENCES public.patients(id) ON DELETE CASCADE,
+    sender VARCHAR(20) NOT NULL,
+    message TEXT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
 
 --
 -- Name: patients patients_accounts_fk; Type: FK CONSTRAINT; Schema: public; Owner: admin
