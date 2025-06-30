@@ -155,27 +155,45 @@ def respond_to_message(patient_id, data):
         if not patient:
             return jsonify({'error': 'Patient not found'}), 404
 
-        message = data.get('message', '')
+        message = data.get('message', '').strip()
         update_symptoms = data.get('updateSymptoms', False)
         use_kg = data.get('useKG', True)
 
-        if update_symptoms:
-            symps = symptomNER(message)
-            current_symptoms = patient.symptoms
+        if update_symptoms and message:
+            new_symptoms = symptomNER(message)
+            current_symptoms = patient.symptoms or []
+
+            # Filter out duplicates or substrings
             unique_symptoms = [
-                s for s in symps if not any(s in cs for cs in current_symptoms)
+                s for s in new_symptoms if not any(s in cs for cs in current_symptoms)
             ]
+
             if unique_symptoms:
-                return jsonify({"reply": unique_symptoms, "type": "symptoms"}), 200
+                # Update and save to DB
+                patient.symptoms = current_symptoms + unique_symptoms
+                db.session.commit()
+
+                return jsonify({
+                    "reply": unique_symptoms,
+                    "type": "symptoms"
+                }), 200
 
         patient_info = patient.to_dict()
 
+        # Route through KG or fallback
         if not use_kg:
             reply = processWithoutKG(patient_id, patient_info, message)
         else:
             reply = processMessage(patient_id, patient_info, message)
 
-        return jsonify({"reply": reply, "type": "message"}), 200
+        return jsonify({
+            "reply": reply,
+            "type": "message"
+        }), 200
 
     except Exception as e:
-        return jsonify({"reply": str(e), "type": "error"}), 500
+        db.session.rollback()
+        return jsonify({
+            "reply": f"An error occurred: {str(e)}",
+            "type": "error"
+        }), 500

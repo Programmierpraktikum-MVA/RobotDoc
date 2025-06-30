@@ -20,19 +20,14 @@ services:
     environment:
       - DATABASE_URL=postgresql://dev_user:dev_pass@db:5432/robotdb
       - APP_SCRT_KEY=dev_secret_key
-      - NVIDIA_VISIBLE_DEVICES=all
     ports:
       - "5000:5000"
     depends_on:
       - db
     volumes:
-      - .:/app
+      - ./backend:/app
       - pip_cache:/root/.cache/pip
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+
 
   frontend:
     build:
@@ -43,8 +38,28 @@ services:
       - "8080:80"
     depends_on:
       - backend
-    restart: always
+
+  llama:
+    build:
+      context: ./llama
+      dockerfile: dockerfile
+    container_name: robotdoc-llama
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "65143:65143"
+    volumes:
+      - ./llama:/app
+      - pip_cache:/root/.cache/pip
+      - hf_cache:/root/.cache/huggingface
+    working_dir: /app                   
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
 
 volumes:
   pgdata:
   pip_cache:
+  hf_cache:
