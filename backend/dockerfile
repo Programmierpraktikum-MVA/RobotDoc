@@ -1,44 +1,14 @@
 # syntax=docker/dockerfile:1.4
-FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    python3-dev \
-    libpq-dev \
-    gcc \
-    musl-dev \
-    git \
-    curl \
-    build-essential \
-    python3-pip \
- && ln -s /usr/bin/python3 /usr/bin/python \
- && rm -rf /var/lib/apt/lists/*
+FROM robotdoc-backend-base as base
 
 # Set working directory
-WORKDIR /
+WORKDIR /app
 
-# Copy requirements
-COPY requirements.txt .
+# Copy the application code
 
-# Upgrade pip with cache
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --upgrade pip
-
-# Pre-install critical large libraries using pip cache mount
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install torch==2.3.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 && \
-    pip install transformers==4.38.2 trl==0.8.6 peft==0.7.1 accelerate==0.30.1 bitsandbytes xformers==0.0.25
-
-# Install rest from pinned requirements
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements.txt
-
-# Copy rest of the application code
-COPY . .
 
 # Expose Flask port
 EXPOSE 5000
 
-# Run setup script and start Flask
-CMD ["sh", "-c", "python modules/Llama/setup_robodoc_direct.py && flask --app app.py run -h 0.0.0.0 || tail -f /dev/null"]
-#CMD [ "flask","--app","app.py","run","-h","0.0.0.0"]
+# Run Flask
+CMD ["sh", "-c", "flask --app app.py run -h 0.0.0.0 || tail -f /dev/null"]

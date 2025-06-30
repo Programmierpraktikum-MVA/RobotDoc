@@ -1,27 +1,58 @@
 <template>
-  <v-card class="mt-4">
-    <v-card-title>Chat</v-card-title>
-    <v-card-text>
-      <div style="max-height: 200px; overflow-y: auto">
-        <div v-for="(msg, i) in messages" :key="i">
-          <strong>{{ msg.from }}:</strong> {{ msg.text }}
-        </div>
+  <v-card color="surface" class="pa-4 d-flex flex-column" style="height: 600px;" elevation="4">
+    <h3 class="text-h6 font-weight-bold mb-2">Chat with RobotDoc</h3>
+
+    <!-- Chat message history -->
+    <div
+      ref="chatContainer"
+      class="flex-grow-1 overflow-y-auto mb-2 pr-1 d-flex flex-column"
+      style="min-height: 0;"
+    >
+      <div
+        v-for="(msg, i) in messages"
+        :key="i"
+        class="mb-2 px-3 py-2 rounded"
+        :class="msg.from === 'You' ? 'align-self-end bg-primary text-white' : 'align-self-start bg-grey-darken-3'"
+        style="max-width: 75%; white-space: pre-line;"
+      >
+        <strong v-if="msg.from !== 'You'" class="mr-1">{{ msg.from }}:</strong>{{ msg.text }}
       </div>
-      <v-text-field
-        v-model="newMessage"
-        label="Your message"
-        @keyup.enter="sendMessage"
-        clearable
-      />
-    </v-card-text>
-    <v-card-actions>
-      <v-btn color="primary" @click="sendMessage">Send</v-btn>
-    </v-card-actions>
+    </div>
+
+    <!-- Checkboxes and input field -->
+    <div class="d-flex flex-column mt-2">
+      <div class="d-flex mb-2">
+        <v-checkbox
+          v-model="updateSymptoms"
+          label="Update Symptoms"
+          density="compact"
+          hide-details
+        />
+        <v-checkbox
+          v-model="useKG"
+          label="Use Knowledge Graph"
+          density="compact"
+          hide-details
+        />
+      </div>
+
+      <div class="d-flex align-center">
+        <v-text-field
+          v-model="newMessage"
+          label="Type a message..."
+          class="flex-grow-1"
+          style="min-height: 56px"
+          @keyup.enter="sendMessage"
+          clearable
+        />
+        <v-btn color="primary" class="ml-2" @click="sendMessage">Send</v-btn>
+      </div>
+    </div>
   </v-card>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 
 const props = defineProps({
   patientId: Number
@@ -33,7 +64,22 @@ const messages = ref([
 ])
 
 const newMessage = ref('')
+const updateSymptoms = ref(true)
+const useKG = ref(true)
+const chatContainer = ref(null)
+
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+
+function scrollToBottom() {
+  nextTick(() => {
+    if (chatContainer.value) {
+      chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+    }
+  })
+}
+
+watch(messages, scrollToBottom, { deep: true })
+
 async function sendMessage() {
   if (!newMessage.value.trim()) return
 
@@ -50,8 +96,8 @@ async function sendMessage() {
       },
       body: JSON.stringify({
         message: input,
-        updateSymptoms: true,
-        useKG: true
+        updateSymptoms: updateSymptoms.value,
+        useKG: useKG.value
       })
     })
 

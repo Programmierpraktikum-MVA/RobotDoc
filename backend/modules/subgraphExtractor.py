@@ -1,5 +1,5 @@
-from modules.KnowledgeExtraction import knowledge_extractor, subgraph_builder, trie_structure, embedding
-from modules.util.kg_utils import node_types, metadata, meta_relations_dict
+from modules.KnowledgeExtraction import subgraph_builder, embedding
+from modules.util.kg_utils import meta_relations_dict
 import pickle
 import networkx as nx
 import matplotlib.pyplot as plt
