@@ -20,6 +20,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://dev_user:dev_pass@db:5432/robotdb
       - APP_SCRT_KEY=dev_secret_key
+      - PYTHONDONTWRITEBYTECODE=1
+      - CORS_ORIGINS=http://localhost:8080,http://localhost:5173
     ports:
       - "5000:5000"
     depends_on:
@@ -41,7 +43,7 @@ services:
 
   llama:
     build:
-      context: ./llama
+      context: ./Llama
       dockerfile: dockerfile
     container_name: robotdoc-llama
     environment:
@@ -49,7 +51,7 @@ services:
     ports:
       - "65143:65143"
     volumes:
-      - ./llama:/app
+      - ./Llama:/app
       - pip_cache:/root/.cache/pip
       - hf_cache:/root/.cache/huggingface
     working_dir: /app                   

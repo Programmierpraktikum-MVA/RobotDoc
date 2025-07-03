@@ -6,37 +6,69 @@
         <v-card color="surface" class="pa-6" style="width: 100%; max-width: 900px;" elevation="6">
           <h2 class="text-h5 font-weight-bold mb-4 text-center">Edit Patient</h2>
           <v-form @submit.prevent="savePatient">
-            <v-text-field v-model="patient.id" label="Patient ID" disabled />
-            <v-text-field v-model="patient.name" label="Name" required />
-            <v-text-field v-model="patient.age" label="Age" type="number" required />
-            <v-text-field v-model="patient.weight" label="Weight (kg)" type="number" required />
+            <v-text-field v-model="patient.id" label="Patient ID" disabled rounded variant="outlined" />
+            <v-text-field v-model="patient.name" label="Name" required rounded variant="outlined" />
+            <v-text-field v-model="patient.age" label="Age" type="number" required rounded variant="outlined" />
+            <v-text-field v-model="patient.weight" label="Weight (kg)" type="number" required rounded variant="outlined" />
             <v-select
               v-model="patient.sex"
               :items="['Male', 'Female']"
               label="Sex"
               required
+              rounded
+              variant="outlined"
             />
             <v-textarea
               v-model="symptomText"
               label="Symptoms (comma-separated)"
               rows="3"
               required
+              rounded
+              variant="outlined"
             />
 
-            <!-- Upload New Image -->
-            <v-file-input
-              v-model="uploadedImage"
-              label="Upload New Image"
-              accept="image/*"
-              prepend-icon="mdi-camera"
-              show-size
-              class="mt-4"
-            />
-            <v-btn color="secondary" class="mt-2" @click="uploadImage">Add Image</v-btn>
+            <!-- Combined Upload Image Block -->
+            <v-card class="pa-4 rounded-lg mb-6 mt-4" color="surface" elevation="2">
+              <v-file-input
+                v-model="uploadedImage"
+                label="Upload New Image"
+                accept="image/*"
+                prepend-icon="mdi-camera"
+                show-size
+                hide-details
+                density="comfortable"
+                rounded
+                variant="outlined"
+              />
+              <v-btn
+                color="primary"
+                class="mt-3"
+                block
+                prepend-icon="mdi-upload"
+                @click="uploadImage"
+              >
+                Add Image
+              </v-btn>
+            </v-card>
 
-            <!-- Buttons -->
-            <v-btn color="primary" type="submit" class="mt-4" block>Save</v-btn>
-            <v-btn color="error" class="mt-2" block @click="deletePatient">Delete</v-btn>
+            <!-- Action Buttons -->
+            <v-btn
+              color="primary"
+              class="mb-3"
+              block
+              prepend-icon="mdi-content-save"
+              @click="savePatient"
+            >
+              Save
+            </v-btn>
+            <v-btn
+              color="error"
+              block
+              prepend-icon="mdi-delete"
+              @click="deletePatient"
+            >
+              Delete
+            </v-btn>
           </v-form>
 
           <!-- Display Existing Images -->
@@ -48,10 +80,10 @@
                 :key="index"
                 cols="12" sm="6" md="4" lg="3"
               >
-                <v-card class="pa-2" elevation="2">
-                  <v-img :src="img.url" class="mb-2 rounded" contain max-height="200" />
-                  <v-btn color="error" block @click="deleteImage(img.id)">
-                    Delete
+                <v-card class="pa-0 rounded-lg overflow-hidden position-relative" elevation="2">
+                  <v-img :src="img.url" class="rounded" contain max-height="200" />
+                  <v-btn icon small class="position-absolute top-0 right-0 ma-1" color="error" @click="deleteImage(img.id)">
+                    <v-icon>mdi-close</v-icon>
                   </v-btn>
                 </v-card>
               </v-col>
@@ -131,8 +163,6 @@ async function uploadImage() {
 }
 
 async function deleteImage(imageId) {
-  if (!confirm('Delete this image?')) return
-
   try {
     await axios.delete(`${API_BASE_URL}/api/image/${imageId}`, { withCredentials: true })
     await fetchImages()
@@ -149,24 +179,18 @@ async function savePatient() {
 
   try {
     await axios.put(`${API_BASE_URL}/api/patient/${patient.value.id}`, patient.value)
-    alert('Patient saved!')
     router.push('/dashboard')
   } catch (error) {
     console.error('Failed to save patient:', error)
-    alert('Failed to save patient. See console for details.')
   }
 }
 
 async function deletePatient() {
-  if (!confirm('Are you sure you want to delete this patient?')) return
-
   try {
     await axios.delete(`${API_BASE_URL}/api/patient/${patient.value.id}`, { withCredentials: true })
-    alert('Patient deleted.')
     router.push('/dashboard')
   } catch (error) {
     console.error('Failed to delete patient:', error)
-    alert('Failed to delete patient. See console for details.')
   }
 }
 </script>
