@@ -28,3 +28,10 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+**/.vscode/*
+
+**/__pycache__/*
+**/unsloth_compiled_cache/*
+**/node_modules
+**/node_modules/*

@@ -5,15 +5,27 @@ from util.db_model import db, Accounts
 from util.db_access import (
     get_patient, get_patient_amount, get_all_patients,
     update_patient_by_id, create_patient, delete_patient_by_id,
-    get_image_urls_for_patient, get_image_blob,upload_image_for_patient, delete_image_by_id, save_chat_message,respond_to_message
+    get_image_urls_for_patient, get_image_blob, upload_image_for_patient,
+    delete_image_by_id, save_chat_message, respond_to_message
 )
 from util.auth import login_route, register_route, logout
+from dotenv import load_dotenv
 import os
 
+# Load environment variables
+load_dotenv()
+
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:8080", "http://localhost:5173"])
+
+# Load CORS origins from environment variable and split by comma
+cors_origins = os.getenv("CORS_ORIGINS", "")
+origin_list = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
+
+CORS(app, supports_credentials=True, origins=origin_list)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 app.secret_key = os.getenv("APP_SCRT_KEY")
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

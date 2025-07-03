@@ -1,28 +1,55 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <v-card color="surface" class="pa-6" width="400" elevation="10">
+    <v-card color="surface" class="pa-6 rounded-lg" width="420" elevation="10">
       <div class="text-h4 font-weight-bold text-center mb-6">Sign Up</div>
+
       <v-card-text>
         <v-text-field
           v-model="username"
           label="Username"
           prepend-inner-icon="mdi-account"
+          variant="outlined"
+          rounded
+          class="mb-3"
         />
+
         <v-text-field
           v-model="password"
           label="Password"
           type="password"
           prepend-inner-icon="mdi-lock"
+          variant="outlined"
+          rounded
+          class="mb-3"
         />
-        <div v-if="message" :class="messageType === 'error' ? 'text-error' : 'text-success'" class="text-caption mt-1 mb-3">
+
+        <div
+          v-if="message"
+          :class="messageType === 'error' ? 'text-error' : 'text-success'"
+          class="text-caption mt-1 mb-3"
+        >
           {{ message }}
         </div>
       </v-card-text>
+
       <v-card-actions class="d-flex flex-column">
-        <v-btn color="primary" class="mb-2" block @click="register">
+        <v-btn
+          color="primary"
+          class="mb-3"
+          block
+          prepend-icon="mdi-account-plus"
+          @click="register"
+        >
           Create Account
         </v-btn>
-        <v-btn variant="outlined" color="secondary" block @click="goToLogin">
+
+        <v-btn
+          variant="outlined"
+          color="secondary"
+          block
+          prepend-icon="mdi-login"
+          @click="goToLogin"
+        >
           Already have an account?
         </v-btn>
       </v-card-actions>
