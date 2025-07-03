@@ -134,6 +134,7 @@ def save_chat_message_route(patient_id):
 @app.route('/api/respond/<int:patient_id>', methods=['POST'])
 @login_required
 def respond_to_message_route(patient_id):
+    print("in respond")
     data = request.get_json()
     return respond_to_message(patient_id, data)
     
