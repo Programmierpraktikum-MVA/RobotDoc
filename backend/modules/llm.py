@@ -40,20 +40,45 @@ class LLM:
 
 
 def send_prompt(user_input, chat_history, nodes_from_subgraph=None, image_captioning=None):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect(('127.0.0.1', 65143))
-        data = {
+    data = {
+        "user_input": user_input,
+        "chat_history": chat_history
+    }
+    if nodes_from_subgraph:
+        data["nodes_from_subgraph"] = nodes_from_subgraph
+    if image_captioning:
+        data["image_captioning"] = image_captioning
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(5)
+            s.connect(('robotdoc-llama', 65143))
+            s.sendall(json.dumps(data).encode('utf-8'))
+            s.shutdown(socket.SHUT_WR)
+
+            response = b""
+            while True:
+                try:
+                    chunk = s.recv(4096)
+                    if not chunk:
+                        break
+                    response += chunk
+                except socket.timeout:
+                    print("Timeout during recv")
+                    break
+
+        decoded = response.decode('utf-8')
+        print("?? Raw response from AI:", decoded)
+
+        return json.loads(decoded)
+
+    except Exception as e:
+        print(f"Exception occurred during socket communication: {str(e)}")
+        return {
             "user_input": user_input,
+            "model_response": "Sorry, I couldn't connect to the AI model.",
             "chat_history": chat_history
         }
-        if nodes_from_subgraph:
-            data["nodes_from_subgraph"] = nodes_from_subgraph
-        if image_captioning:
-            data["image_captioning"] = image_captioning
-
-        s.sendall(json.dumps(data).encode('utf-8'))
-        response = s.recv(4096)
-        return json.loads(response.decode('utf-8'))
 
 
 def chat_with_robodoc(user_input, chat_history, nodes_from_subgraph=None, image_captioning=None):

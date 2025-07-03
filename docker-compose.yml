@@ -7,10 +7,12 @@ services:
       POSTGRES_PASSWORD: dev_pass
       POSTGRES_DB: robotdb
     ports:
-      - "5432:5432"
+      - "5500:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/robotdb.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - robodoc-net
 
   backend:
     build:
@@ -21,15 +23,17 @@ services:
       - DATABASE_URL=postgresql://dev_user:dev_pass@db:5432/robotdb
       - APP_SCRT_KEY=dev_secret_key
       - PYTHONDONTWRITEBYTECODE=1
-      - CORS_ORIGINS=http://localhost:8080,http://localhost:5173
+      - CORS_ORIGINS=http://localhost:8080,http://localhost:5173,http://newgpu.adastruct.com:8080
     ports:
       - "5000:5000"
     depends_on:
       - db
+      - llama
     volumes:
       - ./backend:/app
       - pip_cache:/root/.cache/pip
-
+    networks:
+      - robodoc-net
 
   frontend:
     build:
@@ -40,6 +44,8 @@ services:
       - "8080:80"
     depends_on:
       - backend
+    networks:
+      - robodoc-net
 
   llama:
     build:
@@ -54,14 +60,19 @@ services:
       - ./Llama:/app
       - pip_cache:/root/.cache/pip
       - hf_cache:/root/.cache/huggingface
-    working_dir: /app                   
+    working_dir: /app
     deploy:
       resources:
         reservations:
           devices:
             - capabilities: [gpu]
+    networks:
+      - robodoc-net
 
 volumes:
   pgdata:
   pip_cache:
   hf_cache:
+
+networks:
+  robodoc-net:
