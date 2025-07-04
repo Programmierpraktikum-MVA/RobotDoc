@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <!-- Input Field -->
+    <!-- Input & Actions -->
     <div class="d-flex align-center">
       <v-text-field
         v-model="newMessage"
@@ -66,6 +66,16 @@
       <v-btn icon color="primary" class="ml-2" elevation="2" @click="sendMessage">
         <v-icon>mdi-send</v-icon>
       </v-btn>
+      <v-file-input
+        class="ml-2"
+        density="compact"
+        variant="underlined"
+        hide-details
+        accept="image/*"
+        prepend-icon="mdi-camera"
+        style="max-width: 200px;"
+        @change="e => { uploadImage(e); e.target.value = null; }"
+      />
     </div>
   </v-card>
 </template>
@@ -138,6 +148,39 @@ async function sendMessage() {
   } catch (error) {
     systemTyping.value = false
     messages.value.push({ from: 'Error', text: 'Failed to send message: ' + error.message, time: new Date() })
+  }
+}
+
+async function uploadImage(files) {
+  const file = files?.[0]
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('image', file)
+  formData.append('imgcontext', newMessage.value || '')
+
+  messages.value.push({ from: 'You', text: `[Uploaded: ${file.name}]`, time: new Date() })
+  newMessage.value = ''
+  systemTyping.value = true
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/llava/uploadImageForPatient/${props.patientId}`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    })
+
+    const data = await res.json()
+    systemTyping.value = false
+
+    if (data.reply) {
+      messages.value.push({ from: 'System', text: data.reply, time: new Date() })
+    } else {
+      messages.value.push({ from: 'System', text: 'No reply from model.', time: new Date() })
+    }
+  } catch (err) {
+    systemTyping.value = false
+    messages.value.push({ from: 'Error', text: 'Upload failed: ' + err.message, time: new Date() })
   }
 }
 </script>

@@ -2,6 +2,8 @@ from flask import jsonify, send_file, request
 from util.db_model import db, Patients, Accounts, Image, ChatMessage
 from util.exceptions import OccupiedUsernameError, InvalidUsernameError, InvalidPasswordError
 from io import BytesIO
+from modules.llava_inference import image_captioning_with_robodoc
+import os
 from modules.subgraphExtractor import symptomNER, processMessage, processWithoutKG
 
 def get_patient(patient_id):
@@ -197,3 +199,46 @@ def respond_to_message(patient_id, data):
             "reply": f"An error occurred: {str(e)}",
             "type": "error"
         }), 500
+    
+
+
+def process_uploaded_image_with_llava(patient_id, image_file, message_text):
+    try:
+        patient = db.session.get(Patients, patient_id)
+        if not patient:
+            return jsonify({'error': 'Patient not found'}), 404
+
+        if image_file.filename == '':
+            return jsonify({'error': 'Empty filename'}), 400
+
+        # Save image to disk for LLaVA
+        upload_folder = os.path.join('/app', 'modules', 'img')
+        os.makedirs(upload_folder, exist_ok=True)
+        file_path = os.path.join(upload_folder, image_file.filename)
+        image_file.save(file_path)
+
+        image_file.seek(0)  # rewind to read binary
+        image_data = image_file.read()
+        if not image_data:
+            return jsonify({'error': 'Empty image file'}), 400
+
+        new_image = Image(file=image_data, patient_id=patient_id)
+        db.session.add(new_image)
+        db.session.commit()
+
+        # Run LLaVA captioning
+        
+        caption = image_captioning_with_robodoc(image_file.filename)
+
+        # Build patient info
+        patient_info = patient.to_dict()
+
+        # Run through KG pipeline
+        
+        reply = processMessage(patient_id, patient_info, message_text, imgCaptioning=caption)
+
+        return jsonify({'reply': reply, 'type': 'message'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'reply': str(e), 'type': 'error'}), 500

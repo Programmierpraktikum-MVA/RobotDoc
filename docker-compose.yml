@@ -32,6 +32,7 @@ services:
     volumes:
       - ./backend:/app
       - pip_cache:/root/.cache/pip
+      - llava_imgs:/app/modules/img
     networks:
       - robodoc-net
 
@@ -69,10 +70,33 @@ services:
     networks:
       - robodoc-net
 
+  llava:
+    build:
+      context: ./Llava
+      dockerfile: dockerfile
+    container_name: robotdoc-llava
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "65533:65533"
+    volumes:
+      - ./Llava:/app
+      - pip_cache:/root/.cache/pip
+      - hf_cache:/root/.cache/huggingface
+      - llava_imgs:/app/img
+    working_dir: /app
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    networks:
+      - robodoc-net
 volumes:
   pgdata:
   pip_cache:
   hf_cache:
+  llava_imgs:
 
 networks:
   robodoc-net:

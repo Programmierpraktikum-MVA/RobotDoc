@@ -1,16 +1,18 @@
 from flask import Flask, request, jsonify
 from flask_login import LoginManager, login_required, current_user
 from flask_cors import CORS
+from modules.llava_inference import image_captioning_with_robodoc
 from util.db_model import db, Accounts
 from util.db_access import (
     get_patient, get_patient_amount, get_all_patients,
     update_patient_by_id, create_patient, delete_patient_by_id,
     get_image_urls_for_patient, get_image_blob, upload_image_for_patient,
-    delete_image_by_id, save_chat_message, respond_to_message
+    delete_image_by_id, save_chat_message, respond_to_message, process_uploaded_image_with_llava
 )
 from util.auth import login_route, register_route, logout
 from dotenv import load_dotenv
 import os
+import tempfile
 
 # Load environment variables
 load_dotenv()
@@ -138,3 +140,14 @@ def respond_to_message_route(patient_id):
     data = request.get_json()
     return respond_to_message(patient_id, data)
     
+
+@app.route('/api/llava/uploadImageForPatient/<int:patient_id>', methods=['POST'])
+@login_required
+def uploadHelperPatient(patient_id):
+    image_file = request.files.get('image')
+    message_text = request.form.get('imgcontext', '')
+
+    if not image_file:
+        return jsonify({'error': 'No image file provided'}), 400
+
+    return process_uploaded_image_with_llava(patient_id, image_file, message_text)
