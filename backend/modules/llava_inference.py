@@ -15,7 +15,7 @@ def load_image_from_bytes(image_data):
 def send_prompt(image_name):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect(('127.0.0.1', 65533))
+            s.connect(('robotdoc-llava', 65533))
             data = {
                 "image_file": image_name
             }

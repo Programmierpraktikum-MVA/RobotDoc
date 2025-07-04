@@ -7,7 +7,7 @@ from util.db_access import (
     get_patient, get_patient_amount, get_all_patients,
     update_patient_by_id, create_patient, delete_patient_by_id,
     get_image_urls_for_patient, get_image_blob, upload_image_for_patient,
-    delete_image_by_id, save_chat_message, respond_to_message, process_uploaded_image_with_llava
+    delete_image_by_id, save_chat_message, respond_to_message, process_uploaded_image_with_llava, get_chat_history_for_patient
 )
 from util.auth import login_route, register_route, logout
 from dotenv import load_dotenv
@@ -151,3 +151,11 @@ def uploadHelperPatient(patient_id):
         return jsonify({'error': 'No image file provided'}), 400
 
     return process_uploaded_image_with_llava(patient_id, image_file, message_text)
+
+
+
+@app.route('/api/chat_history/<int:patient_id>', methods=['GET'])
+@login_required
+def get_chat_history(patient_id):
+    history = get_chat_history_for_patient(patient_id)
+    return jsonify(history), 200
