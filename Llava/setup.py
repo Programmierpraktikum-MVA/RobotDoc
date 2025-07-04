@@ -44,59 +44,49 @@ def listen_for_prompts():
     print("Loading model into VRAM...")
     try:
         processor = AutoProcessor.from_pretrained(model_name)
-        # Load the base
         model = LlavaForConditionalGeneration.from_pretrained(
             model_name,
             torch_dtype=torch.float16,
             quantization_config=quantization_config,
-            #use_auth_token=HF_TOKEN
-        )
+        ).to("cuda" if torch.cuda.is_available() else "cpu")
         print("Model loaded successfully.")
     except Exception as e:
         print(f"Failed to load model: {str(e)}")
+        return  # Don't continue if model failed to load
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('127.0.0.1', 65533))
+        s.bind(('0.0.0.0', 65533))
         s.listen()
         print("Waiting for connections...")
-        while True:  # Keep listening for connections indefinitely
+        while True:
             conn, addr = s.accept()
             with conn:
                 print('Connected by', addr)
-                while True:  # Keep processing prompts within the connection
+                while True:
                     data = conn.recv(4096)
                     if not data:
                         break
                     try:
                         received_data = json.loads(data.decode('utf-8'))
                         image_name = received_data['image_file']
+
                         try:
                             path = os.path.join('img', image_name)
                             image = load_image(path)
-                            
-                            generated_texts = ''
-                            try:
-                                prompt = f"USER: <image>\nWhat symptoms can the person recognize?\nASSISTANT:"
-                                inputs = processor(text=prompt, images=image, return_tensors="pt").to("cuda")
 
-                                generated = model.generate(**inputs, max_new_tokens=384)
-                                generated_texts = processor.batch_decode(generated, skip_special_tokens=True)
+                            prompt = f"USER: <image>\nWhat symptoms can the person recognize?\nASSISTANT:"
+                            inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
 
-                            except Exception as e:
-                                print(f"Exception occurred during model generation: {str(e)}")
-                                model_response = "Sorry, I couldn't process your request at the moment."
-
-                            finally:
-                                del processor
-                                del model
-                                torch.cuda.empty_cache()
-                                print("Model unloaded from VRAM.")
+                            generated = model.generate(**inputs, max_new_tokens=384)
+                            generated_texts = processor.batch_decode(generated, skip_special_tokens=True)
 
                             generated_string = list_to_string(generated_texts)
                             model_response = cut_string(generated_string)
-                            #print(generated_string)
+
                         except Exception as e:
                             print(f"Error processing img: {e}")
                             model_response = "Error processing img."
+
                         response_data = {
                             "model_response": model_response
                         }
@@ -104,6 +94,7 @@ def listen_for_prompts():
                     except Exception as e:
                         print(f"Error decoding JSON: {e}")
                         conn.sendall(json.dumps({"model_response": "Error decoding JSON."}).encode('utf-8'))
+
 
 if __name__ == "__main__":
     # Start listening for prompts

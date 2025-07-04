@@ -44,8 +44,13 @@
           </div>
         </template>
         <template v-else>
-          <div>{{ msg.text }}</div>
-          <div class="text-caption mt-1" style="font-size: 0.7rem; opacity: 0.6;">{{ formatTime(msg.time) }}</div>
+          <div v-if="msg.imageUrl" class="mb-2">
+            <v-img :src="msg.imageUrl" max-width="200" max-height="200" class="mb-2 rounded" />
+          </div>
+          <div v-if="msg.text">{{ msg.text }}</div>
+          <div class="text-caption mt-1" style="font-size: 0.7rem; opacity: 0.6;">
+            {{ formatTime(msg.time) }}
+          </div>
         </template>
       </div>
     </div>
@@ -66,16 +71,16 @@
       <v-btn icon color="primary" class="ml-2" elevation="2" @click="sendMessage">
         <v-icon>mdi-send</v-icon>
       </v-btn>
-      <v-file-input
-        class="ml-2"
-        density="compact"
-        variant="underlined"
-        hide-details
-        accept="image/*"
-        prepend-icon="mdi-camera"
-        style="max-width: 200px;"
-        @change="e => { uploadImage(e); e.target.value = null; }"
-      />
+      <v-btn icon class="ml-2" @click="triggerFileInput">
+        <v-icon>mdi-camera</v-icon>
+      </v-btn>
+      <input type="file" ref="fileInput" accept="image/*" style="display: none" @change="onImageSelected" />
+    </div>
+
+    <!-- Image Preview -->
+    <div v-if="selectedImage" class="mt-2 d-flex align-center">
+      <v-img :src="imagePreviewUrl" max-height="120" max-width="120" class="mr-3 rounded" />
+      <v-btn variant="text" icon @click="cancelImage"><v-icon>mdi-close</v-icon></v-btn>
     </div>
   </v-card>
 </template>
@@ -85,26 +90,18 @@ import { ref, watch, computed, nextTick } from 'vue'
 
 const props = defineProps({ patientId: Number })
 
-const messages = ref([
-  { from: 'Doctor', text: 'How are you feeling today?', time: new Date() },
-  { from: 'You', text: 'Tired but okay.', time: new Date() }
-])
-
+const messages = ref([])
 const newMessage = ref('')
 const updateSymptoms = ref(true)
 const useKG = ref(true)
 const chatContainer = ref(null)
 const systemTyping = ref(false)
 
-function scrollToBottom() {
-  nextTick(() => {
-    if (chatContainer.value) {
-      chatContainer.value.scrollTop = chatContainer.value.scrollHeight
-    }
-  })
-}
+const selectedImage = ref(null)
+const imagePreviewUrl = ref(null)
+const fileInput = ref(null)
 
-watch(messages, scrollToBottom, { deep: true })
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
 
 const youAreTyping = computed(() => newMessage.value.trim().length > 0)
 
@@ -115,72 +112,122 @@ const displayedMessages = computed(() => {
   return result
 })
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+watch(messages, () => nextTick(() => {
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+  }
+}), { deep: true })
 
-function formatTime(date) {
-  if (!date) return ''
-  return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
+watch(() => props.patientId, (newId) => {
+  if (newId) fetchChatHistory()
+}, { immediate: true })
 
-async function sendMessage() {
-  if (!newMessage.value.trim()) return
-  const input = newMessage.value
-  messages.value.push({ from: 'You', text: input, time: new Date() })
-  newMessage.value = ''
-  systemTyping.value = true
+async function fetchChatHistory() {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/respond/${props.patientId}`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: input, updateSymptoms: updateSymptoms.value, useKG: useKG.value })
+    const res = await fetch(`${API_BASE_URL}/api/chat_history/${props.patientId}`, {
+      credentials: 'include'
     })
-    const data = await response.json()
-    systemTyping.value = false
-    if (data.reply) {
-      const replyText = data.type === 'symptoms'
-        ? 'Detected new symptoms: ' + data.reply.join(', ')
-        : data.reply
-      messages.value.push({ from: 'System', text: replyText, time: new Date() })
-    } else {
-      messages.value.push({ from: 'System', text: 'No reply from model.', time: new Date() })
-    }
-  } catch (error) {
-    systemTyping.value = false
-    messages.value.push({ from: 'Error', text: 'Failed to send message: ' + error.message, time: new Date() })
+    const history = await res.json()
+    messages.value = history.map(entry => ({
+      from: entry.role === 'user' ? 'You' : 'System',
+      text: entry.content,
+      time: entry.timestamp ? new Date(entry.timestamp) : new Date()
+    }))
+  } catch (err) {
+    console.error("Failed to fetch chat history:", err)
   }
 }
 
-async function uploadImage(files) {
-  const file = files?.[0]
+function formatTime(date) {
+  if (!(date instanceof Date) || isNaN(date)) return ''
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function onImageSelected(event) {
+  const file = event.target.files?.[0]
   if (!file) return
+  selectedImage.value = file
+  imagePreviewUrl.value = URL.createObjectURL(file)
+  event.target.value = null
+}
 
-  const formData = new FormData()
-  formData.append('image', file)
-  formData.append('imgcontext', newMessage.value || '')
+function cancelImage() {
+  selectedImage.value = null
+  if (imagePreviewUrl.value) URL.revokeObjectURL(imagePreviewUrl.value)
+  imagePreviewUrl.value = null
+}
 
-  messages.value.push({ from: 'You', text: `[Uploaded: ${file.name}]`, time: new Date() })
-  newMessage.value = ''
-  systemTyping.value = true
+async function sendMessage() {
+  if (!newMessage.value.trim() && !selectedImage.value) return
 
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/llava/uploadImageForPatient/${props.patientId}`, {
-      method: 'POST',
-      credentials: 'include',
-      body: formData
-    })
+  const input = newMessage.value.trim()
+  const timestamp = new Date()
 
-    const data = await res.json()
-    systemTyping.value = false
+  if (selectedImage.value) {
+    const file = selectedImage.value
+    const imageUrl = URL.createObjectURL(file)
 
-    if (data.reply) {
-      messages.value.push({ from: 'System', text: data.reply, time: new Date() })
-    } else {
-      messages.value.push({ from: 'System', text: 'No reply from model.', time: new Date() })
+    messages.value.push({ from: 'You', text: input, imageUrl, time: timestamp })
+
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('imgcontext', input)
+
+    newMessage.value = ''
+    selectedImage.value = null
+    imagePreviewUrl.value = null
+    systemTyping.value = true
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/llava/uploadImageForPatient/${props.patientId}`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      })
+
+      const data = await res.json()
+      systemTyping.value = false
+
+      messages.value.push({
+        from: 'System',
+        text: data.reply || 'No reply from model.',
+        time: new Date()
+      })
+    } catch (err) {
+      systemTyping.value = false
+      messages.value.push({ from: 'Error', text: 'Upload failed: ' + err.message, time: new Date() })
     }
-  } catch (err) {
-    systemTyping.value = false
-    messages.value.push({ from: 'Error', text: 'Upload failed: ' + err.message, time: new Date() })
+
+  } else {
+    messages.value.push({ from: 'You', text: input, time: timestamp })
+    newMessage.value = ''
+    systemTyping.value = true
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/respond/${props.patientId}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input, updateSymptoms: updateSymptoms.value, useKG: useKG.value })
+      })
+
+      const data = await response.json()
+      systemTyping.value = false
+
+      const replyText = data.type === 'symptoms'
+        ? 'Detected new symptoms: ' + data.reply.join(', ')
+        : data.reply || 'No reply from model.'
+
+      messages.value.push({ from: 'System', text: replyText, time: new Date() })
+
+    } catch (error) {
+      systemTyping.value = false
+      messages.value.push({ from: 'Error', text: 'Failed to send message: ' + error.message, time: new Date() })
+    }
   }
 }
 </script>

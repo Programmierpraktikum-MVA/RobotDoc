@@ -129,7 +129,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
 
 def listen_for_prompts():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('127.0.0.1', 65143))
+        s.bind(('0.0.0.0', 65143))
         s.listen()
         print("Waiting for connections...")
         while True:  # Keep listening for connections indefinitely

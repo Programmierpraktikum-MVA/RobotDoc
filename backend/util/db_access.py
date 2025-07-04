@@ -4,7 +4,7 @@ from util.exceptions import OccupiedUsernameError, InvalidUsernameError, Invalid
 from io import BytesIO
 from modules.llava_inference import image_captioning_with_robodoc
 import os
-from modules.subgraphExtractor import symptomNER, processMessage, processWithoutKG
+from modules.subgraphExtractor import processMessage, processWithoutKG, symptomNER
 
 def get_patient(patient_id):
     patient = db.session.get(Patients, patient_id)
@@ -99,20 +99,17 @@ def get_image_urls_for_patient(patient_id):
     image_urls = [f'/api/image/{img.id}' for img in images]
     return jsonify([{'url': url} for url in image_urls])
 
-
 def get_image_blob(image_id):
     image = db.session.get(Image, image_id)
     if not image:
         return jsonify({'error': 'Image not found'}), 404
 
-    # Serve binary image from memory
     return send_file(
         BytesIO(image.file),
-        mimetype='image/jpeg',  # You can make this dynamic if you store MIME types
+        mimetype='image/jpeg',
         as_attachment=False,
         download_name=f'image_{image_id}.jpg'
     )
-
 
 def upload_image_for_patient(patient_id):
     if 'image' not in request.files:
@@ -131,7 +128,6 @@ def upload_image_for_patient(patient_id):
     db.session.commit()
     return ('', 204)
 
-
 def delete_image_by_id(image_id):
     image = db.session.get(Image, image_id)
     if not image:
@@ -141,16 +137,12 @@ def delete_image_by_id(image_id):
     db.session.commit()
     return ('', 204)
 
-
 def save_chat_message(patient_id, sender, message):
     chat = ChatMessage(patient_id=patient_id, sender=sender, message=message)
     db.session.add(chat)
     db.session.commit()
     return ('', 204)
 
-
-
-###
 def respond_to_message(patient_id, data):
     try:
         patient = db.session.get(Patients, patient_id)
@@ -161,32 +153,32 @@ def respond_to_message(patient_id, data):
         update_symptoms = data.get('updateSymptoms', False)
         use_kg = data.get('useKG', True)
 
+        if message:
+            save_chat_message(patient_id, sender='user', message=message)
+
         if update_symptoms and message:
             new_symptoms = symptomNER(message)
             current_symptoms = patient.symptoms or []
 
-            # Filter out duplicates or substrings
             unique_symptoms = [
                 s for s in new_symptoms if not any(s in cs for cs in current_symptoms)
             ]
 
             if unique_symptoms:
-                # Update and save to DB
                 patient.symptoms = current_symptoms + unique_symptoms
                 db.session.commit()
-
                 return jsonify({
                     "reply": unique_symptoms,
                     "type": "symptoms"
                 }), 200
 
         patient_info = patient.to_dict()
-
-        # Route through KG or fallback
         if not use_kg:
             reply = processWithoutKG(patient_id, patient_info, message)
         else:
             reply = processMessage(patient_id, patient_info, message)
+
+        save_chat_message(patient_id, sender='robotdoc', message=reply)
 
         return jsonify({
             "reply": reply,
@@ -199,8 +191,6 @@ def respond_to_message(patient_id, data):
             "reply": f"An error occurred: {str(e)}",
             "type": "error"
         }), 500
-    
-
 
 def process_uploaded_image_with_llava(patient_id, image_file, message_text):
     try:
@@ -211,13 +201,12 @@ def process_uploaded_image_with_llava(patient_id, image_file, message_text):
         if image_file.filename == '':
             return jsonify({'error': 'Empty filename'}), 400
 
-        # Save image to disk for LLaVA
         upload_folder = os.path.join('/app', 'modules', 'img')
         os.makedirs(upload_folder, exist_ok=True)
         file_path = os.path.join(upload_folder, image_file.filename)
         image_file.save(file_path)
 
-        image_file.seek(0)  # rewind to read binary
+        image_file.seek(0)
         image_data = image_file.read()
         if not image_data:
             return jsonify({'error': 'Empty image file'}), 400
@@ -226,19 +215,33 @@ def process_uploaded_image_with_llava(patient_id, image_file, message_text):
         db.session.add(new_image)
         db.session.commit()
 
-        # Run LLaVA captioning
-        
         caption = image_captioning_with_robodoc(image_file.filename)
-
-        # Build patient info
         patient_info = patient.to_dict()
 
-        # Run through KG pipeline
+        save_chat_message(patient_id, sender='user', message=message_text)
         
         reply = processMessage(patient_id, patient_info, message_text, imgCaptioning=caption)
+
+        save_chat_message(patient_id, sender='robotdoc', message=reply)
 
         return jsonify({'reply': reply, 'type': 'message'}), 200
 
     except Exception as e:
         db.session.rollback()
         return jsonify({'reply': str(e), 'type': 'error'}), 500
+
+def get_chat_history_for_patient(patient_id):
+    messages = (
+        db.session.query(ChatMessage)
+        .filter_by(patient_id=patient_id)
+        .order_by(ChatMessage.timestamp.asc())
+        .all()
+    )
+
+    history = []
+    for msg in messages:
+        role = 'user' if msg.sender.lower() == 'user' else 'robotdoc'
+        history.append({'role': role, 'content': msg.message})
+
+    return history
+

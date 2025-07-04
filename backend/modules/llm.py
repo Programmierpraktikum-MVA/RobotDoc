@@ -17,12 +17,13 @@ class LLM:
             self.patients[patient_id] = []
         self.patients[patient_id].append(message)
 
-    def get_chat_history(self, patient_id):
-        return self.patients.get(patient_id, [])
+
+    
 
     def chat_with_robodoc(self, patient_id, patient_info, user_input, nodes_from_subgraph=None, image_captioning=None):
         patient_info_str = str(patient_info)
-        chat_history = self.get_chat_history(patient_id)
+        
+        chat_history = get_chat_history_for_patient(patient_id)
 
         try:
             model_response = chat_with_robodoc(user_input=user_input, chat_history=chat_history,
@@ -83,4 +84,17 @@ def send_prompt(user_input, chat_history, nodes_from_subgraph=None, image_captio
 
 def chat_with_robodoc(user_input, chat_history, nodes_from_subgraph=None, image_captioning=None):
     return send_prompt(user_input, chat_history, nodes_from_subgraph, image_captioning)
+
+def get_chat_history_for_patient(patient_id):
+    from util.db_model import ChatMessage  # Local import to avoid circular dependency
+    messages = ChatMessage.query.filter_by(patient_id=patient_id).order_by(ChatMessage.timestamp).all()
+    return [
+        {
+            'role': 'user' if m.sender.lower() == 'user' else 'robotdoc',
+            'content': m.message
+        }
+        for m in messages
+    ]
+
+
 
