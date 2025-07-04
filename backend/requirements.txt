@@ -3,7 +3,7 @@ Flask==3.0.0
 Flask-Login==0.6.3
 Flask-SQLAlchemy==3.0.3
 flask_cors==6.0.1
-psycopg2-binary==1.9.10
+psycopg2-binary==2.9.10
 bcrypt==4.0.1
 requests==2.32.4
 flask_caching==2.3.1
