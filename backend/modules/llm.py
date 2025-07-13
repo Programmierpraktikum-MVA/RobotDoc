@@ -8,7 +8,7 @@ class LLM:
         self.patInfo = {}
 
         self.system_message = {
-            "role": "system",
+            "role": "robotdoc",
             "content": "You are an AI assistant supporting a doctor. The user describes patient symptoms. You receive node names and node types from a knowledge graph. Limit responses to 200 characters. For suspected diseases, ask for specific details."
         }
 
@@ -35,7 +35,7 @@ class LLM:
             response = "Sorry, I couldn't process your request at the moment."
 
         self.add_message(patient_id, {"role": "user", "content": user_input})
-        self.add_message(patient_id, {"role": "model_response", "content": response})
+        self.add_message(patient_id, {"role": "robotdoc", "content": response})
         return user_input, response
     
 
@@ -52,26 +52,11 @@ def send_prompt(user_input, chat_history, nodes_from_subgraph=None, image_captio
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(5)
             s.connect(('robotdoc-llama', 65143))
             s.sendall(json.dumps(data).encode('utf-8'))
-            s.shutdown(socket.SHUT_WR)
+            response = s.recv(4096)
 
-            response = b""
-            while True:
-                try:
-                    chunk = s.recv(4096)
-                    if not chunk:
-                        break
-                    response += chunk
-                except socket.timeout:
-                    print("Timeout during recv")
-                    break
-
-        decoded = response.decode('utf-8')
-        print("?? Raw response from AI:", decoded)
-
-        return json.loads(decoded)
+            return json.loads(response.decode('utf-8'))
 
     except Exception as e:
         print(f"Exception occurred during socket communication: {str(e)}")
