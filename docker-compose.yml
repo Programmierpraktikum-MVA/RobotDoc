@@ -41,8 +41,6 @@ services:
       context: ./frontend
       dockerfile: dockerfile
     container_name: robotdoc-frontend
-    environment:
-      - VITE_BACKEND_URL=http://newgpu.adastruct.com:5000
     ports:
       - "8080:80"
     depends_on:

@@ -53,7 +53,12 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
     # Construct instruction based on chat history, nodes, and image captioning
     instruction = "Answer the users question regarding this Patient, if you cant suggest something try to understand the patients situation"
     if len(chat_history) > 0:
-        formatted_history = [f"{msg['role']}:{msg['content']}" for msg in chat_history if msg['role'] != 'system']
+        formatted_history = [
+            f"{msg['role']}:{msg['content']}"
+            for msg in chat_history
+            if msg['role'] != 'user' and msg.get("content") is not None
+        ]
+
         instruction += "\n".join(formatted_history)
     if nodes_from_subgraph:
         instruction += f"\n\nNode Info:\n{nodes_from_subgraph}"
@@ -111,7 +116,7 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
      
         # Update chat_history with user_input and model_response
         chat_history.append(f"user:{user_input}")
-        chat_history.append(f"assistant:{model_response}")
+        chat_history.append(f"robotdoc:{model_response}")
 
         print("chatHistory: ")
         print(chat_history)
@@ -143,11 +148,16 @@ def listen_for_prompts():
                     received_data = json.loads(data.decode('utf-8'))
                     print("received_data: ")
                     print(received_data)
+                    
                     user_input = received_data['user_input']
                     chat_history = received_data['chat_history']
                     nodes_from_subgraph = received_data.get('nodes_from_subgraph', None)
                     image_captioning = received_data.get('image_captioning', None)
+                    print("nodes_from_subgraph: ")
+                    print(nodes_from_subgraph)
+                
                     print("received_data: ")
+                    
                     user_question, model_response, updated_history = chat_with_robodoc(user_input, chat_history,
                                                                                        nodes_from_subgraph,
                                                                                        image_captioning)

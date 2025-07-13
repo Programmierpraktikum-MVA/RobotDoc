@@ -334,7 +334,7 @@ CREATE TABLE public.chat_messages (
     id SERIAL PRIMARY KEY,
     patient_id INTEGER NOT NULL REFERENCES public.patients(id) ON DELETE CASCADE,
     sender VARCHAR(20) NOT NULL,
-    message TEXT NOT NULL,
+    message TEXT,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
