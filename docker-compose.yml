@@ -1,0 +1,102 @@
+services:
+  db:
+    image: postgres:13
+    container_name: robotdoc-db
+    environment:
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_pass
+      POSTGRES_DB: robotdb
+    ports:
+      - "5500:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/robotdb.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - robodoc-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    container_name: robotdoc-backend
+    environment:
+      - DATABASE_URL=postgresql://dev_user:dev_pass@db:5432/robotdb
+      - APP_SCRT_KEY=dev_secret_key
+      - PYTHONDONTWRITEBYTECODE=1
+      - CORS_ORIGINS=http://localhost:8080,http://localhost:5173,http://newgpu.adastruct.com:8080
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - llama
+    volumes:
+      - ./backend:/app
+      - pip_cache:/root/.cache/pip
+      - llava_imgs:/app/modules/img
+    networks:
+      - robodoc-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
+    container_name: robotdoc-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - robodoc-net
+
+  llama:
+    build:
+      context: ./Llama
+      dockerfile: dockerfile
+    container_name: robotdoc-llama
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "65143:65143"
+    volumes:
+      - ./Llama:/app
+      - pip_cache:/root/.cache/pip
+      - hf_cache:/root/.cache/huggingface
+    working_dir: /app
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    networks:
+      - robodoc-net
+
+  llava:
+    build:
+      context: ./Llava
+      dockerfile: dockerfile
+    container_name: robotdoc-llava
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "65533:65533"
+    volumes:
+      - ./Llava:/app
+      - pip_cache:/root/.cache/pip
+      - hf_cache:/root/.cache/huggingface
+      - llava_imgs:/app/img
+    working_dir: /app
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    networks:
+      - robodoc-net
+volumes:
+  pgdata:
+  pip_cache:
+  hf_cache:
+  llava_imgs:
+
+networks:
+  robodoc-net:

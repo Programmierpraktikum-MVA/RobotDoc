@@ -1,0 +1,12 @@
+huggingface_hub
+torch==2.7.0
+matplotlib==3.10.3
+numpy==1.26.4
+pandas==2.3.0
+peft
+bitsandbytes
+trl>=0.8.3
+git+https://github.com/huggingface/transformers
+wandb>=0.12.10
+pytorch-lightning
+nltk==3.8.1
