@@ -1,24 +1,15 @@
 import os
-import io
-from io import BytesIO
 import json
 import torch
 import socket
 from transformers import AutoProcessor, BitsAndBytesConfig, LlavaForConditionalGeneration
 from PIL import Image
-from huggingface_hub import login
-
-# Load configuration data
-#config_data = json.load(open("./config.json"))
-#HF_TOKEN = config_data["HF_TOKEN"]
 
 model_name = "llava-hf/llava-1.5-7b-hf"
 save_directory = "./model"  # Specify your desired save directory
 
 # Define quantization config
-quantization_config = BitsAndBytesConfig(
-    load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16
-)
+quantization_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16)
 
 def load_image(image_file):
     image = Image.open(image_file).convert("RGB")
@@ -31,28 +22,23 @@ def list_to_string(llava_out):
 
     return ' '.join(str(item) for item in llava_out)
 
-#cut string for the relevant part:
 def cut_string(llava_out):
-  cutpoint = "ASSISTANT: "
-  start_idx = llava_out.find(cutpoint)
-  if start_idx != -1:
-    return llava_out[start_idx + len(cutpoint):]
-  else:
+    """Extract only the assistant's part of the response."""
+    cutpoint = "ASSISTANT: "
+    start_idx = llava_out.find(cutpoint)
+    if start_idx != -1:
+        return llava_out[start_idx + len(cutpoint):]
     return ""
 
 def listen_for_prompts():
     print("Loading model into VRAM...")
     try:
         processor = AutoProcessor.from_pretrained(model_name)
-        model = LlavaForConditionalGeneration.from_pretrained(
-            model_name,
-            torch_dtype=torch.float16,
-            quantization_config=quantization_config,
-        ).to("cuda" if torch.cuda.is_available() else "cpu")
+        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, quantization_config=quantization_config).to("cuda")
         print("Model loaded successfully.")
     except Exception as e:
         print(f"Failed to load model: {str(e)}")
-        return  # Don't continue if model failed to load
+        return 
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(('0.0.0.0', 65533))
@@ -97,5 +83,4 @@ def listen_for_prompts():
 
 
 if __name__ == "__main__":
-    # Start listening for prompts
     listen_for_prompts()

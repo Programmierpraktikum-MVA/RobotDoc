@@ -10,16 +10,10 @@ model = None
 tokenizer = None
 
 try:
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=model_name,
-        max_seq_length=2048,
-        dtype=torch.bfloat16,
-        load_in_4bit=True,
-    )
-
+    model, tokenizer = FastLanguageModel.from_pretrained(model_name=model_name, max_seq_length=2048, dtype=torch.bfloat16, load_in_4bit=True)
     FastLanguageModel.for_inference(model)
-
     print("Model loaded successfully.")
+
 except Exception as e:
     print(f"Failed to load model: {str(e)}")
 
@@ -35,16 +29,16 @@ def brechstange(llama_out, cutpoints):
     else:
         return llama_out
 
-#cut string for the relevant part:
 def cut_string(llama_out, user_input):
-  cutpoint = user_input
-  start_idx = llama_out.find(cutpoint)
-  if start_idx != -1:
-    return llama_out[start_idx + len(cutpoint):]
-  else:
-    return llama_out
+    """Extract the model response following the user input prompt."""
+    cutpoint = user_input
+    start_idx = llama_out.find(cutpoint)
+    if start_idx != -1:
+        return llama_out[start_idx + len(cutpoint):]
+    else:
+        return llama_out
 
-def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, image_captioning=None):
+def chat_with_robotdoc(user_input, chat_history=None, nodes_from_subgraph=None, image_captioning=None):
     global model, tokenizer
     # Initialize chat_history if None
     if chat_history is None:
@@ -105,14 +99,9 @@ def chat_with_robodoc(user_input, chat_history=None, nodes_from_subgraph=None, i
 
         # Extract only the response part (excluding prompt and instructions)
         model_response = model_response.split("### Response:")[1].strip()
-        #print("model_response2: ")
-        #print(model_response)
         cutpoints = [" You are an AI assistant", "### Instruction:", "### Input:"]
         model_response = brechstange(model_response, cutpoints)
 
-
-        
-       
      
         # Update chat_history with user_input and model_response
         chat_history.append(f"user:{user_input}")
@@ -158,9 +147,7 @@ def listen_for_prompts():
                 
                     print("received_data: ")
                     
-                    user_question, model_response, updated_history = chat_with_robodoc(user_input, chat_history,
-                                                                                       nodes_from_subgraph,
-                                                                                       image_captioning)
+                    user_question, model_response, updated_history = chat_with_robotdoc(user_input, chat_history,nodes_from_subgraph, image_captioning)
                     response_data = {
                         "user_input": user_question,
                         "model_response": model_response,

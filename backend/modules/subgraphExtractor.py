@@ -102,17 +102,17 @@ def processMessage(patient_id, patient_info, message, imgCaptioning = None):
       
 
       
-    input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, node_strings, image_captioning=imgCaptioning)
+    input, res = llm_instance.chat_with_robotdoc(patient_id, patient_info, message, node_strings, image_captioning=imgCaptioning)
     draw_graph(graph, patient_id)
     return res
       
     #Extract the content from the graph
   except Exception as e:
-        input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, nodes_from_subgraph=None, image_captioning=imgCaptioning)
+        input, res = llm_instance.chat_with_robotdoc(patient_id, patient_info, message, nodes_from_subgraph=None, image_captioning=imgCaptioning)
         return res
   
 def processWithoutKG(patient_id, patient_info, message, imgCaptioning = None):
-    input, res = llm_instance.chat_with_robodoc(patient_id, patient_info, message, nodes_from_subgraph=None, image_captioning=imgCaptioning)
+    input, res = llm_instance.chat_with_robotdoc(patient_id, patient_info, message, nodes_from_subgraph=None, image_captioning=imgCaptioning)
     return res
       
     

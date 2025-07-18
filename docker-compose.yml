@@ -2,10 +2,11 @@ services:
   db:
     image: postgres:13
     container_name: robotdoc-db
+    env_file: .env
     environment:
-      POSTGRES_USER: dev_user
-      POSTGRES_PASSWORD: dev_pass
-      POSTGRES_DB: robotdb
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     ports:
       - "5500:5432"
     volumes:
@@ -17,13 +18,13 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     container_name: robotdoc-backend
     environment:
-      - DATABASE_URL=postgresql://dev_user:dev_pass@db:5432/robotdb
-      - APP_SCRT_KEY=dev_secret_key
+      - DATABASE_URL
+      - APP_SCRT_KEY
       - PYTHONDONTWRITEBYTECODE=1
-      - CORS_ORIGINS=http://localhost:8080,http://localhost:5173,http://newgpu.adastruct.com:8080
+      - CORS_ORIGINS
     ports:
       - "5000:5000"
     depends_on:
@@ -39,8 +40,13 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
     container_name: robotdoc-frontend
+    env_file: .env
+    environment:
+      - VITE_BACKEND_URL=${VITE_BACKEND_URL}
     ports:
       - "8080:80"
     depends_on:
@@ -50,15 +56,15 @@ services:
 
   llama:
     build:
-      context: ./Llama
-      dockerfile: dockerfile
+      context: ./llama
+      dockerfile: Dockerfile
     container_name: robotdoc-llama
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
     ports:
       - "65143:65143"
     volumes:
-      - ./Llama:/app
+      - ./llama:/app
       - pip_cache:/root/.cache/pip
       - hf_cache:/root/.cache/huggingface
     working_dir: /app
@@ -72,15 +78,15 @@ services:
 
   llava:
     build:
-      context: ./Llava
-      dockerfile: dockerfile
+      context: ./llava
+      dockerfile: Dockerfile
     container_name: robotdoc-llava
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
     ports:
       - "65533:65533"
     volumes:
-      - ./Llava:/app
+      - ./llava:/app
       - pip_cache:/root/.cache/pip
       - hf_cache:/root/.cache/huggingface
       - llava_imgs:/app/img

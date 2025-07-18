@@ -1,5 +1,5 @@
 from flask import request, jsonify, session
-from flask_login import login_user
+from flask_login import login_user, logout_user
 from util.db_model import db, Accounts
 from util.exceptions import InvalidUsernameError, InvalidPasswordError
 import bcrypt as bcr
@@ -17,7 +17,10 @@ def validate_password(password):
     return
 
 def login_route():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({'error': 'Invalid JSON body'}), 400
+
     username = data.get('username', '')
     password = data.get('password', '').encode('UTF-8')
 
@@ -34,7 +37,10 @@ def login_route():
 
 
 def register_route():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({'error': 'Invalid JSON body'}), 400
+
     username = str(data.get('username', '')).strip()
     password = data.get('password', '')
 
@@ -62,6 +68,6 @@ def register_route():
     return jsonify({'message': 'User registered successfully'}), 201
 
 
-def logout():
-    session.clear()
+def logout_route():
+    logout_user()
     return jsonify({'message': 'Logged out'}), 200

@@ -2,20 +2,19 @@
 FROM python:3.10-slim as base
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
     libpq-dev \
     gcc \
-    musl-dev \
     git \
     curl \
     build-essential \
  && ln -s /usr/bin/python3 /usr/bin/python \
  && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /
+WORKDIR /app
 
-# Copy only the requirements
+# Copy only the requirements file to leverage cache
 COPY requirements.txt .
 
 # Upgrade pip and install dependencies

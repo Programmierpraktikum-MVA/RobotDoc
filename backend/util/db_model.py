@@ -28,7 +28,6 @@ class ChatMessage(db.Model):
 
 class Patients(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    #id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     age = db.Column(db.Integer)
     weight = db.Column(db.Float)

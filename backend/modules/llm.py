@@ -20,13 +20,13 @@ class LLM:
 
     
 
-    def chat_with_robodoc(self, patient_id, patient_info, user_input, nodes_from_subgraph=None, image_captioning=None):
+    def chat_with_robotdoc(self, patient_id, patient_info, user_input, nodes_from_subgraph=None, image_captioning=None):
         patient_info_str = str(patient_info)
         
         chat_history = get_chat_history_for_patient(patient_id)
-
+        
         try:
-            model_response = chat_with_robodoc(user_input=user_input, chat_history=chat_history,
+            model_response = query_llm_model(user_input=user_input, chat_history=chat_history,
                                                          nodes_from_subgraph=nodes_from_subgraph,
                                                          image_captioning=image_captioning)
             response = model_response["model_response"]
@@ -67,7 +67,7 @@ def send_prompt(user_input, chat_history, nodes_from_subgraph=None, image_captio
         }
 
 
-def chat_with_robodoc(user_input, chat_history, nodes_from_subgraph=None, image_captioning=None):
+def query_llm_model(user_input, chat_history, nodes_from_subgraph=None, image_captioning=None):
     return send_prompt(user_input, chat_history, nodes_from_subgraph, image_captioning)
 
 def get_chat_history_for_patient(patient_id):
