@@ -15,7 +15,11 @@
    git checkout main
    ```
 
-2. Anwendung starten
+3. Anwendung starten
+
+	Create the .env file using the .env.template
+
+3. Anwendung starten
 
 	```bash
  	 chmod +x start-dev.sh
