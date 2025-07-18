@@ -1,0 +1,13 @@
+# syntax=docker/dockerfile:1.4
+FROM robotdoc-llava-base
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+
+EXPOSE 65533
+
+
+#CMD ["sh", "-c", "tail -f /dev/null"]
+CMD ["sh", "-c", "python setup.py || tail -f /dev/null"]

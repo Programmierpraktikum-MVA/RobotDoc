@@ -1,0 +1,14 @@
+# syntax=docker/dockerfile:1.4
+FROM robotdoc-backend-base as base
+
+# Set working directory
+WORKDIR /app
+
+# Copy the application code
+
+
+# Expose Flask port
+EXPOSE 5000
+
+# Run Flask
+CMD ["sh", "-c", "flask --app app.py run -h 0.0.0.0 || tail -f /dev/null"]

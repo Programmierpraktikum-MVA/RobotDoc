@@ -1,0 +1,4 @@
+bitsandbytes
+xformers
+unsloth_zoo==2025.6.6
+git+https://github.com/unslothai/unsloth.git
