@@ -1,0 +1,12 @@
+huggingface_hub==0.33.4
+torch==2.7.0
+matplotlib==3.10.3
+numpy==1.26.4
+pandas==2.3.0
+peft==0.16.0
+bitsandbytes==0.46.1
+trl>=0.8.3
+transformers==4.53.2
+wandb>=0.12.10
+pytorch-lightning==2.5.2
+nltk==3.8.1
