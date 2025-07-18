@@ -1,10 +1,14 @@
-from flask import jsonify, send_file, request
+import os
+from io import BytesIO
+
+from flask import jsonify, request, send_file
+
 from util.db_model import db, Patients, Accounts, Image, ChatMessage
 from util.exceptions import OccupiedUsernameError, InvalidUsernameError, InvalidPasswordError
-from io import BytesIO
 from modules.llava_inference import image_captioning_with_robodoc
-import os
 from modules.subgraphExtractor import processMessage, processWithoutKG, symptomNER
+from werkzeug.utils import secure_filename
+
 
 def get_patient(patient_id):
     patient = db.session.get(Patients, patient_id)
@@ -204,7 +208,8 @@ def process_uploaded_image_with_llava(patient_id, image_file, message_text):
         upload_folder = os.path.join('/app', 'modules', 'img')
         os.makedirs(upload_folder, exist_ok=True)
         file_path = os.path.join(upload_folder, image_file.filename)
-        image_file.save(file_path)
+        filename = secure_filename(image_file.filename)
+        file_path = os.path.join(upload_folder, filename)
 
         image_file.seek(0)
         image_data = image_file.read()

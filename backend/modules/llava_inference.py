@@ -2,7 +2,6 @@ import socket
 import json
 from PIL import Image
 import io
-from io import BytesIO
 
 def load_image_from_bytes(image_data):
     try:
