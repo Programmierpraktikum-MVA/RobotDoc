@@ -1,4 +1,0 @@
-bitsandbytes==0.46.1
-xformers==0.0.30
-unsloth_zoo==2025.7.7
-unsloth==2025.7.5
