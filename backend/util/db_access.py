@@ -7,8 +7,6 @@ from util.db_model import db, Patients, Accounts, Image, ChatMessage
 from util.exceptions import OccupiedUsernameError, InvalidUsernameError, InvalidPasswordError
 from modules.llava_inference import image_captioning_with_robodoc
 from modules.subgraphExtractor import processMessage, processWithoutKG, symptomNER
-from werkzeug.utils import secure_filename
-
 
 def get_patient(patient_id):
     patient = db.session.get(Patients, patient_id)
@@ -208,8 +206,7 @@ def process_uploaded_image_with_llava(patient_id, image_file, message_text):
         upload_folder = os.path.join('/app', 'modules', 'img')
         os.makedirs(upload_folder, exist_ok=True)
         file_path = os.path.join(upload_folder, image_file.filename)
-        filename = secure_filename(image_file.filename)
-        file_path = os.path.join(upload_folder, filename)
+        image_file.save(file_path)
 
         image_file.seek(0)
         image_data = image_file.read()
