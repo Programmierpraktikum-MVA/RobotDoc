@@ -7,6 +7,7 @@ from util.db_model import db, Patients, Accounts, Image, ChatMessage
 from util.exceptions import OccupiedUsernameError, InvalidUsernameError, InvalidPasswordError
 from modules.llava_inference import image_captioning_with_robodoc
 from modules.subgraphExtractor import processMessage, processWithoutKG, symptomNER
+from modules.MedicalAnalysis.emergency_detection import analyze_medical_urgency
 
 def get_patient(patient_id):
     patient = db.session.get(Patients, patient_id)
@@ -157,6 +158,20 @@ def respond_to_message(patient_id, data):
 
         if message:
             save_chat_message(patient_id, sender='user', message=message)
+
+        if message:
+            emergency_analysis = analyze_medical_urgency(message)
+            if emergency_analysis.get('is_emergency'):
+                # Notfall erkannt, sofortige Antwort
+                return jsonify({
+                    "reply": emergency_analysis["response"],
+                    "type": "emergency",
+                    "priority": emergency_analysis["priority"],
+                    "symptoms": emergency_analysis["symptoms"],
+                    "recommendations": emergency_analysis["recommendations"],
+                    "urgency_score": emergency_analysis["urgency_score"]
+                }), 200
+
 
         if update_symptoms and message:
             new_symptoms = symptomNER(message)

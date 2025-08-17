@@ -42,7 +42,17 @@ def symptomNER(text):
 
 # Extract the knowledge from the input and create subgraph
 def extract_knowledge(patient_id, input):
-    subgraph = subgraph_builder.SubgraphBuilder(os.path.join('util', 'datasets', 'prime_kg_nx_63960.pickle'), os.path.join('util', 'datasets', 'prime_kg_embeddings_tensor_63960.pt'), meta_relations_dict, embedding.create_embedding, None, None)
+    # Use the correct knowledge graph files that exist
+    kg_path = os.path.join('util', 'knowledgegraph_embeddings', 'final_kg_with_embeddings_and_index_and_name.pkl')
+    emb_path = os.path.join('util', 'knowledgegraph_embeddings', 'final_kg_embeddings_tensor.pt')
+    
+    subgraph = subgraph_builder.SubgraphBuilder(
+        kg_name_or_path=kg_path,
+        kg_embeddings_path=emb_path,
+        meta_relation_types_dict=meta_relations_dict,
+        embedding_method=embedding.create_embedding
+    )
+    
     graph_filename = os.path.join('util', 'datasets', f'graph_{patient_id}.p')
     if os.path.exists(graph_filename):
       with open(graph_filename, 'rb') as f:
@@ -116,3 +126,48 @@ def processWithoutKG(patient_id, patient_info, message, imgCaptioning = None):
     return res
       
     
+def build_structured_context(graph):
+    """
+    Build structured context from a NetworkX graph for LLM processing.
+    
+    Args:
+        graph: NetworkX graph object
+        
+    Returns:
+        list: Structured context strings for LLM
+    """
+    context_strings = []
+    
+    if not graph or len(graph.nodes()) == 0:
+        return context_strings
+    
+    # Extract node information
+    for node, data in graph.nodes(data=True):
+        name = data.get('name', str(node))
+        node_type = data.get('type', 'unknown')
+        
+        # Create structured context string
+        context_string = f"Entity: {name} (Type: {node_type})"
+        
+        # Add additional information if available
+        if 'raw_data' in data:
+            raw_data = data['raw_data']
+            if isinstance(raw_data, str) and len(raw_data) > 0:
+                # Truncate long descriptions
+                if len(raw_data) > 200:
+                    raw_data = raw_data[:200] + "..."
+                context_string += f" - {raw_data}"
+        
+        context_strings.append(context_string)
+    
+    # Extract edge information (relationships)
+    for source, target, data in graph.edges(data=True):
+        relation = data.get('relation', 'related_to')
+        source_name = graph.nodes[source].get('name', str(source))
+        target_name = graph.nodes[target].get('name', str(target))
+        
+        relationship_string = f"Relationship: {source_name} --[{relation}]--> {target_name}"
+        context_strings.append(relationship_string)
+    
+    return context_strings
+      
