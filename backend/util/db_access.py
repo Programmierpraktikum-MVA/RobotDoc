@@ -172,7 +172,8 @@ def respond_to_message(patient_id, data):
                     "urgency_score": emergency_analysis["urgency_score"]
                 }), 200
 
-
+        #If an image is available, we should still update the symptoms with a caption. The problem is that images are only analyzed when they are uploaded and are not already available in the gallery (I assume).
+        
         if update_symptoms and message:
             new_symptoms = symptomNER(message)
             current_symptoms = patient.symptoms or []

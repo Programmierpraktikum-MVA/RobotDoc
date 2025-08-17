@@ -95,9 +95,13 @@ def processMessage(patient_id, patient_info, message, imgCaptioning = None):
   
     # Extract the knowledge from the input and create subgraph
   try:
-
+    
+    #Combine the image caption and message to the input if imageCaptioning exists:
+    input_text = message
+    if imgCaptioning:
+        input_text = message + " " + imgCaptioning
       
-    subgraph = extract_knowledge(patient_id, message)
+    subgraph = extract_knowledge(patient_id, input_text)
      # Load the graph object
     graph_filename = os.path.join('util', 'datasets', f'graph_{patient_id}.p')
 
